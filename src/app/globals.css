@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #05060a;
+  --bg-muted: #0b1020;
+  --fg: #eaeaf0;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(1200px circle at 20% 10%, rgba(139, 92, 246, 0.22), transparent 55%),
+    radial-gradient(1000px circle at 80% 20%, rgba(59, 130, 246, 0.18), transparent 55%),
+    linear-gradient(180deg, var(--bg) 0%, #03040a 100%);
+  color: var(--fg);
+}
+
+/* Smooth typography defaults */
+@layer base {
+  * {
+    @apply border-white/10;
+  }
+
+  a {
+    @apply text-white/90 hover:text-white;
+  }
+}
+
+@layer utilities {
+  .bg-animated-gradient {
+    background-size: 200% 200%;
+    animation: gradient-x 12s ease infinite;
+  }
+
+  .container-px {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+}
