@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 const siteUrl = "https://go7studio.com";
 
@@ -14,19 +11,22 @@ export const metadata: Metadata = {
     default: "Go7Studio",
     template: "%s | Go7Studio",
   },
-  description: "[Default site description goes here]",
+  description:
+    "Go7Studio crafts fun-first mobile and Roblox games with satisfying progression, juicy polish, and replayable worlds.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: siteUrl,
     title: "Go7Studio",
-    description: "[Default site description goes here]",
+    description:
+      "Go7Studio crafts fun-first mobile and Roblox games with satisfying progression, juicy polish, and replayable worlds.",
     siteName: "Go7Studio",
   },
   twitter: {
     card: "summary_large_image",
     title: "Go7Studio",
-    description: "[Default site description goes here]",
+    description:
+      "Go7Studio crafts fun-first mobile and Roblox games with satisfying progression, juicy polish, and replayable worlds.",
   },
 };
 
@@ -35,11 +35,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${inter.variable} min-h-screen bg-bg text-white antialiased`}
-      >
+      <body className="min-h-screen bg-ink-950 text-white antialiased">
         <Header />
-        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+        <main className="min-h-[calc(100vh-72px)]">{children}</main>
         <Footer />
       </body>
     </html>
