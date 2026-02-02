@@ -29,7 +29,7 @@ export function GameCard({ game }: { game: Game }) {
           </div>
 
           <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/70 ring-1 ring-white/10">
-            {game.status === "released" ? "Released" : "Coming Soon"}
+            {game.status === "released" ? "LIVE" : "Coming Soon"}
           </span>
         </div>
 

@@ -51,8 +51,8 @@ export default function GameDetailPage({ params }: PageProps) {
 
       <header className="glass-card relative overflow-hidden p-8 sm:p-10">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-brand-purple/20 blur-3xl" />
-          <div className="absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-brand-blue/20 blur-3xl" />
+          <div className="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-brand-teal/20 blur-3xl" />
+          <div className="absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-brand-sky/20 blur-3xl" />
         </div>
 
         <div className="relative max-w-3xl">

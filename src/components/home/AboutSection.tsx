@@ -7,58 +7,49 @@ export function AboutSection() {
       <div className="glass-card grid gap-10 p-8 sm:p-10 lg:grid-cols-2 lg:items-center">
         <div>
           <p className="inline-flex items-center gap-2 text-sm font-medium text-white/75">
-            <Sparkles className="h-4 w-4 text-brand-purple" />
+            <Sparkles className="h-4 w-4 text-brand-teal" />
             About Go7Studio
           </p>
           <h2 className="mt-3 text-2xl font-semibold text-white sm:text-3xl">
-            A small, scrappy studio with a big love for games that feel alive.
+            Small studio. High polish. Built for momentum.
           </h2>
 
           <div className="mt-4 space-y-4 text-sm leading-7 text-white/75 sm:text-base">
             <p>
-              Go7Studio is a small, scrappy studio with a big love for games that
-              feel <em>alive</em>. We obsess over the little things—snappy
-              feedback, juicy animations, rewarding progression—because the best
-              games don’t just look good… they <em>feel</em> good.
+              Go7Studio is a small, hands-on team building games and apps with an obsessive focus on usability, performance, and feel. We also partner with creators and teams who need product design and development support—from prototypes to production.
             </p>
             <p>
-              From mobile tycoon strategy to Roblox experiences built for chaos
-              with friends, we design every project around one idea: <b>fun
-              first</b>. That means easy-to-learn mechanics, smart difficulty
-              curves, and a steady stream of goals that keep players saying,
-              “Okay, last run… for real.”
+              Whether it&apos;s a mobile tycoon strategy, a Roblox experience built for chaos with friends, or a handy utility app, we design every project around the same principles: clear UX, satisfying feedback, and shipping real value.
             </p>
             <p>
-              We’re constantly experimenting, polishing, and shipping. If you’re
-              here, you’re early—and we can’t wait to build the next hit with
-              you.
+              We&apos;re constantly experimenting, polishing, and shipping. If you&apos;re here, you&apos;re early—and we&apos;re excited to build what&apos;s next.
             </p>
           </div>
 
           <div className="mt-8">
             <Link href="/games" className="btn-secondary inline-flex">
-              Explore the games
+              See projects
             </Link>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
-            <p className="text-sm font-medium text-white">Fun First</p>
+            <p className="text-sm font-medium text-white">Fun + UX First</p>
             <p className="mt-1 text-sm text-white/70">
-              If it isn’t fun in 30 seconds, we rework it.
+              Delightful experiences that still respect the user.
             </p>
           </div>
           <div className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
             <p className="text-sm font-medium text-white">Polish Matters</p>
             <p className="mt-1 text-sm text-white/70">
-              Feedback, motion, and sound should feel juicy and rewarding.
+              Motion, feedback, and clarity make the difference.
             </p>
           </div>
           <div className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
-            <p className="text-sm font-medium text-white">Ship & Improve</p>
+            <p className="text-sm font-medium text-white">Ship, Learn, Improve</p>
             <p className="mt-1 text-sm text-white/70">
-              Launch, learn, iterate—then make it even better.
+              Launch early, iterate fast, and improve continuously.
             </p>
           </div>
         </div>

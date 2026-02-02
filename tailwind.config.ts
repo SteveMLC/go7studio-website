@@ -11,32 +11,32 @@ export default {
     extend: {
       colors: {
         ink: {
-          950: "#060612",
-          900: "#0B0B1A",
-          800: "#11122A",
-          700: "#1B1D3A",
+          950: "#070B12",
+          900: "#0B1220",
+          800: "#0F1A2E",
+          700: "#172443",
         },
         text: {
-          primary: "#F5F7FF",
-          secondary: "#B9BCE3",
-          muted: "#8B8FBF",
-          link: "#9AA7FF",
+          primary: "#F2F7FF",
+          secondary: "#B7C3D6",
+          muted: "#7E8CA8",
+          link: "#38BDF8",
         },
         brand: {
-          purple: "#8B5CF6",
-          blue: "#3B82F6",
+          teal: "#2DD4BF",
+          sky: "#38BDF8",
           cyan: "#22D3EE",
-          pink: "#EC4899",
+          lime: "#A3E635",
         },
         state: {
           success: "#22C55E",
           warning: "#F59E0B",
           danger: "#EF4444",
         },
-        focusRing: "rgba(59,130,246,0.45)",
+        focusRing: "rgba(45,212,191,0.45)",
         // Back-compat aliases used in existing components
-        primary: "#8B5CF6",
-        accent: "#3B82F6",
+        primary: "#2DD4BF",
+        accent: "#38BDF8",
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui"],
@@ -66,7 +66,7 @@ export default {
         shimmer: "shimmer 1.25s cubic-bezier(0.22, 1, 0.36, 1) infinite",
       },
       boxShadow: {
-        glow: "0 12px 30px rgba(139,92,246,0.18)",
+        glow: "0 12px 30px rgba(45,212,191,0.18)",
       },
     },
   },
@@ -86,21 +86,21 @@ export default {
           borderRadius: "14px",
           padding: "14px 18px",
           fontWeight: "600",
-          color: "#0B0B1A",
+          color: "#0B1220",
           backgroundImage:
-            "linear-gradient(90deg, #8B5CF6 0%, #3B82F6 50%, #22D3EE 100%)",
-          boxShadow: "0 12px 30px rgba(139,92,246,0.18)",
+            "linear-gradient(90deg, #2DD4BF 0%, #38BDF8 100%)",
+          boxShadow: "0 12px 30px rgba(45,212,191,0.18)",
           transition: "transform 180ms, filter 180ms, box-shadow 180ms",
         },
         ".btn-primary:hover": {
           transform: "translateY(-1px)",
           filter: "saturate(1.1)",
           boxShadow:
-            "0 12px 30px rgba(139,92,246,0.20), 0 0 0 1px rgba(59,130,246,0.20)",
+            "0 12px 30px rgba(45,212,191,0.20), 0 0 0 1px rgba(56,189,248,0.20)",
         },
         ".btn-primary:active": {
           transform: "translateY(0)",
-          boxShadow: "0 10px 26px rgba(139,92,246,0.16)",
+          boxShadow: "0 10px 26px rgba(45,212,191,0.16)",
         },
         ".btn-secondary": {
           borderRadius: "14px",
