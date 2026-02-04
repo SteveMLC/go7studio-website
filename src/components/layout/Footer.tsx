@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Github, Twitter, Youtube } from "lucide-react";
 
 export function Footer() {
@@ -6,7 +7,16 @@ export function Footer() {
     <footer className="border-t border-white/10 bg-[#050510]">
       <div className="container-px grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-3 lg:col-span-2">
-          <p className="font-display text-sm font-semibold text-white">Go7Studio</p>
+          <div className="flex items-center gap-2">
+            <Image
+              src="/images/branding/go7studio-logo-square.png"
+              alt="Go7Studio Logo"
+              width={28}
+              height={28}
+              className="rounded-lg"
+            />
+            <p className="font-display text-sm font-semibold text-white">Go7Studio</p>
+          </div>
           <p className="max-w-md text-sm leading-6 text-white/70">
             We build fun-first games with satisfying progression, delightful
             polish, and replayable worlds that players love to return to.
@@ -67,21 +77,27 @@ export function Footer() {
             <div className="mt-3 flex items-center gap-3">
               <a
                 className="grid h-9 w-9 place-items-center rounded-xl bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
-                href="#"
+                href="https://x.com/Steve_mlc"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="X / Twitter"
               >
                 <Twitter className="h-4 w-4 text-white/80" />
               </a>
               <a
                 className="grid h-9 w-9 place-items-center rounded-xl bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
-                href="#"
+                href="https://www.youtube.com/@Go7Studio"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="YouTube"
               >
                 <Youtube className="h-4 w-4 text-white/80" />
               </a>
               <a
                 className="grid h-9 w-9 place-items-center rounded-xl bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
-                href="#"
+                href="https://github.com/SteveMLC"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="GitHub"
               >
                 <Github className="h-4 w-4 text-white/80" />

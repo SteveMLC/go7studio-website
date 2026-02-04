@@ -13,12 +13,12 @@ export function HeroSection() {
           className="absolute inset-0 opacity-25 bg-animated-gradient"
           style={{
             backgroundImage:
-              "linear-gradient(90deg, #2DD4BF 0%, #38BDF8 100%)",
+              "linear-gradient(90deg, #E879F9 0%, #FB923C 50%, #3B82F6 100%)",
           }}
         />
-        <div className="absolute left-1/2 top-[-240px] h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-brand-teal/20 blur-3xl" />
-        <div className="absolute left-[10%] top-[30%] h-[420px] w-[420px] rounded-full bg-brand-sky/18 blur-3xl" />
-        <div className="absolute right-[5%] top-[45%] h-[460px] w-[460px] rounded-full bg-brand-cyan/15 blur-3xl" />
+        <div className="absolute left-1/2 top-[-240px] h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-brand-pink/20 blur-3xl" />
+        <div className="absolute left-[10%] top-[30%] h-[420px] w-[420px] rounded-full bg-brand-orange/18 blur-3xl" />
+        <div className="absolute right-[5%] top-[45%] h-[460px] w-[460px] rounded-full bg-brand-blue/15 blur-3xl" />
       </div>
 
       <div className="container-px py-20 sm:py-28">
@@ -29,7 +29,7 @@ export function HeroSection() {
           className="mx-auto max-w-3xl text-center"
         >
           <p className="mx-auto inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-xs text-white/75 ring-1 ring-white/10">
-            <Gamepad2 className="h-4 w-4 text-brand-sky" />
+            <Gamepad2 className="h-4 w-4 text-brand-orange" />
             Games • Apps • Design/Dev Services
           </p>
 

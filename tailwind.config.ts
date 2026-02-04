@@ -23,6 +23,10 @@ export default {
           link: "#38BDF8",
         },
         brand: {
+          pink: "#E879F9",
+          orange: "#FB923C",
+          blue: "#3B82F6",
+          // Legacy colors (keep for backwards compatibility)
           teal: "#2DD4BF",
           sky: "#38BDF8",
           cyan: "#22D3EE",
@@ -88,19 +92,19 @@ export default {
           fontWeight: "600",
           color: "#0B1220",
           backgroundImage:
-            "linear-gradient(90deg, #2DD4BF 0%, #38BDF8 100%)",
-          boxShadow: "0 12px 30px rgba(45,212,191,0.18)",
+            "linear-gradient(90deg, #E879F9 0%, #FB923C 50%, #3B82F6 100%)",
+          boxShadow: "0 12px 30px rgba(251,146,60,0.18)",
           transition: "transform 180ms, filter 180ms, box-shadow 180ms",
         },
         ".btn-primary:hover": {
           transform: "translateY(-1px)",
           filter: "saturate(1.1)",
           boxShadow:
-            "0 12px 30px rgba(45,212,191,0.20), 0 0 0 1px rgba(56,189,248,0.20)",
+            "0 12px 30px rgba(251,146,60,0.20), 0 0 0 1px rgba(232,121,249,0.20)",
         },
         ".btn-primary:active": {
           transform: "translateY(0)",
-          boxShadow: "0 10px 26px rgba(45,212,191,0.16)",
+          boxShadow: "0 10px 26px rgba(251,146,60,0.16)",
         },
         ".btn-secondary": {
           borderRadius: "14px",

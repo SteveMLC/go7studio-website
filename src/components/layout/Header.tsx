@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -15,9 +15,13 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-ink-950/55 backdrop-blur-xl">
       <div className="container-px flex h-[72px] items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/5 ring-1 ring-white/10">
-            <Sparkles className="h-5 w-5 text-brand-purple" />
-          </span>
+          <Image
+            src="/images/branding/go7studio-logo-square.png"
+            alt="Go7Studio Logo"
+            width={36}
+            height={36}
+            className="rounded-lg"
+          />
           <span className="font-display text-sm font-semibold tracking-wide text-white">
             Go7Studio
           </span>
