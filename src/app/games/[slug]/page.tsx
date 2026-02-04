@@ -3,10 +3,33 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { GAMES, getGameBySlug } from "@/lib/games";
+import { GameStructuredData } from "@/components/seo/GameStructuredData";
 
 type PageProps = {
   params: { slug: string };
 };
+
+// Lightweight YouTube embed component
+function YouTubeEmbed({ url }: { url: string }) {
+  const videoId = url.match(/youtu\.be\/([^?]+)|youtube\.com\/watch\?v=([^&]+)/)?.[1] || 
+                  url.match(/youtu\.be\/([^?]+)|youtube\.com\/watch\?v=([^&]+)/)?.[2];
+  
+  if (!videoId) return null;
+
+  return (
+    <div className="relative w-full overflow-hidden rounded-lg" style={{ paddingBottom: "56.25%" }}>
+      <iframe
+        src={`https://www.youtube.com/embed/${videoId}`}
+        title="Game Trailer"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        loading="lazy"
+        className="absolute inset-0 h-full w-full"
+        style={{ border: 0 }}
+      />
+    </div>
+  );
+}
 
 export function generateStaticParams() {
   return GAMES.map((g) => ({ slug: g.slug }));
@@ -16,15 +39,53 @@ export function generateMetadata({ params }: PageProps): Metadata {
   const game = getGameBySlug(params.slug);
   if (!game) return {};
 
+  const baseUrl = "https://go7studio.com";
+  const fullUrl = `${baseUrl}/games/${game.slug}`;
+  const fullDescription = `${game.tagline} ${game.description}`;
+  const ogImageUrl = game.ogImage ? `${baseUrl}${game.ogImage}` : `${baseUrl}/og-default.png`;
+  
+  // Extract YouTube video ID for embed URL
+  const videoId = game.trailerUrl?.match(/youtu\.be\/([^?]+)|youtube\.com\/watch\?v=([^&]+)/)?.[1] || 
+                  game.trailerUrl?.match(/youtu\.be\/([^?]+)|youtube\.com\/watch\?v=([^&]+)/)?.[2];
+  const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : undefined;
+
   return {
     title: game.title,
-    description: `${game.tagline} ${game.description}`,
+    description: fullDescription,
+    keywords: game.keywords,
     alternates: { canonical: `/games/${game.slug}` },
     openGraph: {
       title: game.title,
-      description: `${game.tagline} ${game.description}`,
-      url: `/games/${game.slug}`,
-      type: "article",
+      description: fullDescription,
+      url: fullUrl,
+      type: "website",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: game.title,
+        },
+      ],
+      videos: embedUrl ? [
+        {
+          url: embedUrl,
+          width: 1280,
+          height: 720,
+        },
+      ] : undefined,
+    },
+    twitter: {
+      card: embedUrl ? "player" : "summary_large_image",
+      title: game.title,
+      description: fullDescription,
+      images: [ogImageUrl],
+      players: embedUrl ? {
+        playerUrl: embedUrl,
+        streamUrl: embedUrl,
+        width: 1280,
+        height: 720,
+      } : undefined,
     },
   };
 }
@@ -34,7 +95,9 @@ export default function GameDetailPage({ params }: PageProps) {
   if (!game) notFound();
 
   return (
-    <div className="container-px py-14 sm:py-20">
+    <>
+      <GameStructuredData game={game} />
+      <div className="container-px py-14 sm:py-20">
       <div className="mb-8 flex items-center justify-between gap-4">
         <Link
           href="/games"
@@ -90,6 +153,15 @@ export default function GameDetailPage({ params }: PageProps) {
         </div>
       </header>
 
+      {game.trailerUrl && (
+        <section className="mt-10">
+          <div className="glass-card p-6">
+            <h2 className="mb-4 text-lg font-semibold text-white">Watch Trailer</h2>
+            <YouTubeEmbed url={game.trailerUrl} />
+          </div>
+        </section>
+      )}
+
       <section className="mt-10 grid gap-6 lg:grid-cols-3">
         <div className="glass-card p-6 lg:col-span-2">
           <h2 className="text-lg font-semibold text-white">Features</h2>
@@ -118,6 +190,7 @@ export default function GameDetailPage({ params }: PageProps) {
           </dl>
         </aside>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

@@ -14,13 +14,16 @@ export type Game = {
   primaryCtaHref: string;
   secondaryCtaLabel?: string;
   secondaryCtaHref?: string;
+  trailerUrl?: string;
+  ogImage?: string;
+  keywords?: string[];
 };
 
 export const GAMES: Game[] = [
   {
     slug: "empire-tycoon",
-    title: "Empire Tycoon",
-    tagline: "From tiny shop to unstoppable empire.",
+    title: "Empire Tycoon - Idle Business",
+    tagline: "Build your business empire! Idle tycoon with real estate & smart investing.",
     description:
       "Build businesses, automate income, and scale from your first shop to a booming empire.",
     longDescription:
@@ -31,7 +34,7 @@ export const GAMES: Game[] = [
       "Hire managers to automate and optimize your income",
       "Unlock new zones and scale your empire across the map",
       "Satisfying progression with clear goals and juicy rewards",
-      "Offline earnings so your empire keeps working while you’re away",
+      "Offline earnings so your empire keeps working while you're away",
     ],
     status: "released",
     platforms: ["android"],
@@ -39,19 +42,22 @@ export const GAMES: Game[] = [
     primaryCtaHref: "https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon",
     secondaryCtaLabel: "Meet the Studio",
     secondaryCtaHref: "/#about",
+    trailerUrl: "https://youtu.be/fTPL9IJ-BpI",
+    ogImage: "/images/games/empire-tycoon/og-image.jpg",
+    keywords: ["idle game", "tycoon", "business simulator", "investment game", "real estate", "offline earnings", "android game"],
   },
   {
     slug: "slimeslip",
-    title: "SlimeSlip: Don’t Die!",
-    tagline: "Slip fast. Dodge everything. Don’t die.",
+    title: "SlimeSlip: Don't Die!",
+    tagline: "Slip fast. Dodge everything. Don't die.",
     description:
-      "A high-speed Roblox obstacle experience built for chaos with friends—slick movement, wild hazards, and clutch wins.",
+      "A high-speed Roblox obstacle experience built for chaos with friends-slick movement, wild hazards, and clutch wins.",
     longDescription:
-      "Welcome to SlimeSlip: Don’t Die!—a high-speed Roblox obstacle experience where the floor is slick, the hazards are unfair (in the best way), and your friends are definitely going to push you.\n\nDash, slide, bounce, and scramble through slime-coated courses built for maximum chaos. Every run is a new chance to clutch a win, unlock cool cosmetics, and prove you can survive the slip.",
+      "Welcome to SlimeSlip: Don't Die!-a high-speed Roblox obstacle experience where the floor is slick, the hazards are unfair (in the best way), and your friends are definitely going to push you.\n\nDash, slide, bounce, and scramble through slime-coated courses built for maximum chaos. Every run is a new chance to clutch a win, unlock cool cosmetics, and prove you can survive the slip.",
     features: [
       "Slime movement mechanics: speed, slides, and satisfying control",
-      "Wild hazards, traps, and “how did I survive that?” moments",
-      "Multiplayer mayhem that’s better (and louder) with friends",
+      "Wild hazards, traps, and \"how did I survive that?\" moments",
+      "Multiplayer mayhem that's better (and louder) with friends",
       "Unlocks & cosmetics to flex your drip between rounds",
     ],
     status: "coming-soon",
@@ -68,7 +74,7 @@ export const GAMES: Game[] = [
     description:
       "A cozy Roblox pet-collecting world with deep breeding, surprising mutations, and rare combos worth showing off.",
     longDescription:
-      "Pet Paradise is a Roblox pet-collecting and breeding game where your imagination is the meta. Hatch adorable companions, combine traits, and discover surprising mutations as you build the ultimate roster.\n\nIt’s cozy, it’s addictive, and it’s packed with “wait… that actually worked?” moments. Build a perfect pet, trade with friends, and chase rare combinations you’ll want to show off.",
+      "Pet Paradise is a Roblox pet-collecting and breeding game where your imagination is the meta. Hatch adorable companions, combine traits, and discover surprising mutations as you build the ultimate roster.\n\nIt's cozy, it's addictive, and it's packed with \"wait… that actually worked?\" moments. Build a perfect pet, trade with friends, and chase rare combinations you'll want to show off.",
     features: [
       "Deep breeding system: mix traits to create new looks and abilities",
       "Mutation rolls with rare outcomes and collect-worthy surprises",
