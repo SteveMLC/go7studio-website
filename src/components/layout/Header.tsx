@@ -8,6 +8,7 @@ const navItems = [
   { href: "/", label: "Home" },
   { href: "/games", label: "Games" },
   { href: "/#about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function Header() {

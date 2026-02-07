@@ -61,9 +61,9 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <a href="mailto:hello@go7studio.com" className="hover:text-white">
+              <Link href="/contact" className="hover:text-white">
                 Contact
-              </a>
+              </Link>
             </li>
             <li>
               <a href="https://discord.gg/pRCD6apa" target="_blank" rel="noopener noreferrer" className="hover:text-white">
