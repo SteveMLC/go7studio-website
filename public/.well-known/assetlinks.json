@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.go7studio.empire_tycoon",
+    "sha256_cert_fingerprints": [
+      "9A:19:81:D2:B8:9A:10:7F:81:BF:6A:8E:E4:49:0B:14:AB:FA:EB:D9:67:EC:1A:D6:7E:7F:52:45:8F:90:12:12"
+    ]
+  }
+}]
