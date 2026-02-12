@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { GAMES, getGameBySlug } from "@/lib/games";
 import { ScreenshotGallery } from "@/components/games/ScreenshotGallery";
-import { GameStructuredData } from "@/components/seo/GameStructuredData";
 import { GooglePlayBadge } from "@/components/common/GooglePlayBadge";
 import { DownloadButton } from "@/components/common/DownloadButton";
 
@@ -101,7 +100,6 @@ export default function GameDetailPage({ params }: PageProps) {
 
   return (
     <>
-      <GameStructuredData game={game} />
       <div className={`container-px py-14 sm:py-20 ${showEnhancedEmpireCta ? "pb-28 sm:pb-20" : ""}`}>
       <div className="mb-8 flex items-center justify-between gap-4">
         <Link

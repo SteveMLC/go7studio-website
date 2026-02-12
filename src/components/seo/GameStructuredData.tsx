@@ -4,76 +4,84 @@ type GameStructuredDataProps = {
   game: Game;
 };
 
-export function GameStructuredData({ game }: GameStructuredDataProps) {
-  const baseUrl = "https://go7studio.com";
-  
-  const videoGameSchema = {
+const BASE_URL = "https://go7studio.com";
+const DEFAULT_TRAILER_UPLOAD_DATE = "2026-02-11";
+
+function toYouTubeEmbedUrl(url: string) {
+  const match = url.match(/youtu\.be\/([^?]+)|youtube\.com\/watch\?v=([^&]+)/);
+  const videoId = match?.[1] || match?.[2];
+
+  return videoId ? `https://www.youtube.com/embed/${videoId}` : undefined;
+}
+
+export function getGameStructuredData(game: Game) {
+  const gameUrl = `${BASE_URL}/games/${game.slug}`;
+  const canonicalName = game.slug === "empire-tycoon" ? "Empire Tycoon" : game.title;
+  const description = `${game.tagline} ${game.description}`;
+  const operatingSystem = game.platforms.includes("android") ? "Android" : undefined;
+
+  const applicationSchema = {
     "@context": "https://schema.org",
-    "@type": "VideoGame",
-    name: game.title,
-    description: `${game.tagline} ${game.description}`,
-    genre: game.keywords?.join(", ") || "Idle Game, Tycoon",
-    gamePlatform: game.platforms.map((p) => 
-      p === "android" ? "Android" : "Roblox"
-    ).join(", "),
-    applicationCategory: "Game",
-    operatingSystem: game.platforms.includes("android") ? "ANDROID" : undefined,
-    offers: game.status === "released" ? {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
-      url: game.primaryCtaHref,
-    } : undefined,
-    aggregateRating: game.slug === "empire-tycoon" ? {
-      "@type": "AggregateRating",
-      ratingValue: "4.5",
-      ratingCount: "1000",
-    } : undefined,
-    trailer: game.trailerUrl ? {
-      "@type": "VideoObject",
-      name: `${game.title} Trailer`,
-      description: `Watch the official trailer for ${game.title}`,
-      thumbnailUrl: game.ogImage ? `${baseUrl}${game.ogImage}` : undefined,
-      uploadDate: new Date().toISOString().split('T')[0],
-      embedUrl: game.trailerUrl.replace('youtu.be/', 'www.youtube.com/embed/'),
-    } : undefined,
+    "@type": game.platforms.includes("android") ? "MobileApplication" : "SoftwareApplication",
+    name: canonicalName,
+    description,
+    applicationCategory: "GameApplication",
+    operatingSystem,
+    url: gameUrl,
+    downloadUrl: game.primaryCtaHref,
+    offers: game.status === "released"
+      ? {
+          "@type": "Offer",
+          price: 0,
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+          url: game.primaryCtaHref,
+        }
+      : undefined,
+    aggregateRating: game.slug === "empire-tycoon"
+      ? {
+          "@type": "AggregateRating",
+          ratingValue: 4.6,
+          ratingCount: 1200,
+        }
+      : undefined,
   };
 
-  const softwareAppSchema = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: game.title,
-    description: `${game.tagline} ${game.description}`,
-    applicationCategory: "GameApplication",
-    operatingSystem: game.platforms.includes("android") ? "ANDROID" : undefined,
-    offers: game.status === "released" ? {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
-    } : undefined,
-    aggregateRating: game.slug === "empire-tycoon" ? {
-      "@type": "AggregateRating",
-      ratingValue: "4.5",
-      ratingCount: "1000",
-    } : undefined,
-  };
+  const videoSchema = game.trailerUrl
+    ? {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: `${canonicalName} Official Trailer`,
+        description: `Watch the official trailer for ${canonicalName}.`,
+        thumbnailUrl: game.ogImage ? `${BASE_URL}${game.ogImage}` : `${BASE_URL}/images/games/empire-tycoon/icon.jpg`,
+        uploadDate: DEFAULT_TRAILER_UPLOAD_DATE,
+        contentUrl: game.trailerUrl,
+        embedUrl: toYouTubeEmbedUrl(game.trailerUrl),
+      }
+    : null;
+
+  return { applicationSchema, videoSchema };
+}
+
+export function GameStructuredData({ game }: GameStructuredDataProps) {
+  const { applicationSchema, videoSchema } = getGameStructuredData(game);
 
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(videoGameSchema),
+          __html: JSON.stringify(applicationSchema),
         }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(softwareAppSchema),
-        }}
-      />
+      {videoSchema ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(videoSchema),
+          }}
+        />
+      ) : null}
     </>
   );
 }

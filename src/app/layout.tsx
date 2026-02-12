@@ -7,6 +7,19 @@ import { Footer } from "@/components/layout/Footer";
 const GA_MEASUREMENT_ID = "G-ER8B7QWQBY";
 
 const siteUrl = "https://go7studio.com";
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Go7Studio",
+  url: siteUrl,
+  logo: `${siteUrl}/images/branding/go7studio-logo-square.png`,
+  sameAs: [
+    "https://x.com/Steve_mlc",
+    "https://www.youtube.com/@Go7Studio",
+    "https://discord.gg/pRCD6apa",
+    "https://github.com/SteveMLC",
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -39,6 +52,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          id="organization-jsonld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
           strategy="afterInteractive"
