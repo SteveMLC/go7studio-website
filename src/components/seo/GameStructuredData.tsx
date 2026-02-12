@@ -19,16 +19,55 @@ export function getGameStructuredData(game: Game) {
   const canonicalName = game.slug === "empire-tycoon" ? "Empire Tycoon" : game.title;
   const description = `${game.tagline} ${game.description}`;
   const operatingSystem = game.platforms.includes("android") ? "Android" : undefined;
+  const isEmpireTycoon = game.slug === "empire-tycoon";
+  const gameId = `${gameUrl}/#game`;
+  const trailerId = `${gameUrl}/#trailer-1`;
+  const softwareVersion = (game as Game & { softwareVersion?: string }).softwareVersion ?? "1.0.0";
+  const normalizedScreenshots = game.screenshots?.map((screenshot) =>
+    screenshot.startsWith("http") ? screenshot : `${BASE_URL}${screenshot}`,
+  );
+  const empireScreenshots = [
+    "https://go7studio.com/images/games/empire-tycoon/screenshots/ScreenOne.png",
+    "https://go7studio.com/images/games/empire-tycoon/screenshots/ScreenTwo.png",
+    "https://go7studio.com/images/games/empire-tycoon/screenshots/ScreenThree.png",
+    "https://go7studio.com/images/games/empire-tycoon/screenshots/screenfour.png",
+    "https://go7studio.com/images/games/empire-tycoon/screenshots/screenfive.png",
+    "https://go7studio.com/images/games/empire-tycoon/screenshots/screensix.png",
+  ];
 
   const applicationSchema = {
     "@context": "https://schema.org",
-    "@type": game.platforms.includes("android") ? "MobileApplication" : "SoftwareApplication",
+    "@id": gameId,
+    "@type": isEmpireTycoon
+      ? ["SoftwareApplication", "MobileApplication", "VideoGame"]
+      : game.platforms.includes("android")
+        ? "MobileApplication"
+        : "SoftwareApplication",
     name: canonicalName,
     description,
     applicationCategory: "GameApplication",
     operatingSystem,
     url: gameUrl,
+    inLanguage: isEmpireTycoon ? "en" : undefined,
+    installUrl: isEmpireTycoon
+      ? "https://play.google.com/store/apps/details?id=com.go7studio.empiretycoon"
+      : undefined,
     downloadUrl: game.primaryCtaHref,
+    identifier: isEmpireTycoon
+      ? {
+          "@type": "PropertyValue",
+          propertyID: "androidPackageName",
+          value: "com.go7studio.empiretycoon",
+        }
+      : undefined,
+    screenshot: isEmpireTycoon ? empireScreenshots : normalizedScreenshots,
+    softwareVersion: isEmpireTycoon ? softwareVersion : undefined,
+    releaseNotes: isEmpireTycoon
+      ? "Build your business empire with real estate and smart investing. Latest update includes improved offline earnings and new upgrades."
+      : undefined,
+    genre: isEmpireTycoon ? ["Idle game", "Tycoon"] : undefined,
+    gamePlatform: isEmpireTycoon ? ["Android"] : undefined,
+    publisher: isEmpireTycoon ? { "@id": "https://go7studio.com/#org" } : undefined,
     offers: game.status === "released"
       ? {
           "@type": "Offer",
@@ -50,6 +89,7 @@ export function getGameStructuredData(game: Game) {
   const videoSchema = game.trailerUrl
     ? {
         "@context": "https://schema.org",
+        "@id": trailerId,
         "@type": "VideoObject",
         name: `${canonicalName} Official Trailer`,
         description: `Watch the official trailer for ${canonicalName}.`,

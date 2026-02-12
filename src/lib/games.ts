@@ -25,7 +25,7 @@ export const GAMES: Game[] = [
   {
     slug: "empire-tycoon",
     title: "Empire Tycoon - Idle Business",
-    thumbnail: "/images/games/empire-tycoon/icon.jpg",
+    thumbnail: "/images/games/empire-tycoon-promo.jpg",
     tagline: "Build your business empire! Idle tycoon with real estate & smart investing.",
     description:
       "Build businesses, automate income, and scale from your first shop to a booming empire.",
@@ -60,7 +60,7 @@ export const GAMES: Game[] = [
   {
     slug: "slimeslip",
     title: "SlimeSlip: Don't Die!",
-    thumbnail: "/images/games/empire-tycoon/icon.jpg",
+    thumbnail: "/images/games/slimeslip-promo.jpg",
     tagline: "Slip fast. Dodge everything. Don't die.",
     description:
       "A high-speed Roblox obstacle experience built for chaos with friends-slick movement, wild hazards, and clutch wins.",
@@ -82,7 +82,7 @@ export const GAMES: Game[] = [
   {
     slug: "pet-paradise",
     title: "Pet Paradise",
-    thumbnail: "/images/games/empire-tycoon/icon.jpg",
+    thumbnail: "/images/games/pet-paradise-promo.jpg",
     tagline: "Breed. Mutate. Create your dream pet.",
     description:
       "A cozy Roblox pet-collecting world with deep breeding, surprising mutations, and rare combos worth showing off.",
