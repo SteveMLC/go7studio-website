@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Smartphone, Gamepad2 } from "lucide-react";
 import type { Game } from "@/lib/games";
 
@@ -15,13 +16,23 @@ function PlatformIcon({ platform }: { platform: Game["platforms"][number] }) {
 
 export function GameCard({ game }: { game: Game }) {
   return (
-    <article className="glass-card group relative overflow-hidden p-6">
+    <article className="glass-card group relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <div className="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
         <div className="absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
       </div>
 
-      <div className="relative space-y-4">
+      <div className="relative aspect-video w-full overflow-hidden bg-neutral-900/80">
+        <Image
+          src={game.thumbnail}
+          alt={`${game.title} thumbnail`}
+          fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+          className="object-cover transition duration-300 group-hover:scale-[1.03] group-hover:brightness-110"
+        />
+      </div>
+
+      <div className="relative space-y-4 p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-lg font-semibold text-white">{game.title}</h3>

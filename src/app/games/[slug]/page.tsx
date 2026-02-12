@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { GAMES, getGameBySlug } from "@/lib/games";
+import { ScreenshotGallery } from "@/components/games/ScreenshotGallery";
 import { GameStructuredData } from "@/components/seo/GameStructuredData";
+import { GooglePlayBadge } from "@/components/common/GooglePlayBadge";
+import { DownloadButton } from "@/components/common/DownloadButton";
 
 type PageProps = {
   params: { slug: string };
@@ -93,11 +96,13 @@ export function generateMetadata({ params }: PageProps): Metadata {
 export default function GameDetailPage({ params }: PageProps) {
   const game = getGameBySlug(params.slug);
   if (!game) notFound();
+  const showEnhancedEmpireCta = game.slug === "empire-tycoon";
+  const isExternalPrimaryLink = game.primaryCtaHref.startsWith("http");
 
   return (
     <>
       <GameStructuredData game={game} />
-      <div className="container-px py-14 sm:py-20">
+      <div className={`container-px py-14 sm:py-20 ${showEnhancedEmpireCta ? "pb-28 sm:pb-20" : ""}`}>
       <div className="mb-8 flex items-center justify-between gap-4">
         <Link
           href="/games"
@@ -130,26 +135,47 @@ export default function GameDetailPage({ params }: PageProps) {
             {game.longDescription}
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={game.primaryCtaHref}
-              className="btn-primary inline-flex items-center justify-center gap-2"
-              rel="noopener noreferrer"
-              target={game.primaryCtaHref.startsWith("http") ? "_blank" : undefined}
-            >
-              {game.primaryCtaLabel}
-              <ExternalLink className="h-4 w-4" />
-            </a>
-
-            {game.secondaryCtaLabel && game.secondaryCtaHref ? (
-              <Link
-                href={game.secondaryCtaHref}
-                className="btn-secondary inline-flex items-center justify-center"
+          {showEnhancedEmpireCta ? (
+            <div className="mt-8 max-w-xl">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="chip border-brand-teal/30 bg-brand-teal/15 text-white">Free to Play</span>
+                <span className="text-xs uppercase tracking-wide text-white/60">Android</span>
+              </div>
+              <div className="flex flex-col items-start gap-4">
+                <GooglePlayBadge href={game.primaryCtaHref} />
+                <DownloadButton href={game.primaryCtaHref} label="Download Empire Tycoon" className="w-full sm:w-auto" />
+              </div>
+              {game.secondaryCtaLabel && game.secondaryCtaHref ? (
+                <Link
+                  href={game.secondaryCtaHref}
+                  className="btn-secondary mt-4 inline-flex items-center justify-center"
+                >
+                  {game.secondaryCtaLabel}
+                </Link>
+              ) : null}
+            </div>
+          ) : (
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a
+                href={game.primaryCtaHref}
+                className="btn-primary inline-flex items-center justify-center gap-2"
+                rel="noopener noreferrer"
+                target={isExternalPrimaryLink ? "_blank" : undefined}
               >
-                {game.secondaryCtaLabel}
-              </Link>
-            ) : null}
-          </div>
+                {game.primaryCtaLabel}
+                <ExternalLink className="h-4 w-4" />
+              </a>
+
+              {game.secondaryCtaLabel && game.secondaryCtaHref ? (
+                <Link
+                  href={game.secondaryCtaHref}
+                  className="btn-secondary inline-flex items-center justify-center"
+                >
+                  {game.secondaryCtaLabel}
+                </Link>
+              ) : null}
+            </div>
+          )}
         </div>
       </header>
 
@@ -161,6 +187,15 @@ export default function GameDetailPage({ params }: PageProps) {
           </div>
         </section>
       )}
+
+      {game.screenshots?.length ? (
+        <section className="mt-10">
+          <ScreenshotGallery
+            screenshots={game.screenshots}
+            title={`${game.title} Screenshots`}
+          />
+        </section>
+      ) : null}
 
       <section className="mt-10 grid gap-6 lg:grid-cols-3">
         <div className="glass-card p-6 lg:col-span-2">
@@ -191,6 +226,12 @@ export default function GameDetailPage({ params }: PageProps) {
         </aside>
       </section>
       </div>
+
+      {showEnhancedEmpireCta ? (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/15 bg-ink-900/95 px-4 py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur sm:hidden">
+          <DownloadButton href={game.primaryCtaHref} label="Download Free on Google Play" className="w-full justify-center" />
+        </div>
+      ) : null}
     </>
   );
 }

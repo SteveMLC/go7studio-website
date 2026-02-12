@@ -4,6 +4,7 @@ export type GamePlatform = "android" | "roblox";
 export type Game = {
   slug: string;
   title: string;
+  thumbnail: string;
   tagline: string;
   description: string;
   longDescription: string;
@@ -15,6 +16,7 @@ export type Game = {
   secondaryCtaLabel?: string;
   secondaryCtaHref?: string;
   trailerUrl?: string;
+  screenshots?: string[];
   ogImage?: string;
   keywords?: string[];
 };
@@ -23,6 +25,7 @@ export const GAMES: Game[] = [
   {
     slug: "empire-tycoon",
     title: "Empire Tycoon - Idle Business",
+    thumbnail: "/images/games/empire-tycoon/icon.jpg",
     tagline: "Build your business empire! Idle tycoon with real estate & smart investing.",
     description:
       "Build businesses, automate income, and scale from your first shop to a booming empire.",
@@ -43,12 +46,21 @@ export const GAMES: Game[] = [
     secondaryCtaLabel: "Meet the Studio",
     secondaryCtaHref: "/#about",
     trailerUrl: "https://youtu.be/fTPL9IJ-BpI",
+    screenshots: [
+      "/images/games/empire-tycoon/screenshots/ScreenOne.png",
+      "/images/games/empire-tycoon/screenshots/ScreenTwo.png",
+      "/images/games/empire-tycoon/screenshots/ScreenThree.png",
+      "/images/games/empire-tycoon/screenshots/screenfour.png",
+      "/images/games/empire-tycoon/screenshots/screenfive.png",
+      "/images/games/empire-tycoon/screenshots/screensix.png",
+    ],
     ogImage: "/images/games/empire-tycoon/og-image.jpg",
     keywords: ["idle game", "tycoon", "business simulator", "investment game", "real estate", "offline earnings", "android game"],
   },
   {
     slug: "slimeslip",
     title: "SlimeSlip: Don't Die!",
+    thumbnail: "/images/games/empire-tycoon/icon.jpg",
     tagline: "Slip fast. Dodge everything. Don't die.",
     description:
       "A high-speed Roblox obstacle experience built for chaos with friends-slick movement, wild hazards, and clutch wins.",
@@ -70,6 +82,7 @@ export const GAMES: Game[] = [
   {
     slug: "pet-paradise",
     title: "Pet Paradise",
+    thumbnail: "/images/games/empire-tycoon/icon.jpg",
     tagline: "Breed. Mutate. Create your dream pet.",
     description:
       "A cozy Roblox pet-collecting world with deep breeding, surprising mutations, and rare combos worth showing off.",
