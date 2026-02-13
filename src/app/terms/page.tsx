@@ -1,6 +1,9 @@
-export const metadata = {
-  title: 'Terms of Service | Go7Studio',
-  description: 'Terms of Service for Go7Studio apps and services',
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Terms of Service',
+  description: 'Terms of Service for Go7Studio apps, games, and services. Rules and guidelines for using our products.',
+  alternates: { canonical: '/terms' },
 };
 
 export default function TermsPage() {

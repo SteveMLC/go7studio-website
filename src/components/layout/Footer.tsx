@@ -61,6 +61,11 @@ export function Footer() {
               </Link>
             </li>
             <li>
+              <Link href="/services" className="hover:text-white">
+                Services
+              </Link>
+            </li>
+            <li>
               <Link href="/contact" className="hover:text-white">
                 Contact
               </Link>
@@ -122,10 +127,10 @@ export function Footer() {
         <div className="container-px flex flex-col gap-2 py-6 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
           <span>Built with love (and a little chaos).</span>
           <div className="flex gap-4">
-            <Link href="/privacy-policy" className="hover:text-white">
+            <Link href="/privacy" className="hover:text-white">
               Privacy
             </Link>
-            <Link href="/terms-of-service" className="hover:text-white">
+            <Link href="/terms" className="hover:text-white">
               Terms
             </Link>
           </div>

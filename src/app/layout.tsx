@@ -20,25 +20,47 @@ const rootSchemaGraph = createSchemaGraph(
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Go7Studio",
+    default: "Go7Studio | Game Development & Consulting",
     template: "%s | Go7Studio",
   },
   description:
-    "Go7Studio crafts fun-first mobile and Roblox games with satisfying progression, juicy polish, and replayable worlds.",
+    "Go7Studio builds fun-first mobile and Roblox games with satisfying progression and juicy polish. Expert game development consulting for indie studios.",
   alternates: { canonical: "/" },
+  keywords: ["game development", "mobile games", "Roblox", "Flutter", "game consulting", "indie studio"],
   openGraph: {
     type: "website",
     url: siteUrl,
-    title: "Go7Studio",
+    title: "Go7Studio | Game Development & Consulting",
     description:
-      "Go7Studio crafts fun-first mobile and Roblox games with satisfying progression, juicy polish, and replayable worlds.",
+      "We build fun-first games and offer expert consulting for indie studios. Mobile games, Roblox development, monetization strategy, and MVP prototyping.",
     siteName: "Go7Studio",
+    images: [
+      {
+        url: "/images/og-default.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Go7Studio - Game Development & Consulting",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Go7Studio",
+    title: "Go7Studio | Game Development & Consulting",
     description:
-      "Go7Studio crafts fun-first mobile and Roblox games with satisfying progression, juicy polish, and replayable worlds.",
+      "We build fun-first games and offer expert consulting for indie studios. Mobile games, Roblox development, monetization strategy.",
+    images: ["/images/og-default.jpg"],
+    creator: "@Steve_mlc",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 

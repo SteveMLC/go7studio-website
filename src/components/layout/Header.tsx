@@ -48,7 +48,9 @@ export function Header() {
           className="flex items-center gap-2"
         >
           <a
-            href="#"
+            href="https://discord.gg/pRCD6apa"
+            target="_blank"
+            rel="noopener noreferrer"
             className="hidden rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white ring-1 ring-white/10 hover:bg-white/15 sm:inline-flex"
           >
             Discord
