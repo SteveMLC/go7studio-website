@@ -10,7 +10,8 @@ export default function ReferralPage() {
   const [countdown, setCountdown] = useState(3);
   const [showManual, setShowManual] = useState(false);
 
-  const playStoreUrl = `https://play.google.com/store/apps/details?id=com.go7studio.empiretycoon&referrer=${encodeURIComponent(code)}`;
+  // NOTE: Must match the Android applicationId in the app.
+  const playStoreUrl = `https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon&referrer=${encodeURIComponent(code)}`;
   const appDeepLink = `empiretycoon://refer?code=${code}`;
 
   useEffect(() => {
@@ -69,7 +70,7 @@ export default function ReferralPage() {
           <p className="text-amber-300 font-semibold mb-2">🎁 You&apos;ll receive:</p>
           <ul className="text-white/80 space-y-1 text-sm">
             <li>• 50 Platinum Points</li>
-            <li>• 2x Income Boost for 1 hour</li>
+            <li>• 1.5x Income Boost for 30 minutes</li>
           </ul>
         </div>
 
