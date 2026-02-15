@@ -12,7 +12,9 @@ export default function ReferralPage() {
   const [showManual, setShowManual] = useState(false);
 
   // NOTE: Must match the Android applicationId in the app.
-  const playStoreUrl = `https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon&referrer=${encodeURIComponent(code)}`;
+  // The referrer must be URL-encoded key-value pairs for Play Install Referrer API
+  const referrerString = `utm_source=referral&referral_code=${code}`;
+  const playStoreUrl = `https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon&referrer=${encodeURIComponent(referrerString)}`;
   const appDeepLink = `empiretycoon://refer?code=${code}`;
 
   useEffect(() => {
