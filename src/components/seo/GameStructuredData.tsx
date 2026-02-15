@@ -50,14 +50,14 @@ export function getGameStructuredData(game: Game) {
     url: gameUrl,
     inLanguage: isEmpireTycoon ? "en" : undefined,
     installUrl: isEmpireTycoon
-      ? "https://play.google.com/store/apps/details?id=com.go7studio.empiretycoon"
+      ? "https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon"
       : undefined,
     downloadUrl: game.primaryCtaHref,
     identifier: isEmpireTycoon
       ? {
           "@type": "PropertyValue",
           propertyID: "androidPackageName",
-          value: "com.go7studio.empiretycoon",
+          value: "com.go7studio.empire_tycoon",
         }
       : undefined,
     screenshot: isEmpireTycoon ? empireScreenshots : normalizedScreenshots,

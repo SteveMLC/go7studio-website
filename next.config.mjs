@@ -10,12 +10,6 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      // Empire Tycoon - Google Play
-      {
-        source: '/play/empire',
-        destination: 'https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon',
-        permanent: false,
-      },
       // Empire Tycoon - App Store (ready for iOS launch)
       {
         source: '/ios/empire',
