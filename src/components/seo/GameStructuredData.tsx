@@ -5,7 +5,7 @@ type GameStructuredDataProps = {
 };
 
 const BASE_URL = "https://go7studio.com";
-const DEFAULT_TRAILER_UPLOAD_DATE = "2026-02-11";
+const DEFAULT_TRAILER_UPLOAD_DATE = "2026-02-11T12:00:00-05:00";
 
 function toYouTubeEmbedUrl(url: string) {
   const match = url.match(/youtu\.be\/([^?]+)|youtube\.com\/watch\?v=([^&]+)/);
