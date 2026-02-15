@@ -23,17 +23,48 @@ function absoluteUrl(url: string): string {
 
 export function getOrganizationSchema(): SchemaNode {
   return {
-    "@type": "Organization",
+    "@type": ["Organization", "Corporation"],
     "@id": SCHEMA_IDS.ORG,
     name: "Go7Studio",
+    legalName: "Go7Studio LLC",
     url: SITE_URL,
-    logo: `${SITE_URL}/images/branding/go7studio-logo-square.png`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_URL}/images/branding/go7studio-logo-square.png`,
+      width: 512,
+      height: 512,
+    },
+    image: `${SITE_URL}/images/branding/go7studio-logo-square.png`,
+    description: "Indie game development studio creating fun-first mobile and Roblox games with satisfying progression, delightful polish, and replayable worlds.",
+    foundingDate: "2024",
+    founder: {
+      "@type": "Person",
+      name: "Stephen",
+      url: "https://x.com/Steve_mlc",
+    },
     sameAs: [
       "https://www.youtube.com/@go7studio",
       "https://x.com/Go7Studio",
+      "https://x.com/Steve_mlc",
       "https://discord.gg/go7studio",
       "https://github.com/SteveMLC",
     ],
+    knowsAbout: [
+      "Mobile Game Development",
+      "Flutter Development", 
+      "Roblox Game Development",
+      "Idle Games",
+      "Tycoon Games",
+      "Game Monetization",
+      "User Experience Design",
+    ],
+    slogan: "We build playful products that feel polished.",
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      url: `${SITE_URL}/contact`,
+      availableLanguage: "English",
+    },
   };
 }
 

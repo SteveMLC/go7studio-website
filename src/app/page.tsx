@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedGames } from "@/components/home/FeaturedGames";
 import { AboutSection } from "@/components/home/AboutSection";
 import { StatsSection } from "@/components/home/StatsSection";
+import { HomepageStructuredData } from "@/components/seo/HomepageStructuredData";
 
 export const metadata: Metadata = {
   title: "Go7Studio | Game Development Studio & Consulting",
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
+      <HomepageStructuredData />
       <HeroSection />
       <FeaturedGames />
       <AboutSection />
