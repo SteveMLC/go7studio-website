@@ -94,11 +94,11 @@ export default function EducationPage() {
         </h2>
         <div className="mt-6 max-w-2xl space-y-4 text-white/75">
           <p>
-            We're an indie game and tool studio. We build apps that people
+            We&apos;re an indie game and tool studio. We build apps that people
             actually enjoy using.
           </p>
           <p>
-            Our mission: create quality tools and games that respect users' time
+            Our mission: create quality tools and games that respect users&apos; time
             and attention.
           </p>
           <Link
@@ -113,7 +113,7 @@ export default function EducationPage() {
       {/* Footer CTA */}
       <section className="mt-20 rounded-2xl border border-white/10 bg-white/5 p-8 text-center sm:mt-28 sm:p-12">
         <p className="text-lg font-medium text-white">
-          Using our metronome in your classroom? We'd love to hear about it!
+          Using our metronome in your classroom? We&apos;d love to hear about it!
         </p>
         <a
           href="mailto:contact@go7studio.com"
