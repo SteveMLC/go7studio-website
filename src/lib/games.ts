@@ -101,6 +101,31 @@ export const GAMES: Game[] = [
     secondaryCtaLabel: "Explore other games",
     secondaryCtaHref: "/games",
   },
+  {
+    slug: "stakd",
+    title: "STAKD - Zen Block Puzzle",
+    thumbnail: "/images/games/stakd/icon.png",
+    tagline: "Stack. Sort. Find your zen.",
+    description:
+      "A meditative block-sorting puzzle game with a zen garden that grows as you play. Solve, breathe, grow.",
+    longDescription:
+      "STAKD is a zen puzzle game where you sort colored blocks into stacks—simple to learn, deeply satisfying to master.\n\nEvery puzzle you solve grows your personal zen garden. Watch it evolve from bare stones to a lush paradise as you progress through 25 ranks of mastery.\n\nFour difficulty levels from Easy to Ultra, special blocks that challenge your strategy, and a progression system with 48 achievements to unlock. No ads interrupting your flow. No timers. Just puzzles, peace, and your garden.",
+    features: [
+      "Meditative block-sorting puzzles across 4 difficulty levels",
+      "Zen garden that grows and evolves as you solve puzzles",
+      "25 ranks from Curious Wanderer to Infinite Keeper",
+      "48 achievements across mastery, speed, streaks, and more",
+      "Special blocks: locked and frozen challenges",
+      "No intrusive ads — play at your own pace",
+    ],
+    status: "released",
+    platforms: ["android"],
+    primaryCtaLabel: "Get STAKD on Google Play",
+    primaryCtaHref: "https://play.google.com/store/apps/details?id=com.go7studio.stakd",
+    secondaryCtaLabel: "Meet the Studio",
+    secondaryCtaHref: "/#about",
+    keywords: ["puzzle game", "zen game", "block sorting", "relaxing puzzle", "meditation game", "android game"],
+  },
 ];
 
 export function getGameBySlug(slug: string): Game | undefined {
