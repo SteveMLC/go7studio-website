@@ -23,6 +23,37 @@ export type Game = {
 
 export const GAMES: Game[] = [
   {
+    slug: "rampart",
+    title: "Rampart - Tower Defense",
+    thumbnail: "/images/games/rampart/icon.png",
+    tagline: "Defend your kingdom. Build your fortress. Command your army.",
+    description:
+      "A medieval tower defense where strategy meets chaos—build towers, summon heroes, and hold the line against relentless waves.",
+    longDescription:
+      "The horde is coming. In Rampart, you are the last line of defense between your kingdom and total destruction.\n\nBuild an impenetrable fortress with towers, walls, and strategic chokepoints. Summon powerful heroes to turn the tide. Face increasingly challenging waves of enemies—from goblin scouts to fire-breathing dragons.\n\nEvery decision matters: placement, upgrades, timing. Will your rampart hold, or will the kingdom fall?",
+    features: [
+      "Strategic tower defense with deep placement mechanics",
+      "Multiple tower types: Archer, Cannon, Mage, and more",
+      "Hero system: Summon powerful champions to defend",
+      "Dynamic castle health system—watch your fortress take damage",
+      "Wave-based progression with increasing difficulty",
+      "Medieval pixel art aesthetic with earthy, warm tones",
+    ],
+    status: "coming-soon",
+    platforms: ["android"],
+    primaryCtaLabel: "Join the Waitlist",
+    primaryCtaHref: "#",
+    secondaryCtaLabel: "Meet the Studio",
+    secondaryCtaHref: "/#about",
+    screenshots: [
+      "/images/games/rampart/castle-damaged.png",
+      "/images/games/rampart/castle-critical.png",
+      "/images/games/rampart/hero-bg.png",
+    ],
+    ogImage: "/images/games/rampart/hero-bg.png",
+    keywords: ["tower defense", "strategy game", "medieval", "pixel art", "android game", "castle defense"],
+  },
+  {
     slug: "empire-tycoon",
     title: "Empire Tycoon - Idle Business",
     thumbnail: "/images/games/empire-tycoon/icon.jpg",
