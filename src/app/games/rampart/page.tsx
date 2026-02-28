@@ -3,71 +3,57 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Sword, Shield, Castle, Sparkles, ChevronRight } from "lucide-react";
+import { ArrowLeft, Skull, Shield, Zap, Target, ChevronRight } from "lucide-react";
 
-// Animated floating particles component
-function FloatingParticles() {
+// Wave animation component
+function WaveAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     let animationId: number;
-    let particles: Array<{
-      x: number;
-      y: number;
-      size: number;
-      speedY: number;
-      opacity: number;
-      color: string;
-    }> = [];
+    let time = 0;
+    const waves: Array<{ y: number; amplitude: number; speed: number; color: string }> = [
+      { y: 0.3, amplitude: 30, speed: 0.02, color: "rgba(212, 166, 37, 0.1)" },
+      { y: 0.4, amplitude: 25, speed: 0.025, color: "rgba(139, 105, 20, 0.15)" },
+      { y: 0.5, amplitude: 20, speed: 0.03, color: "rgba(212, 166, 37, 0.08)" },
+    ];
 
     const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
 
-    const createParticle = () => ({
-      x: Math.random() * canvas.width,
-      y: canvas.height + 10,
-      size: Math.random() * 3 + 1,
-      speedY: Math.random() * 0.5 + 0.2,
-      opacity: Math.random() * 0.5 + 0.2,
-      color: Math.random() > 0.5 ? "#D4A625" : "#8B6914",
-    });
-
-    const init = () => {
-      resize();
-      particles = Array.from({ length: 30 }, createParticle);
-    };
-
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      time += 0.016;
 
-      particles.forEach((p, i) => {
-        p.y -= p.speedY;
-        p.opacity -= 0.002;
-
-        if (p.y < -10 || p.opacity <= 0) {
-          particles[i] = createParticle();
-        }
-
+      waves.forEach((wave) => {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.opacity;
+        ctx.moveTo(0, canvas.height);
+        
+        for (let x = 0; x <= canvas.width; x += 5) {
+          const y = 
+            canvas.height * wave.y + 
+            Math.sin(x * 0.005 + time * wave.speed * 100) * wave.amplitude +
+            Math.sin(x * 0.01 + time * wave.speed * 150) * (wave.amplitude * 0.5);
+          ctx.lineTo(x, y);
+        }
+        
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.closePath();
+        ctx.fillStyle = wave.color;
         ctx.fill();
       });
 
-      ctx.globalAlpha = 1;
       animationId = requestAnimationFrame(animate);
     };
 
-    init();
+    resize();
     animate();
     window.addEventListener("resize", resize);
 
@@ -81,121 +67,182 @@ function FloatingParticles() {
     <canvas
       ref={canvasRef}
       className="pointer-events-none fixed inset-0 z-10"
-      style={{ mixBlendMode: "screen" }}
     />
   );
 }
 
-// Animated sword slash effect
-function SwordSlash({ active }: { active: boolean }) {
-  return (
-    <div
-      className={`absolute inset-0 transition-opacity duration-300 ${active ? "opacity-100" : "opacity-0"}`}
-      style={{
-        background: "linear-gradient(135deg, transparent 40%, rgba(212, 166, 37, 0.3) 50%, transparent 60%)",
-        transform: active ? "translateX(100%)" : "translateX(-100%)",
-        transition: "transform 0.6s ease-out, opacity 0.3s",
-      }}
-    />
-  );
-}
-
-// Castle showcase with damage states
-function CastleShowcase() {
-  const [damageLevel, setDamageLevel] = useState(0);
-  const castles = [
-    { src: "/images/games/rampart/icon.png", label: "Healthy", color: "#2D5A1E" },
-    { src: "/images/games/rampart/castle-damaged.png", label: "Damaged", color: "#8B6914" },
-    { src: "/images/games/rampart/castle-critical.png", label: "Critical", color: "#8B1A1A" },
+// Enemy showcase component
+function EnemyShowcase() {
+  const enemies = [
+    { 
+      src: "/images/games/rampart/militia-archer.png", 
+      name: "Archer", 
+      type: "Militia",
+      threat: "Low",
+      desc: "Quick attacks from range"
+    },
+    { 
+      src: "/images/games/rampart/enemy-orc.png", 
+      name: "Orc Raider", 
+      type: "Enemy",
+      threat: "Medium",
+      desc: "Brutal melee damage"
+    },
+    { 
+      src: "/images/games/rampart/enemy-wolf.png", 
+      name: "Dire Wolf", 
+      type: "Enemy",
+      threat: "Medium",
+      desc: "Fast and ferocious"
+    },
+    { 
+      src: "/images/games/rampart/enemy-skeleton.png", 
+      name: "Skeleton", 
+      type: "Undead",
+      threat: "Medium",
+      desc: "Relentless undead horde"
+    },
+    { 
+      src: "/images/games/rampart/enemy-behemoth.png", 
+      name: "Behemoth", 
+      type: "Boss",
+      threat: "High",
+      desc: "Massive tank unit"
+    },
+    { 
+      src: "/images/games/rampart/enemy-dragon.png", 
+      name: "Dragon", 
+      type: "Boss",
+      threat: "Extreme",
+      desc: "Fire-breathing nightmare"
+    },
   ];
+
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <div className="relative">
-      <div className="flex items-center justify-center gap-8">
-        {castles.map((castle, index) => (
-          <button
-            key={index}
-            onClick={() => setDamageLevel(index)}
-            className={`group relative transition-all duration-500 ${
-              damageLevel === index ? "scale-110" : "scale-100 opacity-60 hover:opacity-80"
-            }`}
-          >
-            <div
-              className="absolute -inset-4 rounded-full blur-xl transition-opacity duration-500"
+      {/* Main showcase */}
+      <div className="relative mx-auto max-w-md aspect-square">
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-red-900/20 via-amber-900/10 to-slate-900/50" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="relative">
+            {/* Glow effect */}
+            <div 
+              className="absolute -inset-8 rounded-full blur-3xl transition-colors duration-500"
               style={{
-                background: castle.color,
-                opacity: damageLevel === index ? 0.3 : 0,
+                background: activeIndex >= 4 
+                  ? "rgba(220, 38, 38, 0.3)" 
+                  : activeIndex >= 1 
+                    ? "rgba(212, 166, 37, 0.2)" 
+                    : "rgba(34, 197, 94, 0.2)"
               }}
             />
             <Image
-              src={castle.src}
-              alt={`Castle ${castle.label}`}
-              width={120}
-              height={120}
-              className="relative drop-shadow-2xl"
+              src={enemies[activeIndex].src}
+              alt={enemies[activeIndex].name}
+              width={280}
+              height={280}
+              className="relative drop-shadow-2xl transition-all duration-500 hover:scale-105"
             />
-            <span
-              className={`absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-medium transition-all duration-300 ${
-                damageLevel === index ? "text-white opacity-100" : "text-white/50 opacity-0"
-              }`}
+          </div>
+        </div>
+
+        {/* Stats overlay */}
+        <div className="absolute bottom-4 left-4 right-4 rounded-xl bg-slate-950/80 backdrop-blur-sm p-4 border border-white/10">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-lg font-bold text-white">{enemies[activeIndex].name}</span>
+            <span 
+              className="px-2 py-0.5 rounded text-xs font-medium"
+              style={{
+                background: enemies[activeIndex].threat === "Extreme" 
+                  ? "rgba(220, 38, 38, 0.3)"
+                  : enemies[activeIndex].threat === "High"
+                    ? "rgba(239, 68, 68, 0.3)"
+                    : enemies[activeIndex].threat === "Medium"
+                      ? "rgba(234, 179, 8, 0.3)"
+                      : "rgba(34, 197, 94, 0.3)",
+                color: enemies[activeIndex].threat === "Extreme" 
+                  ? "rgb(248, 113, 113)"
+                  : enemies[activeIndex].threat === "High"
+                    ? "rgb(252, 165, 165)"
+                    : enemies[activeIndex].threat === "Medium"
+                      ? "rgb(253, 224, 71)"
+                      : "rgb(134, 239, 172)"
+              }}
             >
-              {castle.label}
+              {enemies[activeIndex].threat} Threat
+            </span>
+          </div>          <p className="text-sm text-white/60">{enemies[activeIndex].desc}</p>
+        </div>
+      </div>
+
+      {/* Thumbnail selector */}
+      <div className="mt-8 flex justify-center gap-3 flex-wrap">
+        {enemies.map((enemy, index) => (
+          <button
+            key={index}
+            onClick={() => setActiveIndex(index)}
+            className={`relative rounded-xl overflow-hidden transition-all duration-300 ${
+              activeIndex === index 
+                ? "ring-2 ring-amber-500 scale-110" 
+                : "opacity-50 hover:opacity-80"
+            }`}
+          >
+            <div className="w-16 h-16 bg-slate-800 relative">
+              <Image
+                src={enemy.src}
+                alt={enemy.name}
+                fill
+                className="object-contain p-1"
+              />
+            </div>
+            <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-white/70 whitespace-nowrap">
+              {enemy.name}
             </span>
           </button>
         ))}
-      </div>
-
-      {/* Health bar */}
-      <div className="mx-auto mt-12 max-w-md">
-        <div className="flex items-center justify-between text-xs text-white/60 mb-2">
-          <span>Castle Health</span>
-          <span>{damageLevel === 0 ? "100%" : damageLevel === 1 ? "50%" : "25%"}</span>
-        </div>
-        <div className="h-3 rounded-full bg-white/10 overflow-hidden">
-          <div
-            className="h-full transition-all duration-700 ease-out rounded-full"
-            style={{
-              width: damageLevel === 0 ? "100%" : damageLevel === 1 ? "50%" : "25%",
-              background: `linear-gradient(90deg, ${castles[damageLevel].color}, ${castles[damageLevel].color}88)`,
-            }}
-          />
-        </div>
       </div>
     </div>
   );
 }
 
-// Feature card with icon
-function FeatureCard({ icon: Icon, title, description, delay }: { icon: React.ComponentType<{ className?: string }>; title: string; description: string; delay: number }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
+// Wave counter animation
+function WaveCounter() {
+  const [wave, setWave] = useState(1);
+  
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => setIsVisible(true), delay);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [delay]);
+    const interval = setInterval(() => {
+      setWave(w => (w >= 99 ? 1 : w + 1));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div
-      ref={ref}
-      className={`glass-card p-6 transition-all duration-700 ${
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-      }`}
-    >
-      <div className="mb-4 inline-flex rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-700/10 p-3">
-        <Icon className="h-6 w-6 text-amber-400" />
+    <div className="inline-flex items-center gap-3 rounded-2xl bg-slate-950/60 backdrop-blur border border-red-500/30 px-5 py-3">
+      <Skull className="h-5 w-5 text-red-500" />
+      <div>
+        <p className="text-[10px] uppercase tracking-wider text-white/50">Wave Incoming</p>
+        <p className="text-2xl font-bold text-white tabular-nums">
+          {wave.toString().padStart(2, '0')}
+        </p>
       </div>
-      <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
-      <p className="text-sm leading-relaxed text-white/70">{description}</p>
+    </div>
+  );
+}
+
+// Feature card
+function FeatureCard({ icon: Icon, title, description }: { icon: React.ComponentType<{ className?: string }>; title: string; description: string }) {
+  return (
+    <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900/80 to-slate-950/80 border border-white/10 p-6 hover:border-amber-500/30 transition-all duration-300">
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="relative">
+        <div className="mb-4 inline-flex rounded-xl bg-amber-500/10 p-3">
+          <Icon className="h-6 w-6 text-amber-400" />
+        </div>
+        <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
+        <p className="text-sm leading-relaxed text-white/60">{description}</p>
+      </div>
     </div>
   );
 }
@@ -203,48 +250,29 @@ function FeatureCard({ icon: Icon, title, description, delay }: { icon: React.Co
 export default function RampartLandingPage() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [slashActive, setSlashActive] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
       setSubmitted(true);
-      setSlashActive(true);
-      setTimeout(() => setSlashActive(false), 600);
     }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
-      <FloatingParticles />
+    <div className="relative min-h-screen overflow-hidden bg-slate-950">
+      <WaveAnimation />
 
-      {/* Parallax Background */}
-      <div
-        ref={heroRef}
-        className="fixed inset-0 z-0"
-        style={{
-          transform: `translateY(${scrollY * 0.3}px)`,
-        }}
-      >
+      {/* Background layers */}
+      <div className="fixed inset-0 z-0">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: "url('/images/games/rampart/hero-bg.png')",
-            filter: "brightness(0.4) saturate(1.2)",
+            filter: "brightness(0.25) saturate(1.2)",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/80" />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-transparent to-slate-950/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/90 to-slate-950" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-900/20 via-transparent to-transparent" />
       </div>
 
       {/* Content */}
@@ -253,7 +281,7 @@ export default function RampartLandingPage() {
         <nav className="container-px py-6">
           <Link
             href="/games"
-            className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to games
@@ -261,148 +289,183 @@ export default function RampartLandingPage() {
         </nav>
 
         {/* Hero Section */}
-        <section className="container-px py-16 sm:py-24 lg:py-32">
-          <div className="mx-auto max-w-4xl text-center">
-            {/* Badge */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5">
-              <Sparkles className="h-4 w-4 text-amber-400" />
-              <span className="text-xs font-medium uppercase tracking-wider text-amber-300">
-                Coming Soon
-              </span>
+        <section className="container-px py-12 sm:py-20">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div className="order-2 lg:order-1">
+              <div className="mb-6 flex items-center gap-4">
+                <span className="rounded-full bg-red-500/10 border border-red-500/30 px-3 py-1 text-xs font-medium uppercase tracking-wider text-red-400">
+                  Coming Soon
+                </span>
+                <WaveCounter />
+              </div>
+
+              <h1 className="mb-4 text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
+                <span className="block">RAMPART</span>
+                <span className="block mt-2 text-3xl sm:text-4xl lg:text-5xl bg-gradient-to-r from-amber-400 via-amber-200 to-amber-400 bg-clip-text text-transparent">
+                  Wave Defense
+                </span>
+              </h1>
+
+              <p className="mb-8 text-lg text-white/70 leading-relaxed max-w-lg">
+                The horde never stops coming. Build your defenses, command your units, 
+                and survive wave after wave of relentless enemies in this medieval pixel-art 
+                action strategy game.
+              </p>
+
+              <div className="flex flex-wrap gap-4">
+                {!submitted ? (
+                  <form onSubmit={handleSubmit} className="flex-1 max-w-sm">
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter email for beta access"
+                        className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-amber-500/50 focus:outline-none"
+                        required
+                      />
+                      <button
+                        type="submit"
+                        className="group rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-amber-500/25"
+                      >
+                        <span className="flex items-center gap-1">
+                          Join
+                          <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                        </span>
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="rounded-xl border border-green-500/30 bg-green-500/10 px-5 py-3">
+                    <p className="text-green-400 font-medium text-sm">🛡️ You&apos;re enlisted! Watch for battle orders.</p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Title with animation */}
-            <h1 className="relative mb-6">
-              <span className="block text-6xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl">
-                RAMPART
-              </span>
-              <span className="absolute -inset-4 blur-3xl opacity-30 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700" />
-            </h1>
-
-            <p className="mx-auto mb-4 max-w-2xl text-xl text-amber-100/90 sm:text-2xl">
-              Defend Your Kingdom
-            </p>
-
-            <p className="mx-auto mb-10 max-w-xl text-base leading-relaxed text-white/60">
-              A medieval tower defense where strategy meets chaos. Build towers, summon heroes, 
-              and hold the line against relentless waves of enemies.
-            </p>
-
-            {/* CTA */}
-            {!submitted ? (
-              <form onSubmit={handleSubmit} className="mx-auto max-w-md">
-                <div className="flex gap-3">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email for early access"
-                    className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
-                    required
-                  />
-                  <button
-                    type="submit"
-                    className="group relative overflow-hidden rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-amber-500/25"
-                  >
-                    <SwordSlash active={slashActive} />
-                    <span className="relative flex items-center gap-2">
-                      Join Waitlist
-                      <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="mx-auto max-w-md rounded-lg border border-green-500/30 bg-green-500/10 px-6 py-4">
-                <p className="text-green-400 font-medium">⚔️ You&apos;re on the list!</p>
-                <p className="mt-1 text-sm text-white/60">We&apos;ll notify you when Rampart is ready for battle.</p>
-              </div>
-            )}
+            <div className="order-1 lg:order-2">
+              <EnemyShowcase />
+            </div>
           </div>
         </section>
 
-        {/* Castle Damage Showcase */}
-        <section className="container-px py-16">
-          <div className="glass-card relative overflow-hidden p-8 sm:p-12">
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-600/5 to-transparent" />
+        {/* How It Works */}
+        <section className="container-px py-16 border-t border-white/5">
+          <div className="mx-auto max-w-3xl text-center mb-12">
+            <h2 className="text-2xl font-semibold text-white mb-3">Survive the Onslaught</h2>
+            <p className="text-white/50">Wave after wave. How long can you hold?</p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-3">
             <div className="relative">
-              <h2 className="mb-2 text-center text-2xl font-semibold text-white">
-                Your Castle. Your Defense.
-              </h2>
-              <p className="mb-10 text-center text-sm text-white/60">
-                Watch your fortress take damage as enemies breach your walls. Can you hold the line?
-              </p>
-              <CastleShowcase />
+              <div className="absolute top-8 left-full w-full h-px bg-gradient-to-r from-amber-500/50 to-transparent hidden sm:block" />
+              <div className="rounded-2xl bg-slate-900/50 border border-white/10 p-6 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10">
+                  <Shield className="h-8 w-8 text-amber-400" />
+                </div>
+                <h3 className="mb-2 font-semibold text-white">Build Defenses</h3>
+                <p className="text-sm text-white/50">Walls, towers, and traps to slow the enemy advance</p>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute top-8 left-full w-full h-px bg-gradient-to-r from-amber-500/50 to-transparent hidden sm:block" />
+              <div className="rounded-2xl bg-slate-900/50 border border-white/10 p-6 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10">
+                  <Target className="h-8 w-8 text-amber-400" />
+                </div>
+                <h3 className="mb-2 font-semibold text-white">Command Units</h3>
+                <p className="text-sm text-white/50">Deploy archers, knights, and heroes to repel invaders</p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-slate-900/50 border border-white/10 p-6 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10">
+                <Zap className="h-8 w-8 text-amber-400" />
+              </div>
+              <h3 className="mb-2 font-semibold text-white">Upgrade & Adapt</h3>
+              <p className="text-sm text-white/50">Between waves, strengthen your position for the next assault</p>
             </div>
           </div>
         </section>
 
         {/* Features Grid */}
-        <section className="container-px py-16">
-          <h2 className="mb-10 text-center text-2xl font-semibold text-white">
-            What Awaits in Rampart
-          </h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="container-px py-16 border-t border-white/5">
+          <div className="mx-auto max-w-3xl text-center mb-12">
+            <h2 className="text-2xl font-semibold text-white mb-3">Features</h2>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <FeatureCard
-              icon={Castle}
-              title="Strategic Tower Defense"
-              description="Place towers wisely. Archer, Cannon, Mage—each with unique strengths. Create kill zones and chokepoints."
-              delay={0}
+              icon={Skull}
+              title="Relentless Waves"
+              description="Enemies come in endless waves, each stronger than the last. No breaks, no mercy."
             />
             <FeatureCard
-              icon={Sword}
-              title="Hero System"
-              description="Summon powerful champions to turn the tide. Level them up, equip gear, and unleash devastating abilities."
-              delay={100}
+              icon={Target}
+              title="Strategic Combat"
+              description="Position units, manage resources, and make split-second tactical decisions."
             />
             <FeatureCard
               icon={Shield}
-              title="Dynamic Fortress"
-              description="Your castle takes real damage. Watch walls crumble and towers fall. Repair, rebuild, and persevere."
-              delay={200}
+              title="Base Building"
+              description="Construct walls, towers, and defenses between waves to prepare for the next assault."
+            />
+            <FeatureCard
+              icon={Zap}
+              title="Hero System"
+              description="Unlock powerful heroes with unique abilities to turn the tide of battle."
+            />
+            <FeatureCard
+              icon={Skull}
+              title="Diverse Enemies"
+              description="From goblin scouts to fire-breathing dragons, face a variety of threats."
+            />
+            <FeatureCard
+              icon={Target}
+              title="Pixel Art Style"
+              description="Hand-crafted medieval pixel art with dynamic lighting and effects."
             />
           </div>
         </section>
 
-        {/* Wave Preview */}
-        <section className="container-px py-16">
-          <div className="glass-card relative overflow-hidden p-8 sm:p-12">
-            <div className="absolute inset-0 bg-gradient-to-r from-red-900/10 via-transparent to-amber-900/10" />
-            <div className="relative grid gap-8 lg:grid-cols-2 lg:items-center">
+        {/* Castle State */}
+        <section className="container-px py-16 border-t border-white/5">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-slate-950 border border-white/10">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/20 via-transparent to-transparent" />
+            
+            <div className="relative grid gap-8 p-8 sm:p-12 lg:grid-cols-2 lg:items-center">
               <div>
-                <h2 className="mb-4 text-2xl font-semibold text-white">
-                  Face the Horde
-                </h2>
-                <p className="mb-6 text-white/70 leading-relaxed">
-                  From goblin scouts to fire-breathing dragons, each wave brings new challenges. 
-                  Adapt your strategy, upgrade your defenses, and survive the onslaught.
+                <h2 className="mb-4 text-3xl font-bold text-white">Your Castle is Your Life</h2>                <p className="mb-6 text-white/60 leading-relaxed">
+                  Watch your fortress take damage in real-time. Every hit matters. 
+                  When the walls fall, the kingdom falls with them. Repair, rebuild, 
+                  and fight on—or watch everything crumble.
                 </p>
-                <ul className="space-y-3">
-                  {[
-                    "Wave-based progression with increasing difficulty",
-                    "Diverse enemy types with unique behaviors",
-                    "Boss battles that test your mastery",
-                    "Endless mode for the ultimate challenge",
-                  ].map((feature) => (
-                    <li key={feature} className="flex items-center gap-3 text-sm text-white/60">
-                      <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="relative aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-amber-900/30 to-slate-900/50">
-                <Image
-                  src="/images/games/rampart/hero-bg.png"
-                  alt="Battlefield"
-                  fill
-                  className="object-cover opacity-60"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="mb-2 text-6xl">⚔️</div>
-                    <p className="text-sm text-white/50">Battlefield Preview</p>
+                <div className="flex items-center gap-4">
+                  <div className="flex -space-x-2">
+                    {[
+                      "/images/games/rampart/icon.png",
+                      "/images/games/rampart/castle-damaged.png", 
+                      "/images/games/rampart/castle-critical.png"
+                    ].map((src, i) => (
+                      <div key={i} className="h-12 w-12 rounded-full border-2 border-slate-900 bg-slate-800 overflow-hidden">
+                        <Image src={src} alt="" width={48} height={48} className="object-contain" />
+                      </div>
+                    ))}
                   </div>
+                  <span className="text-sm text-white/40">3 damage states</span>
+                </div>
+              </div>
+              <div className="flex justify-center">
+                <div className="relative">
+                  <div className="absolute -inset-8 rounded-full bg-red-500/20 blur-3xl" />
+                  <Image
+                    src="/images/games/rampart/castle-critical.png"
+                    alt="Critical castle state"
+                    width={200}
+                    height={200}
+                    className="relative drop-shadow-2xl"
+                  />
                 </div>
               </div>
             </div>
@@ -412,50 +475,48 @@ export default function RampartLandingPage() {
         {/* Final CTA */}
         <section className="container-px py-24">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="mb-4 text-3xl font-bold text-white">
-              The Kingdom Needs You
-            </h2>
+            <h2 className="mb-4 text-3xl font-bold text-white">Ready to Defend?</h2>
             <p className="mb-8 text-white/60">
-              Join the waitlist and be among the first to defend the realm.
+              The first wave is coming. Will you be ready?
             </p>
             {!submitted ? (
-              <form onSubmit={handleSubmit} className="mx-auto max-w-md">
-                <div className="flex gap-3">
+              <form onSubmit={handleSubmit} className="mx-auto max-w-sm">
+                <div className="flex gap-2">
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-amber-500/50 focus:outline-none"
+                    className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-amber-500/50 focus:outline-none"
                     required
                   />
                   <button
                     type="submit"
-                    className="rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-amber-500/25"
+                    className="rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-amber-500/25"
                   >
-                    Join Waitlist
+                    Join Beta
                   </button>
                 </div>
               </form>
             ) : (
-              <div className="mx-auto max-w-md rounded-lg border border-green-500/30 bg-green-500/10 px-6 py-4">
-                <p className="text-green-400 font-medium">🛡️ You&apos;re enlisted!</p>
+              <div className="mx-auto max-w-sm rounded-xl border border-green-500/30 bg-green-500/10 px-6 py-4">
+                <p className="text-green-400 font-medium">⚔️ You&apos;re on the list!</p>
               </div>
             )}
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="container-px py-8 border-t border-white/10">
+        <footer className="container-px py-8 border-t border-white/5">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-white/40">
+            <p className="text-sm text-white/30">
               © 2025 Go7Studio. All rights reserved.
             </p>
             <div className="flex gap-6">
-              <Link href="/games" className="text-sm text-white/40 hover:text-white/70">
+              <Link href="/games" className="text-sm text-white/30 hover:text-white/60">
                 All Games
               </Link>
-              <Link href="/" className="text-sm text-white/40 hover:text-white/70">
+              <Link href="/" className="text-sm text-white/30 hover:text-white/60">
                 Go7Studio
               </Link>
             </div>

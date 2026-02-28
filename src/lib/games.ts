@@ -24,19 +24,19 @@ export type Game = {
 export const GAMES: Game[] = [
   {
     slug: "rampart",
-    title: "Rampart - Tower Defense",
+    title: "Rampart - Wave Defense",
     thumbnail: "/images/games/rampart/icon.png",
-    tagline: "Defend your kingdom. Build your fortress. Command your army.",
+    tagline: "Defend your kingdom. Build your fortress. Survive the endless waves.",
     description:
-      "A medieval tower defense where strategy meets chaos—build towers, summon heroes, and hold the line against relentless waves.",
+      "A medieval wave defense where strategy meets chaos—build defenses, command units, and hold the line against relentless enemy waves.",
     longDescription:
-      "The horde is coming. In Rampart, you are the last line of defense between your kingdom and total destruction.\n\nBuild an impenetrable fortress with towers, walls, and strategic chokepoints. Summon powerful heroes to turn the tide. Face increasingly challenging waves of enemies—from goblin scouts to fire-breathing dragons.\n\nEvery decision matters: placement, upgrades, timing. Will your rampart hold, or will the kingdom fall?",
+      "The horde is coming. In Rampart, you are the last line of defense between your kingdom and total destruction.\n\nBuild an impenetrable fortress with walls, towers, and strategic chokepoints. Command powerful units and heroes to turn the tide. Face increasingly challenging waves of enemies—from militia scouts to fire-breathing dragons.\n\nEvery decision matters: placement, upgrades, timing. Will your rampart hold, or will the kingdom fall?",
     features: [
-      "Strategic tower defense with deep placement mechanics",
-      "Multiple tower types: Archer, Cannon, Mage, and more",
-      "Hero system: Summon powerful champions to defend",
+      "Strategic wave defense with deep placement mechanics",
+      "Command units: Militia, Archers, Knights, and more",
+      "Hero system: Unlock powerful champions to turn the tide",
       "Dynamic castle health system—watch your fortress take damage",
-      "Wave-based progression with increasing difficulty",
+      "Endless waves with increasing difficulty and enemy variety",
       "Medieval pixel art aesthetic with earthy, warm tones",
     ],
     status: "coming-soon",
@@ -46,12 +46,12 @@ export const GAMES: Game[] = [
     secondaryCtaLabel: "Meet the Studio",
     secondaryCtaHref: "/#about",
     screenshots: [
-      "/images/games/rampart/castle-damaged.png",
-      "/images/games/rampart/castle-critical.png",
+      "/images/games/rampart/enemy-orc.png",
+      "/images/games/rampart/enemy-wolf.png",
       "/images/games/rampart/hero-bg.png",
     ],
     ogImage: "/images/games/rampart/hero-bg.png",
-    keywords: ["tower defense", "strategy game", "medieval", "pixel art", "android game", "castle defense"],
+    keywords: ["wave defense", "strategy game", "medieval", "pixel art", "android game", "castle defense", "endless waves"],
   },
   {
     slug: "empire-tycoon",
