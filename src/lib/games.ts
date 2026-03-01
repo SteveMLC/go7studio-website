@@ -46,9 +46,9 @@ export const GAMES: Game[] = [
     secondaryCtaLabel: "Meet the Studio",
     secondaryCtaHref: "/#about",
     screenshots: [
-      "/images/games/rampart/enemy-orc.png",
-      "/images/games/rampart/enemy-wolf.png",
-      "/images/games/rampart/hero-bg.png",
+      "/images/games/rampart/troop-axe-goblin.png",
+      "/images/games/rampart/troop-fire-golem.png",
+      "/images/games/rampart/troop-behemoth.png",
     ],
     ogImage: "/images/games/rampart/hero-bg.png",
     keywords: ["wave defense", "strategy game", "medieval", "pixel art", "android game", "castle defense", "endless waves"],

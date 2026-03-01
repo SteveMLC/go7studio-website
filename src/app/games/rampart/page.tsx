@@ -71,50 +71,50 @@ function WaveAnimation() {
   );
 }
 
-// Enemy showcase component
+// Enemy showcase component - using ACTUAL in-game troop sprites
 function EnemyShowcase() {
   const enemies = [
     { 
-      src: "/images/games/rampart/militia-archer.png", 
-      name: "Archer", 
-      type: "Militia",
+      src: "/images/games/rampart/troop-militiaman.png", 
+      name: "Club Militia", 
+      type: "Basic",
       threat: "Low",
-      desc: "Quick attacks from range"
+      desc: "Basic melee fighter"
     },
     { 
-      src: "/images/games/rampart/enemy-orc.png", 
-      name: "Orc Raider", 
+      src: "/images/games/rampart/troop-axe-goblin.png", 
+      name: "Axe Goblin", 
       type: "Enemy",
       threat: "Medium",
-      desc: "Brutal melee damage"
+      desc: "Fast goblin raider"
     },
     { 
-      src: "/images/games/rampart/enemy-wolf.png", 
-      name: "Dire Wolf", 
+      src: "/images/games/rampart/troop-troll-dog.png", 
+      name: "Troll Dog", 
+      type: "Beast",
+      threat: "Medium",
+      desc: "Vicious beast unit"
+    },
+    { 
+      src: "/images/games/rampart/troop-swordsman.png", 
+      name: "Chainmail Swordsman", 
       type: "Enemy",
-      threat: "Medium",
-      desc: "Fast and ferocious"
+      threat: "High",
+      desc: "Armored melee elite"
     },
     { 
-      src: "/images/games/rampart/enemy-skeleton.png", 
-      name: "Skeleton", 
-      type: "Undead",
-      threat: "Medium",
-      desc: "Relentless undead horde"
-    },
-    { 
-      src: "/images/games/rampart/enemy-behemoth.png", 
-      name: "Behemoth", 
+      src: "/images/games/rampart/troop-fire-golem.png", 
+      name: "Fire Golem", 
       type: "Boss",
       threat: "High",
-      desc: "Massive tank unit"
+      desc: "Burning elemental"
     },
     { 
-      src: "/images/games/rampart/enemy-dragon.png", 
-      name: "Dragon", 
+      src: "/images/games/rampart/troop-behemoth.png", 
+      name: "Electric Behemoth", 
       type: "Boss",
       threat: "Extreme",
-      desc: "Fire-breathing nightmare"
+      desc: "Massive tank boss"
     },
   ];
 
