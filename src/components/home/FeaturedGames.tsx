@@ -60,11 +60,11 @@ export function FeaturedGames() {
               onClick={() => setActiveFilter(filter.value)}
               className={`group inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? "bg-white text-ink-950"
+                  ? "bg-white text-slate-950"
                   : "bg-white/5 text-white/70 ring-1 ring-white/10 hover:bg-white/10 hover:text-white"
               }`}
             >
-              <Icon className={`h-4 w-4 transition-colors ${isActive ? "text-ink-950" : ""}`} />
+              <Icon className={`h-4 w-4 transition-colors ${isActive ? "text-slate-950" : ""}`} />
               {filter.label}
             </button>
           );
