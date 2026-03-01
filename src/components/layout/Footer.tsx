@@ -1,12 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Github, Twitter, Youtube } from "lucide-react";
+import { NewsletterSignup } from "@/components/common/NewsletterSignup";
 
 export function Footer() {
   return (
     <footer className="border-t border-white/10 bg-[#050510]">
       <div className="container-px grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="space-y-3 lg:col-span-2">
+        <div className="space-y-4 lg:col-span-2">
           <div className="flex items-center gap-2">
             <Image
               src="/images/branding/go7studio-logo-square.png"
@@ -21,6 +22,13 @@ export function Footer() {
             We build fun-first games with satisfying progression, delightful
             polish, and replayable worlds that players love to return to.
           </p>
+          
+          {/* Newsletter Signup */}
+          <div className="max-w-sm">
+            <p className="mb-2 text-sm font-medium text-white">Stay Updated</p>
+            <NewsletterSignup />
+          </div>
+          
           <p className="text-xs text-white/40">
             © {new Date().getFullYear()} Go7Studio. All rights reserved.
           </p>
