@@ -59,20 +59,20 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
         const r = inner + (outer - inner) * ratio * pulse;
 
         const isHovered = hoveredDay === i;
-        const color = `hsla(${190 + i * 18}, 90%, 62%, ${isHovered ? "1" : "0.9"})`;
+        const hue = 190 + (i / 7) * 160; // cyan -> pink
+        const colorOuter = `hsla(${hue}, 90%, 62%, ${isHovered ? "1" : "0.88"})`;
+        const colorInner = `hsla(${hue}, 90%, 62%, 0.3)`;
         const grad = ctx.createRadialGradient(cx, cy, inner, cx, cy, r);
-        grad.addColorStop(0, color.replace("0.9", "0.35"));
-        grad.addColorStop(1, color);
+        grad.addColorStop(0, colorInner);
+        grad.addColorStop(1, colorOuter);
 
         ctx.beginPath();
         ctx.arc(cx, cy, r, start, end);
         ctx.arc(cx, cy, inner, end, start, true);
         ctx.closePath();
         ctx.fillStyle = grad;
-        if (isHovered) {
-          ctx.shadowColor = "rgba(56,189,248,0.7)";
-          ctx.shadowBlur = 20;
-        }
+        ctx.shadowColor = "rgba(56,189,248,0.7)";
+        ctx.shadowBlur = isHovered ? 25 : 15;
         ctx.fill();
         ctx.shadowBlur = 0;
 

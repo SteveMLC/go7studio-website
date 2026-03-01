@@ -112,15 +112,29 @@ export function OrbitalNetwork({ repos, loading }: { repos: GitHubRepo[]; loadin
       const p = positions[i];
       const [r, g, b] = hexToRgb(n.color);
       const hovered = hoveredRef.current === i;
+      const pulse = 1 + Math.sin(ts * 0.001 + i) * 0.1;
 
-      ctx.shadowColor = `rgba(${r},${g},${b},0.9)`;
-      ctx.shadowBlur = hovered ? 24 : 10;
-      const grad = ctx.createRadialGradient(p.x - 1, p.y - 1, 0, p.x, p.y, n.size * (hovered ? 1.6 : 1));
-      grad.addColorStop(0, `rgba(${Math.min(255, r + 90)},${Math.min(255, g + 90)},${Math.min(255, b + 90)},0.95)`);
-      grad.addColorStop(1, `rgba(${r},${g},${b},0.8)`);
+      // motion trail
+      for (let t = 1; t <= 5; t++) {
+        const trailAngle = n.angle + (ts - t * 50) * n.speed;
+        const tx = cx + Math.cos(trailAngle) * n.orbitRadius * scale;
+        const ty = cy + Math.sin(trailAngle) * n.orbitRadius * scale * 0.6;
+        const alpha = 0.16 - t * 0.025;
+        if (alpha <= 0) continue;
+        ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+        ctx.beginPath();
+        ctx.arc(tx, ty, Math.max(1, n.size * (0.42 - t * 0.06)), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.shadowColor = `rgba(${r},${g},${b},0.95)`;
+      ctx.shadowBlur = hovered ? 35 : 20 * pulse;
+      const grad = ctx.createRadialGradient(p.x - 1, p.y - 1, 0, p.x, p.y, n.size * (hovered ? 2.1 : 1.4));
+      grad.addColorStop(0, `rgba(${Math.min(255, r + 90)},${Math.min(255, g + 90)},${Math.min(255, b + 90)},0.98)`);
+      grad.addColorStop(1, `rgba(${r},${g},${b},0.85)`);
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, n.size * (hovered ? 1.35 : 1), 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, n.size * (hovered ? 1.45 : 1.1) * pulse, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
     });

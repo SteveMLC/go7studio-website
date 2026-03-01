@@ -89,18 +89,30 @@ function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
           <div className="grid grid-rows-7 grid-flow-col gap-[3px]">
             {days.map((d, i) => {
               const p = d.count / max;
-              const bg = d.count === 0 
-                ? "rgba(255,255,255,0.05)" 
-                : `rgba(6,182,212,${0.3 + p * 0.7})`;
+              const bg = d.count === 0
+                ? "rgba(255,255,255,0.05)"
+                : `rgba(34,211,238,${0.4 + p * 0.6})`;
               return (
                 <motion.div 
                   key={d.date}
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.001, duration: 0.2 }}
+                  transition={{
+                    delay: (i % 7) * 0.01 + Math.floor(i / 7) * 0.005,
+                    duration: 0.2,
+                  }}
+                  whileHover={{
+                    scale: 1.3,
+                    boxShadow: "0 0 12px rgba(34,211,238,0.8)",
+                  }}
                   title={`${d.date}: ${d.count}`}
-                  className="h-3 w-3 rounded-[2px] transition-all duration-200 hover:shadow-[0_0_8px_rgba(6,182,212,0.6)] hover:scale-125"
-                  style={{ backgroundColor: bg }}
+                  className="h-3 w-3 rounded-[2px]"
+                  style={{
+                    backgroundColor: bg,
+                    boxShadow: d.count > 0
+                      ? `0 0 ${4 + p * 8}px rgba(34,211,238,0.4)`
+                      : "none",
+                  }}
                 />
               );
             })}
@@ -210,17 +222,21 @@ export function InsightsDashboard() {
         
         {/* Floating particles */}
         <div className="pointer-events-none absolute inset-0">
-          {[...Array(12)].map((_, i) => (
+          {[...Array(25)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute h-1 w-1 rounded-full bg-cyan-400"
+              className="absolute rounded-full"
               style={{
+                width: `${1 + (i % 4)}px`,
+                height: `${1 + (i % 4)}px`,
+                backgroundColor: i % 2 === 0 ? "rgb(34 211 238)" : "rgb(232 121 249)",
                 left: `${10 + (i * 7) % 80}%`,
                 top: `${20 + (i * 13) % 60}%`,
               }}
               animate={{
+                x: [0, 8 - (i % 3), 0],
                 y: [0, -15 - (i % 5), 0],
-                opacity: [0.1, 0.5, 0.1],
+                opacity: [0.1, 0.55, 0.1],
               }}
               transition={{
                 duration: 3 + (i % 3),

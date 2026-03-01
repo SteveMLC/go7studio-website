@@ -70,15 +70,31 @@ export function ContributionStream({ days, loading }: { days: DayPoint[]; loadin
       particlesRef.current.forEach((p, i) => {
         p.x = (i / Math.max(1, particlesRef.current.length - 1)) * w + Math.sin(t * 0.5 + p.t) * 4;
         p.y = p.baseY + Math.sin(t * 0.8 + p.t) * (10 + (p.count / 10));
-        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
-        glow.addColorStop(0, `rgba(${p.r},${p.g},${p.b},0.5)`);
+        const glowRadius = p.size * 5;
+        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius);
+        glow.addColorStop(0, `rgba(${p.r},${p.g},${p.b},0.8)`);
         glow.addColorStop(1, `rgba(${p.r},${p.g},${p.b},0)`);
         ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},0.95)`;
+        const trail = ctx.createRadialGradient(
+          p.x - Math.cos(p.t + t) * 10,
+          p.y - Math.sin(p.t + t) * 10,
+          0,
+          p.x,
+          p.y,
+          p.size * 2,
+        );
+        trail.addColorStop(0, `rgba(${p.r},${p.g},${p.b},0.25)`);
+        trail.addColorStop(1, `rgba(${p.r},${p.g},${p.b},0.15)`);
+        ctx.fillStyle = trail;
+        ctx.beginPath();
+        ctx.arc(p.x - Math.cos(p.t + t) * 6, p.y - Math.sin(p.t + t) * 6, p.size * 1.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},0.98)`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
