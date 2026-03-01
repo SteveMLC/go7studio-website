@@ -3,197 +3,103 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useInView, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Leaf, Wind, Sparkles, Mountain, Download, ExternalLink } from "lucide-react";
+import { motion, useInView } from "framer-motion";
+import { ArrowLeft, Wind, Leaf, Mountain, Sparkles, Download, ExternalLink } from "lucide-react";
 import Script from "next/script";
 import { getVideoGameSchema, createSchemaGraph } from "@/lib/schema";
 
-// Zen garden elements for stacked composition
-const zenElements = [
-  { src: "/images/games/sortbloom/zen-garden/rock_shrine_stone.png", name: "Shrine Stone", layer: 1 },
-  { src: "/images/games/sortbloom/zen-garden/plant_bonsai.png", name: "Bonsai", layer: 2 },
-  { src: "/images/games/sortbloom/zen-garden/plant_bamboo.png", name: "Bamboo", layer: 3 },
-  { src: "/images/games/sortbloom/zen-garden/plant_cherry_blossom.png", name: "Cherry Blossom", layer: 4 },
-  { src: "/images/games/sortbloom/zen-garden/water_lily_pad.png", name: "Lily Pad", layer: 5 },
+// Zen garden elements positioned like a real garden
+const gardenElements = [
+  { src: "/images/games/sortbloom/zen-garden/rock_shrine_stone.png", x: "15%", y: "60%", size: 100, delay: 0 },
+  { src: "/images/games/sortbloom/zen-garden/plant_bonsai.png", x: "75%", y: "45%", size: 90, delay: 0.2 },
+  { src: "/images/games/sortbloom/zen-garden/plant_bamboo.png", x: "65%", y: "70%", size: 85, delay: 0.4 },
+  { src: "/images/games/sortbloom/zen-garden/rock_medium_cluster1.png", x: "25%", y: "75%", size: 70, delay: 0.6 },
+  { src: "/images/games/sortbloom/zen-garden/plant_cherry_blossom.png", x: "80%", y: "25%", size: 80, delay: 0.8 },
+  { src: "/images/games/sortbloom/zen-garden/water_lily_pad.png", x: "45%", y: "55%", size: 60, delay: 1 },
 ];
 
-// Floating sakura petals animation
-function FloatingPetals() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animationId: number;
-    const petals: Array<{
-      x: number;
-      y: number;
-      size: number;
-      speedY: number;
-      speedX: number;
-      rotation: number;
-      rotationSpeed: number;
-      opacity: number;
-    }> = [];
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    const createPetal = () => ({
-      x: Math.random() * canvas.width,
-      y: -20,
-      size: Math.random() * 8 + 4,
-      speedY: Math.random() * 1 + 0.5,
-      speedX: (Math.random() - 0.5) * 0.5,
-      rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.02,
-      opacity: Math.random() * 0.4 + 0.3,
-    });
-
-    const init = () => {
-      resize();
-      for (let i = 0; i < 25; i++) {
-        const petal = createPetal();
-        petal.y = Math.random() * canvas.height;
-        petals.push(petal);
-      }
-    };
-
-    const drawPetal = (p: typeof petals[0]) => {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rotation);
-      ctx.globalAlpha = p.opacity;
-      
-      // Draw cherry blossom petal shape
-      ctx.beginPath();
-      ctx.moveTo(0, -p.size);
-      ctx.bezierCurveTo(p.size * 0.5, -p.size * 0.5, p.size * 0.5, p.size * 0.5, 0, p.size);
-      ctx.bezierCurveTo(-p.size * 0.5, p.size * 0.5, -p.size * 0.5, -p.size * 0.5, 0, -p.size);
-      ctx.fillStyle = "#FFB7C5";
-      ctx.fill();
-      
-      ctx.restore();
-    };
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      petals.forEach((p, i) => {
-        p.y += p.speedY;
-        p.x += p.speedX + Math.sin(p.y * 0.01) * 0.3;
-        p.rotation += p.rotationSpeed;
-
-        if (p.y > canvas.height + 20) {
-          petals[i] = createPetal();
-        }
-
-        drawPetal(p);
-      });
-
-      animationId = requestAnimationFrame(animate);
-    };
-
-    init();
-    animate();
-    window.addEventListener("resize", resize);
-
-    return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener("resize", resize);
-    };
-  }, []);
+// Gentle floating garden element
+function GardenElement({ element, index }: { element: typeof gardenElements[0]; index: number }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-10"
-    />
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={isInView ? { 
+        opacity: 1, 
+        scale: 1,
+      } : {}}
+      transition={{ duration: 1, delay: element.delay }}
+      className="absolute"
+      style={{ 
+        left: element.x, 
+        top: element.y,
+        filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.15))"
+      }}
+    >
+      <motion.div
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 4 + index * 0.5, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <Image
+          src={element.src}
+          alt=""
+          width={element.size}
+          height={element.size}
+          className="object-contain"
+        />
+      </motion.div>
+    </motion.div>
   );
 }
 
-// Stacked zen garden composition
-function ZenGardenStack() {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-
+// Zen Garden Scene
+function ZenGardenScene() {
   return (
-    <div ref={ref} className="relative mx-auto h-[400px] w-[300px] sm:h-[500px] sm:w-[400px]">
-      {/* Background sand texture */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-b from-[#E8DCC4] to-[#D4C4A8] opacity-30 blur-3xl" />
-      
-      {/* Zen elements stacked */}
-      <AnimatePresence>
-        {zenElements.map((element, index) => (
-          <motion.div
-            key={element.name}
-            initial={{ opacity: 0, y: 50, scale: 0.8 }}
-            animate={isInView ? { 
-              opacity: 1, 
-              y: 0, 
-              scale: hoveredIndex === index ? 1.1 : 1,
-              zIndex: hoveredIndex === index ? 10 : element.layer,
-            } : {}}
-            transition={{ 
-              duration: 0.6, 
-              delay: index * 0.15,
-              type: "spring",
-              stiffness: 100,
-            }}
-            className="absolute left-1/2 cursor-pointer"
-            style={{
-              bottom: `${index * 60}px`,
-              transform: "translateX(-50%)",
-              zIndex: hoveredIndex === index ? 10 : element.layer,
-            }}
-            onMouseEnter={() => setHoveredIndex(index)}
-            onMouseLeave={() => setHoveredIndex(null)}
-          >
-            <div className="relative">
-              <Image
-                src={element.src}
-                alt={element.name}
-                width={120 + index * 20}
-                height={120 + index * 20}
-                className="drop-shadow-2xl transition-all duration-300"
-                style={{
-                  filter: hoveredIndex === index ? "brightness(1.2)" : "brightness(1)",
-                }}
-              />
-              <AnimatePresence>
-                {hoveredIndex === index && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 5 }}
-                    className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white/10 px-3 py-1 text-xs text-white/80 backdrop-blur-sm"
-                  >
-                    {element.name}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+    <div className="relative w-full h-[400px] sm:h-[500px]">
+      {/* Raked sand circles background */}
+      <div className="absolute inset-0">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.4 }}
+          transition={{ duration: 2 }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full"
+          style={{
+            background: "repeating-radial-gradient(circle at center, transparent 0, transparent 20px, rgba(139, 115, 85, 0.1) 20px, rgba(139, 115, 85, 0.1) 21px)"
+          }}
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.3 }}
+          transition={{ duration: 2, delay: 0.5 }}
+          className="absolute top-[20%] left-[15%] w-[150px] h-[150px] rounded-full border border-[#C4B59D]/30"
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.2 }}
+          transition={{ duration: 2, delay: 0.8 }}
+          className="absolute bottom-[25%] right-[10%] w-[200px] h-[200px] rounded-full border border-[#C4B59D]/20"
+        />
+      </div>
+
+      {/* Garden elements */}
+      {gardenElements.map((element, index) => (
+        <GardenElement key={index} element={element} index={index} />
+      ))}
     </div>
   );
 }
 
-// Feature card with zen styling
-function ZenFeatureCard({ 
+// Feature card with zen minimalism
+function ZenFeature({ 
   icon: Icon, 
   title, 
   description, 
   index 
 }: { 
-  icon: typeof Leaf; 
+  icon: typeof Wind; 
   title: string; 
   description: string; 
   index: number;
@@ -204,65 +110,45 @@ function ZenFeatureCard({
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/[0.05] to-transparent border border-white/10 p-6 transition-all duration-300 hover:border-emerald-500/30 hover:bg-white/[0.08]"
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      className="group relative p-6"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      
-      <div className="relative">
-        <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 ring-1 ring-emerald-500/30">
-          <Icon className="h-6 w-6 text-emerald-400" />
-        </div>
-        <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
-        <p className="text-sm leading-relaxed text-white/60">{description}</p>
+      <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#7A9E7E]/20 to-[#8B9A46]/10 ring-1 ring-[#7A9E7E]/30 transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-[#7A9E7E]/20">
+        <Icon className="h-5 w-5 text-[#5A7A5E]" />
       </div>
+      <h3 className="mb-2 text-lg font-medium text-[#3D3D3D]">{title}</h3>
+      <p className="text-sm leading-relaxed text-[#6B6B6B]">{description}</p>
     </motion.div>
   );
 }
 
-// Rank progression
-const ranks = [
-  { name: "Seedling", color: "#8B9A46" },
-  { name: "Sprout", color: "#7A9E7E" },
-  { name: "Gardener", color: "#6B8E6B" },
-  { name: "Zen Master", color: "#D4A574" },
-  { name: "Summit", color: "#C9B037" },
-];
-
-function RankProgression() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-
+// Gentle wave divider
+function WaveDivider() {
   return (
-    <div ref={ref} className="relative">
-      <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500/50 via-teal-500/50 to-amber-500/50" />
-      
-      <div className="space-y-6">
-        {ranks.map((rank, index) => (
-          <motion.div
-            key={rank.name}
-            initial={{ opacity: 0, x: -20 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
-            className="relative flex items-center gap-4 pl-12"
-          >
-            <div 
-              className="absolute left-2 h-4 w-4 rounded-full ring-4 ring-ink-950"
-              style={{ backgroundColor: rank.color }}
-            />
-            <div className="flex-1 rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
-              <span className="text-sm font-medium text-white">{rank.name}</span>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+    <div className="w-full overflow-hidden">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-16 opacity-30">
+        <path 
+          d="M0,60 C300,120 600,0 900,60 C1050,90 1150,40 1200,60 L1200,120 L0,120 Z" 
+          fill="url(#zenGradient)"
+        />
+        <defs>
+          <linearGradient id="zenGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#7A9E7E" stopOpacity="0.2" />
+            <stop offset="50%" stopColor="#C4B59D" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#7A9E7E" stopOpacity="0.2" />
+          </linearGradient>
+        </defs>
+      </svg>
     </div>
   );
 }
 
 export default function SortbloomPage() {
+  const heroRef = useRef(null);
+  const isHeroInView = useInView(heroRef, { once: true });
+
   return (
     <>
       <Script
@@ -292,219 +178,235 @@ export default function SortbloomPage() {
           ),
         }}
       />
-      <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-[#1a2f2a] to-slate-950">
-      <FloatingPetals />
 
-      {/* Background layers */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/30 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-teal-900/20 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-amber-900/10 via-transparent to-transparent" />
-      </div>
+      <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#FAF8F5] via-[#F5F2ED] to-[#EDE8E0]">
+        {/* Subtle paper texture overlay */}
+        <div 
+          className="fixed inset-0 pointer-events-none opacity-30 z-0"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          }}
+        />
 
-      {/* Content */}
-      <div className="relative z-20">
-        {/* Navigation */}
-        <nav className="container-px py-6">
-          <Link
-            href="/games"
-            className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to games
-          </Link>
-        </nav>
+        <div className="relative z-10">
+          {/* Navigation */}
+          <nav className="container-px py-6">
+            <Link 
+              href="/games" 
+              className="inline-flex items-center gap-2 text-sm text-[#7A7A7A] hover:text-[#5A7A5E] transition-colors duration-300"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to games
+            </Link>
+          </nav>
 
-        {/* Hero Section */}
-        <section className="container-px py-12 sm:py-20">
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-            <div className="order-2 lg:order-1">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 ring-1 ring-emerald-500/30">
-                <Sparkles className="h-3.5 w-3.5" />
-                Available Now
+          {/* Hero Section */}
+          <section className="container-px py-12 sm:py-16">
+            <motion.div 
+              ref={heroRef}
+              initial={{ opacity: 0 }}
+              animate={isHeroInView ? { opacity: 1 } : {}}
+              transition={{ duration: 0.6 }}
+              className="grid gap-8 lg:grid-cols-2 lg:items-center"
+            >
+              <div className="order-2 lg:order-1 text-center lg:text-left">
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                  className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#7A9E7E]/10 px-4 py-2 text-xs font-medium text-[#5A7A5E] ring-1 ring-[#7A9E7E]/20"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Available Now
+                </motion.div>
+
+                <motion.h1 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="text-5xl font-light tracking-tight text-[#3D3D3D] sm:text-6xl lg:text-7xl"
+                >
+                  Sortbloom
+                </motion.h1>
+
+                <motion.p 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="mt-3 text-xl text-[#7A9E7E] font-light"
+                >
+                  Zen Block Puzzle
+                </motion.p>
+
+                <motion.p 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="mt-6 text-lg leading-relaxed text-[#6B6B6B] max-w-md mx-auto lg:mx-0"
+                >
+                  Sort blocks. Watch your garden bloom. Find your zen in this 
+                  meditative puzzle experience.
+                </motion.p>
+
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  className="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start"
+                >
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.go7studio.stakd"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#7A9E7E] to-[#6B8E6B] px-6 py-3 text-sm font-medium text-white shadow-md shadow-[#7A9E7E]/20 transition-all duration-300 hover:shadow-lg hover:shadow-[#7A9E7E]/30 hover:-translate-y-0.5"
+                  >
+                    <Download className="h-4 w-4" />
+                    Get it on Google Play
+                  </a>
+
+                  <a
+                    href="https://sortbloom.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur-sm px-6 py-3 text-sm font-medium text-[#5A5A5A] ring-1 ring-[#D4C4B0] transition-all duration-300 hover:bg-white hover:shadow-md"
+                  >
+                    Visit Site
+                    <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </a>
+                </motion.div>
               </div>
 
-              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Sortbloom
-              </h1>
+              <div className="order-1 lg:order-2">
+                <ZenGardenScene />
+              </div>
+            </motion.div>
+          </section>
 
-              <p className="mt-4 text-xl text-emerald-100/80">
-                Zen Block Puzzle
-              </p>
+          <WaveDivider />
 
-              <p className="mt-6 text-lg leading-relaxed text-white/70">
-                Sort blocks. Watch your garden bloom. Find your zen in this 
-                meditative puzzle experience where every solve nurtures your 
-                personal sanctuary.
-              </p>
+          {/* How It Works */}
+          <section className="container-px py-20 bg-gradient-to-b from-transparent to-[#F8F5F0]/50">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="mx-auto max-w-2xl text-center mb-16"
+            >
+              <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#9A9A9A] mb-4">
+                How to Play
+              </span>
+              <h2 className="text-3xl font-light text-[#3D3D3D]">
+                Simple to Learn. Deep to Master.
+              </h2>
+            </motion.div>
 
-              <div className="mt-8 flex flex-wrap gap-4">
+            <div className="grid gap-8 sm:grid-cols-3">
+              {[
+                { emoji: "🧩", title: "Sort Blocks", desc: "Move colored blocks into matching stacks", color: "from-[#A8C5A8]" },
+                { emoji: "🌸", title: "Grow Garden", desc: "Complete puzzles to nurture your zen garden", color: "from-[#E8B4B4]" },
+                { emoji: "🏔️", title: "Reach Summit", desc: "Progress through 25 ranks to mastery", color: "from-[#C4B59D]" },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.15 }}
+                  className="text-center group"
+                >
+                  <div className={`mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br ${item.color} to-white/50 shadow-lg shadow-stone-200/50 transition-transform duration-500 group-hover:scale-105`}>
+                    <span className="text-3xl">{item.emoji}</span>
+                  </div>
+                  <h3 className="mb-2 text-lg font-medium text-[#3D3D3D]">{item.title}</h3>
+                  <p className="text-sm text-[#7A7A7A]">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          <WaveDivider />
+
+          {/* Features Grid */}
+          <section className="container-px py-20">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="mx-auto max-w-2xl text-center mb-16"
+            >
+              <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#9A9A9A] mb-4">
+                Features
+              </span>
+              <h2 className="text-3xl font-light text-[#3D3D3D]">Find Your Zen</h2>
+            </motion.div>
+
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <ZenFeature icon={Wind} title="No Timers" description="Play at your own peaceful pace. No pressure, no rush." index={0} />
+              <ZenFeature icon={Leaf} title="Living Garden" description="Watch your zen garden flourish with every puzzle solved." index={1} />
+              <ZenFeature icon={Mountain} title="25 Ranks" description="From Seedling to Summit — a journey of mastery." index={2} />
+              <ZenFeature icon={Sparkles} title="48 Achievements" description="Rewards for dedication, speed, and skill." index={3} />
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="container-px py-20">
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#7A9E7E]/10 via-[#C4B59D]/10 to-[#7A9E7E]/5 border border-[#C4B59D]/30 p-10 sm:p-16 text-center"
+            >
+              {/* Decorative circles */}
+              <div className="absolute top-0 left-0 w-40 h-40 rounded-full bg-[#7A9E7E]/5 -translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute bottom-0 right-0 w-60 h-60 rounded-full bg-[#C4B59D]/5 translate-x-1/3 translate-y-1/3" />
+              
+              <div className="relative">
+                <h2 className="text-3xl font-light text-[#3D3D3D] mb-3">
+                  Ready to Find Your Zen?
+                </h2>
+                <p className="mb-8 text-[#6B6B6B] max-w-md mx-auto">
+                  Download Sortbloom today and begin your journey.
+                </p>
+                
                 <a
                   href="https://play.google.com/store/apps/details?id=com.go7studio.stakd"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 hover:scale-105"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#7A9E7E] to-[#6B8E6B] px-8 py-4 text-base font-medium text-white shadow-lg shadow-[#7A9E7E]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#7A9E7E]/30 hover:-translate-y-0.5"
                 >
-                  <Download className="h-4 w-4" />
-                  Get it on Google Play
+                  <Download className="h-5 w-5" />
+                  Download Free on Google Play
                 </a>
+              </div>
+            </motion.div>
+          </section>
 
-                <a
-                  href="https://sortbloom.com"
+          {/* Footer */}
+          <footer className="container-px py-10 border-t border-[#D4C4B0]/30">
+            <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+              <p className="text-sm text-[#9A9A9A]">
+                © 2025 Go7Studio. Made with peace. 🍃
+              </p>
+              <div className="flex gap-6">
+                <Link href="/games" className="text-sm text-[#9A9A9A] hover:text-[#5A7A5E] transition-colors">
+                  All Games
+                </Link>
+                <a 
+                  href="https://sortbloom.com" 
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-2 rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white ring-1 ring-white/20 transition-all hover:bg-white/15"
+                  className="text-sm text-[#9A9A9A] hover:text-[#5A7A5E] transition-colors"
                 >
-                  Visit Sortbloom.com
-                  <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  Sortbloom.com
                 </a>
               </div>
             </div>
-
-            <div className="order-1 lg:order-2">
-              <ZenGardenStack />
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works */}
-        <section className="container-px py-16 border-t border-white/5">
-          <div className="mx-auto max-w-3xl text-center mb-12">
-            <span className="inline-block rounded-full bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/60 ring-1 ring-white/10 mb-4">
-              How to Play
-            </span>
-            <h2 className="text-2xl font-bold text-white">Simple to Learn. Deep to Master.</h2>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-3">
-            <div className="relative">
-              <div className="absolute top-8 left-full w-full h-px bg-gradient-to-r from-emerald-500/30 to-transparent hidden sm:block" />
-              <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10">
-                  <span className="text-3xl">🧩</span>
-                </div>
-                <h3 className="mb-2 font-semibold text-white">Sort Blocks</h3>
-                <p className="text-sm text-white/50">Move colored blocks into matching stacks</p>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="absolute top-8 left-full w-full h-px bg-gradient-to-r from-teal-500/30 to-transparent hidden sm:block" />
-              <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500/20 to-teal-600/10">
-                  <span className="text-3xl">🌸</span>
-                </div>
-                <h3 className="mb-2 font-semibold text-white">Grow Garden</h3>
-                <p className="text-sm text-white/50">Complete puzzles to nurture your zen garden</p>
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-white/5 border border-white/10 p-6 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-600/10">
-                <span className="text-3xl">🏔️</span>
-              </div>
-              <h3 className="mb-2 font-semibold text-white">Reach Summit</h3>
-              <p className="text-sm text-white/50">Progress through 25 ranks to mastery</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Grid */}
-        <section className="container-px py-16 border-t border-white/5">
-          <div className="grid gap-12 lg:grid-cols-2">
-            <div>
-              <span className="inline-block rounded-full bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/60 ring-1 ring-white/10 mb-4">
-                Features
-              </span>
-              <h2 className="text-2xl font-bold text-white mb-8">Find Your Zen</h2>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <ZenFeatureCard
-                  icon={Wind}
-                  title="No Timers, No Pressure"
-                  description="Play at your own peaceful pace. No ads interrupting your flow."
-                  index={0}
-                />
-                <ZenFeatureCard
-                  icon={Leaf}
-                  title="Living Garden"
-                  description="Watch your zen garden flourish as you solve puzzles."
-                  index={1}
-                />
-                <ZenFeatureCard
-                  icon={Mountain}
-                  title="25 Ranks"
-                  description="From Seedling to Summit — master 25 levels of progression."
-                  index={2}
-                />
-                <ZenFeatureCard
-                  icon={Sparkles}
-                  title="48 Achievements"
-                  description="Unlock rewards for mastery, speed, streaks, and more."
-                  index={3}
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center">
-              <span className="inline-block rounded-full bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/60 ring-1 ring-white/10 mb-4">
-                Progression
-              </span>
-              <h2 className="text-2xl font-bold text-white mb-8">Rise Through the Ranks</h2>
-              <RankProgression />
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="container-px py-24">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-900/40 to-teal-900/20 border border-emerald-500/20 p-8 sm:p-12 text-center">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500/10 via-transparent to-transparent" />
-            
-            <div className="relative">
-              <h2 className="text-3xl font-bold text-white mb-4">
-                Ready to Find Your Zen?
-              </h2>
-              <p className="mb-8 text-white/60 max-w-md mx-auto">
-                Download Sortbloom today and begin your journey to puzzle mastery.
-              </p>
-              
-              <a
-                href="https://play.google.com/store/apps/details?id=com.go7studio.stakd"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 hover:scale-105"
-              >
-                <Download className="h-5 w-5" />
-                Download Free on Google Play
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="container-px py-8 border-t border-white/5">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-white/30">
-              © 2025 Go7Studio. Sortbloom is a trademark of Go7Studio LLC.
-            </p>
-            <div className="flex gap-6">
-              <Link href="/games" className="text-sm text-white/30 hover:text-white/60">
-                All Games
-              </Link>
-              <a 
-                href="https://sortbloom.com" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-white/30 hover:text-white/60"
-              >
-                Sortbloom.com
-              </a>
-            </div>
-          </div>
-        </footer>
+          </footer>
+        </div>
       </div>
-    </div>
     </>
   );
 }

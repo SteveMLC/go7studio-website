@@ -4,8 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
-// Contact form posts to our own /api/contact endpoint
-// which sends Telegram notifications to the team
+const FORMSPREE_ID = "mdalvabv";
 
 const projectTypes = [
   { value: "", label: "Select project type..." },
@@ -40,18 +39,18 @@ export default function ContactPage() {
     const formData = new FormData(form);
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
         method: "POST",
         body: formData,
+        headers: { Accept: "application/json" },
       });
 
-      const result = await response.json();
-
-      if (response.ok && result.ok) {
+      if (response.ok) {
         setStatus("success");
         form.reset();
       } else {
-        setErrorMessage(result.error || "Something went wrong. Please try again.");
+        const data = await response.json();
+        setErrorMessage(data.error || "Something went wrong. Please try again.");
         setStatus("error");
       }
     } catch {
