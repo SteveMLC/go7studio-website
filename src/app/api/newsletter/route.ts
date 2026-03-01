@@ -11,31 +11,38 @@ interface NewsletterEntry {
   userAgent?: string;
 }
 
-const NEWSLETTER_FILE = path.join(process.cwd(), "data", "newsletter.json");
+// Use /tmp for Vercel serverless compatibility
+const DATA_DIR = process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "data");
+const NEWSLETTER_FILE = path.join(DATA_DIR, "newsletter.json");
 
 function ensureDataDir() {
-  const dataDir = path.join(process.cwd(), "data");
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
   }
 }
 
 function readNewsletter(): NewsletterEntry[] {
-  ensureDataDir();
-  if (!fs.existsSync(NEWSLETTER_FILE)) {
-    return [];
-  }
   try {
+    ensureDataDir();
+    if (!fs.existsSync(NEWSLETTER_FILE)) {
+      return [];
+    }
     const data = fs.readFileSync(NEWSLETTER_FILE, "utf-8");
     return JSON.parse(data);
-  } catch {
+  } catch (error) {
+    console.error("Error reading newsletter file:", error);
     return [];
   }
 }
 
 function writeNewsletter(entries: NewsletterEntry[]) {
-  ensureDataDir();
-  fs.writeFileSync(NEWSLETTER_FILE, JSON.stringify(entries, null, 2));
+  try {
+    ensureDataDir();
+    fs.writeFileSync(NEWSLETTER_FILE, JSON.stringify(entries, null, 2));
+  } catch (error) {
+    console.error("Error writing newsletter file:", error);
+    throw error;
+  }
 }
 
 export async function POST(request: NextRequest) {

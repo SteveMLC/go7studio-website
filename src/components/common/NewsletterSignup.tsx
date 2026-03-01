@@ -36,7 +36,7 @@ export function NewsletterSignup() {
         setEmail("");
       } else {
         setStatus("error");
-        setMessage(data.error || "Something went wrong. Please try again.");
+        setMessage(data.error || `Server error: ${response.status}. Please try again.`);
       }
     } catch {
       setStatus("error");

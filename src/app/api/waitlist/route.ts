@@ -9,31 +9,38 @@ interface WaitlistEntry {
   userAgent?: string;
 }
 
-const WAITLIST_FILE = path.join(process.cwd(), "data", "waitlist.json");
+// Use /tmp for Vercel serverless compatibility
+const DATA_DIR = process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "data");
+const WAITLIST_FILE = path.join(DATA_DIR, "waitlist.json");
 
 function ensureDataDir() {
-  const dataDir = path.join(process.cwd(), "data");
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
   }
 }
 
 function readWaitlist(): WaitlistEntry[] {
-  ensureDataDir();
-  if (!fs.existsSync(WAITLIST_FILE)) {
-    return [];
-  }
   try {
+    ensureDataDir();
+    if (!fs.existsSync(WAITLIST_FILE)) {
+      return [];
+    }
     const data = fs.readFileSync(WAITLIST_FILE, "utf-8");
     return JSON.parse(data);
-  } catch {
+  } catch (error) {
+    console.error("Error reading waitlist file:", error);
     return [];
   }
 }
 
 function writeWaitlist(entries: WaitlistEntry[]) {
-  ensureDataDir();
-  fs.writeFileSync(WAITLIST_FILE, JSON.stringify(entries, null, 2));
+  try {
+    ensureDataDir();
+    fs.writeFileSync(WAITLIST_FILE, JSON.stringify(entries, null, 2));
+  } catch (error) {
+    console.error("Error writing waitlist file:", error);
+    throw error;
+  }
 }
 
 export async function POST(request: NextRequest) {
