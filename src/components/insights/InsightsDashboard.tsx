@@ -123,48 +123,115 @@ function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
   );
 }
 
+function buildSmoothPath(points: Array<{ x: number; y: number }>): string {
+  if (points.length < 2) return "";
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const cx = (prev.x + curr.x) / 2;
+    d += ` C ${cx} ${prev.y}, ${cx} ${curr.y}, ${curr.x} ${curr.y}`;
+  }
+  return d;
+}
+
 function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number; deletions: number }> }) {
   const data = rows.slice(-24);
+  const width = 720;
+  const height = 220;
+  const pad = 18;
   const max = Math.max(1, ...data.map((r) => Math.max(r.additions, r.deletions)));
 
+  const addPoints = data.map((r, i) => ({
+    x: pad + (i / Math.max(1, data.length - 1)) * (width - pad * 2),
+    y: height - pad - (r.additions / max) * (height - pad * 2),
+  }));
+  const delPoints = data.map((r, i) => ({
+    x: pad + (i / Math.max(1, data.length - 1)) * (width - pad * 2),
+    y: height - pad - (r.deletions / max) * (height - pad * 2),
+  }));
+
+  const addPath = buildSmoothPath(addPoints);
+  const delPath = buildSmoothPath(delPoints);
+
+  const addArea = addPoints.length
+    ? `${addPath} L ${addPoints[addPoints.length - 1].x} ${height - pad} L ${addPoints[0].x} ${height - pad} Z`
+    : "";
+  const delArea = delPoints.length
+    ? `${delPath} L ${delPoints[delPoints.length - 1].x} ${height - pad} L ${delPoints[0].x} ${height - pad} Z`
+    : "";
+
   return (
-    <div className="space-y-1.5">
-      {data.map((r, i) => (
-        <div key={r.week} className="flex items-center gap-2 text-xs">
-          <div className="w-16 text-[10px] tabular-nums text-white/40">{r.week.slice(5)}</div>
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${Math.round((r.additions / max) * 180)}px` }}
-            transition={{ duration: 0.5, delay: i * 0.02 }}
-            className="h-1.5 rounded-full bg-cyan-400" 
-          />
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${Math.round((r.deletions / max) * 180)}px` }}
-            transition={{ duration: 0.5, delay: i * 0.02 }}
-            className="h-1.5 rounded-full bg-fuchsia-400" 
-          />
-        </div>
-      ))}
+    <div className="overflow-x-auto">
+      <svg viewBox={`0 0 ${width} ${height}`} className="h-[220px] w-full min-w-[680px]">
+        <defs>
+          <linearGradient id="cvAdd" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(34,211,238,0.40)" />
+            <stop offset="100%" stopColor="rgba(34,211,238,0.04)" />
+          </linearGradient>
+          <linearGradient id="cvDel" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(244,114,182,0.28)" />
+            <stop offset="100%" stopColor="rgba(244,114,182,0.03)" />
+          </linearGradient>
+        </defs>
+
+        <line x1={pad} y1={height - pad} x2={width - pad} y2={height - pad} stroke="rgba(255,255,255,0.12)" />
+
+        {addArea && <path d={addArea} fill="url(#cvAdd)" />}
+        {delArea && <path d={delArea} fill="url(#cvDel)" />}
+
+        {addPath && <path d={addPath} fill="none" stroke="rgba(34,211,238,0.95)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
+        {delPath && <path d={delPath} fill="none" stroke="rgba(244,114,182,0.95)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
+      </svg>
     </div>
   );
 }
 
 function CommitClock({ hourly }: { hourly: number[] }) {
+  const size = 320;
+  const cx = size / 2;
+  const cy = size / 2;
+  const inner = 58;
+  const outer = 128;
   const max = Math.max(1, ...hourly);
+
+  const points = hourly.map((v, i) => {
+    const angle = (i / 24) * Math.PI * 2 - Math.PI / 2;
+    const r = inner + (v / max) * (outer - inner);
+    return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r };
+  });
+  const closed = points.length ? [...points, points[0]] : points;
+  const path = buildSmoothPath(closed);
+
+  const peakHour = hourly.reduce((best, v, i) => (v > hourly[best] ? i : best), 0);
+
   return (
-    <div className="grid grid-cols-12 gap-1">
-      {hourly.map((v, i) => (
-        <div key={i} className="space-y-1 text-center">
-          <motion.div 
-            initial={{ height: 0 }}
-            animate={{ height: `${Math.max(4, Math.round((v / max) * 40))}px` }}
-            transition={{ duration: 0.3, delay: i * 0.02 }}
-            className="mx-auto w-2 rounded-full bg-fuchsia-400" 
-          />
-          <div className="text-[9px] tabular-nums text-white/40">{i}</div>
-        </div>
-      ))}
+    <div className="flex justify-center">
+      <svg viewBox={`0 0 ${size} ${size}`} className="h-[300px] w-[300px]">
+        <defs>
+          <radialGradient id="clockArea" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stopColor="rgba(168,85,247,0.08)" />
+            <stop offset="100%" stopColor="rgba(34,211,238,0.24)" />
+          </radialGradient>
+        </defs>
+
+        <circle cx={cx} cy={cy} r={inner} fill="none" stroke="rgba(255,255,255,0.08)" />
+        <circle cx={cx} cy={cy} r={outer} fill="none" stroke="rgba(255,255,255,0.08)" />
+
+        {path && (
+          <>
+            <path d={`${path} L ${cx} ${cy} Z`} fill="url(#clockArea)" />
+            <path d={path} fill="none" stroke="rgba(34,211,238,0.95)" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
+          </>
+        )}
+
+        <text x={cx} y={cy - 4} textAnchor="middle" fill="rgba(255,255,255,0.9)" fontSize="18" fontWeight="700">
+          {peakHour}:00
+        </text>
+        <text x={cx} y={cy + 16} textAnchor="middle" fill="rgba(255,255,255,0.55)" fontSize="10" style={{ letterSpacing: "0.14em" }}>
+          PEAK HOUR
+        </text>
+      </svg>
     </div>
   );
 }
