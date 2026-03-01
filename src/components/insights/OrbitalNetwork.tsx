@@ -176,7 +176,8 @@ export function OrbitalNetwork({ repos, loading }: { repos: GitHubRepo[]; loadin
 
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-      <h3 className="mb-4 text-white">Orbital Network</h3>
+      <h3 className="mb-1 text-white">Orbital Network</h3>
+      <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Repository constellation · language glow map</p>
       <div ref={wrapperRef} className="relative h-[420px] w-full">
         <canvas ref={canvasRef} onMouseMove={onMove} onMouseLeave={() => { hoveredRef.current = -1; if (tooltipRef.current) tooltipRef.current.style.display = "none"; }} className="h-full w-full" />
         <div ref={tooltipRef} className="pointer-events-none absolute hidden rounded-lg border border-white/20 bg-[#020618]/90 px-3 py-2 text-xs text-white/90" />

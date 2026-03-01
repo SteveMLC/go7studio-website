@@ -89,7 +89,8 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
 
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-      <h3 className="mb-4 text-white">Radial Activity Ring</h3>
+      <h3 className="mb-1 text-white">Radial Activity Ring</h3>
+      <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Weekly rhythm · average contributions by weekday</p>
       <div ref={wrapRef} className="mx-auto aspect-square w-full max-w-[340px]">
         <canvas ref={canvasRef} className="h-full w-full" />
       </div>

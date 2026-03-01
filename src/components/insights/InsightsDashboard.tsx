@@ -9,8 +9,8 @@ import { RadialActivityRing } from "./RadialActivityRing";
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-      <div className="text-xs uppercase tracking-wider text-white/60">{label}</div>
+    <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-colors hover:border-cyan-300/30">
+      <div className="text-xs uppercase tracking-[0.14em] text-white/60">{label}</div>
       <div className="mt-2 text-2xl font-bold text-white">{value}</div>
     </div>
   );
@@ -91,13 +91,14 @@ export function InsightsDashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-cyan-500/15 to-fuchsia-500/10 p-8">
-        <div className="flex flex-wrap items-center gap-3 text-white/80">
+      <div className="relative overflow-hidden rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-cyan-500/15 via-slate-950 to-fuchsia-500/10 p-8 shadow-[0_0_40px_rgba(56,189,248,0.12)]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(56,189,248,0.2),transparent_35%),radial-gradient(circle_at_85%_85%,rgba(232,121,249,0.16),transparent_40%)]" />
+        <div className="relative flex flex-wrap items-center gap-3 text-white/80">
           <Sparkles className="h-5 w-5 text-cyan-300" />
-          <span className="text-xs uppercase tracking-wider">Live Engineering Signal</span>
+          <span className="text-xs uppercase tracking-[0.22em]">Live Engineering Signal</span>
         </div>
-        <h1 className="mt-2 text-4xl font-bold text-white">GitHub Insights</h1>
-        <p className="mt-2 max-w-3xl text-white/70">
+        <h1 className="relative mt-2 text-4xl font-bold tracking-tight text-white">GitHub Insights</h1>
+        <p className="relative mt-2 max-w-3xl text-white/70">
           Real-time contribution and repository telemetry for Go7Studio. Private repositories are anonymized.
         </p>
       </div>
@@ -107,6 +108,12 @@ export function InsightsDashboard() {
         <StatCard label="Repositories" value={totals.repos} />
         <StatCard label="Private (Anonymized)" value={totals.privateRepos} />
         <StatCard label="Active Days" value={totals.activeDays} />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-white/55">
+        <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-3 py-1 text-cyan-200">telemetry</span>
+        <span className="inline-flex items-center gap-2 rounded-full border border-fuchsia-300/30 bg-fuchsia-400/10 px-3 py-1 text-fuchsia-200">activity graph</span>
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-white/70">repo anonymization active</span>
       </div>
 
       <OrbitalNetwork repos={repos.data || []} loading={repos.loading} />

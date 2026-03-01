@@ -92,7 +92,8 @@ export function ContributionStream({ days, loading }: { days: DayPoint[]; loadin
 
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-      <h3 className="mb-4 text-white">Contribution Stream</h3>
+      <h3 className="mb-1 text-white">Contribution Stream</h3>
+      <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Last 90 days · flow intensity by contribution count</p>
       <div ref={wrapRef} className="h-[220px] w-full overflow-hidden rounded-lg">
         <canvas ref={canvasRef} className="h-full w-full" />
       </div>
