@@ -41,9 +41,9 @@ function ValueCard({ value, index }: { value: typeof values[0]; index: number })
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-      animate={isInView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.15 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
       className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/[0.06] to-white/[0.02] border border-white/10 p-6 transition-all duration-300 hover:border-white/20"
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${value.color} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
@@ -70,11 +70,16 @@ export function AboutSection() {
         {/* Left column - Story */}
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs text-white/70 ring-1 ring-white/10">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs text-white/70 ring-1 ring-white/10"
+          >
             <Image
               src="/images/branding/go7studio-logo-square.png"
               alt="Go7Studio"
@@ -83,17 +88,27 @@ export function AboutSection() {
               className="rounded"
             />
             About Go7Studio
-          </div>
+          </motion.div>
           
-          <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-4 text-3xl font-bold text-white sm:text-4xl"
+          >
             Small studio.
             <br />
             <span className="text-gradient">High polish.</span>
             <br />
             Built for momentum.
-          </h2>
+          </motion.h2>
           
-          <div className="mt-6 space-y-4 text-base leading-relaxed text-white/70">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-6 space-y-4 text-base leading-relaxed text-white/70"
+          >
             <p>
               We&apos;re a hands-on team building games and apps with obsessive focus 
               on usability, performance, and feel.
@@ -102,10 +117,15 @@ export function AboutSection() {
               From mobile tycoons to Roblox experiences, every project follows 
               the same principles: clear UX, satisfying feedback, and shipping real value.
             </p>
-          </div>
+          </motion.div>
 
           {/* Services pills */}
-          <div className="mt-6 flex flex-wrap gap-2">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-6 flex flex-wrap gap-2"
+          >
             {services.map((service) => (
               <span
                 key={service.text}
@@ -115,16 +135,21 @@ export function AboutSection() {
                 {service.text}
               </span>
             ))}
-          </div>
+          </motion.div>
           
-          <div className="mt-8">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-8"
+          >
             <Link
               href="/services"
               className="btn-secondary inline-flex items-center gap-2"
             >
               Explore Services
             </Link>
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* Right column - Values */}
