@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Gamepad2, Sparkles, Download } from "lucide-react";
+import { ArrowRight, Gamepad2, Sparkles, Download, Activity } from "lucide-react";
 
 // Animated floating particles
 function FloatingElements() {
@@ -184,6 +184,23 @@ export function HeroSection() {
               className="btn-secondary inline-flex w-full items-center justify-center gap-2 sm:w-auto"
             >
               Studio Services
+            </Link>
+          </motion.div>
+
+          {/* Insights CTA */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-6"
+          >
+            <Link
+              href="/insights"
+              className="group inline-flex items-center gap-2 text-sm text-cyan-300/80 transition-colors hover:text-cyan-200"
+            >
+              <Activity className="h-4 w-4" />
+              See what we&apos;re working on
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </motion.div>
 
