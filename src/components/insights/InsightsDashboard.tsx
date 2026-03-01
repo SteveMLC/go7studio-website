@@ -33,10 +33,20 @@ function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
   return (
     <div className="overflow-x-auto">
       <div className="grid grid-rows-7 grid-flow-col gap-1 min-w-[900px]">
-        {days.map((d) => {
+        {days.map((d, i) => {
           const p = d.count / max;
           const bg = d.count === 0 ? "rgba(255,255,255,0.06)" : `rgba(56,189,248,${0.2 + p * 0.8})`;
-          return <div key={d.date} title={`${d.date}: ${d.count}`} className="h-3 w-3 rounded-sm" style={{ backgroundColor: bg }} />;
+          return (
+            <motion.div
+              key={d.date}
+              title={`${d.date}: ${d.count}`}
+              className="h-3 w-3 rounded-sm"
+              style={{ backgroundColor: bg }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2, delay: Math.min(i * 0.002, 0.5) }}
+            />
+          );
         })}
       </div>
     </div>

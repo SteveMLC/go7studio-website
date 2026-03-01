@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DayPoint } from "./useGithubInsights";
+import { AnimatedTooltip } from "./AnimatedTooltip";
 
 type Particle = { x: number; y: number; baseY: number; size: number; count: number; date: string; r: number; g: number; b: number; t: number };
 
@@ -123,15 +124,18 @@ export function ContributionStream({ days, loading }: { days: DayPoint[]; loadin
       <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Last 90 days · flow intensity by contribution count</p>
       <div ref={wrapRef} className="relative h-[220px] w-full overflow-hidden rounded-lg">
         <canvas ref={canvasRef} onMouseMove={onMove} onMouseLeave={() => setTooltip(null)} className="h-full w-full cursor-crosshair" />
-        {tooltip && (
-          <div
-            className="pointer-events-none absolute rounded-lg border border-white/20 bg-[#020618]/90 px-3 py-2 text-xs text-white/90 shadow-[0_0_18px_rgba(56,189,248,0.2)]"
-            style={{ left: `${Math.min(tooltip.x + 14, (wrapRef.current?.clientWidth || 300) - 140)}px`, top: `${Math.max(tooltip.y - 44, 8)}px` }}
-          >
-            <div className="font-semibold text-cyan-200">{tooltip.count} contribution{tooltip.count === 1 ? "" : "s"}</div>
-            <div className="text-white/65">{new Date(tooltip.date).toLocaleDateString()}</div>
-          </div>
-        )}
+        <AnimatedTooltip
+          show={tooltip !== null}
+          x={Math.min((tooltip?.x || 0) + 14, (wrapRef.current?.clientWidth || 300) - 160)}
+          y={Math.max((tooltip?.y || 0) - 44, 8)}
+        >
+          {tooltip && (
+            <>
+              <div className="font-semibold text-cyan-200">{tooltip.count} contribution{tooltip.count === 1 ? "" : "s"}</div>
+              <div className="text-white/65">{new Date(tooltip.date).toLocaleDateString()}</div>
+            </>
+          )}
+        </AnimatedTooltip>
       </div>
     </section>
   );

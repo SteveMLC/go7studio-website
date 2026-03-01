@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GitHubRepo } from "./useGithubInsights";
+import { AnimatedTooltip } from "./AnimatedTooltip";
 
 type OrbitalNode = {
   repo: GitHubRepo;
@@ -36,10 +37,11 @@ const hexToRgb = (hex: string): [number, number, number] => [parseInt(hex.slice(
 export function OrbitalNetwork({ repos, loading }: { repos: GitHubRepo[]; loading?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
   const nodesRef = useRef<OrbitalNode[]>([]);
   const hoveredRef = useRef<number>(-1);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const topRepos = useMemo(() => {
     const now = Date.now();
@@ -160,15 +162,11 @@ export function OrbitalNetwork({ repos, loading }: { repos: GitHubRepo[]; loadin
     });
 
     hoveredRef.current = best;
-    const tt = tooltipRef.current;
-    if (best >= 0 && tt) {
-      const repo = nodesRef.current[best].repo;
-      tt.style.display = "block";
-      tt.style.left = `${Math.min(mx + 14, width - 190)}px`;
-      tt.style.top = `${Math.max(my - 50, 8)}px`;
-      tt.textContent = `${repo.name} · ${repo.language || "Unknown"}`;
-    } else if (tt) {
-      tt.style.display = "none";
+    if (best >= 0) {
+      setHoveredIndex(best);
+      setMousePos({ x: Math.min(mx + 14, width - 220), y: Math.max(my - 50, 8) });
+    } else {
+      setHoveredIndex(null);
     }
   };
 
@@ -179,8 +177,20 @@ export function OrbitalNetwork({ repos, loading }: { repos: GitHubRepo[]; loadin
       <h3 className="mb-1 text-white">Orbital Network</h3>
       <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Repository constellation · language glow map</p>
       <div ref={wrapperRef} className="relative h-[420px] w-full">
-        <canvas ref={canvasRef} onMouseMove={onMove} onMouseLeave={() => { hoveredRef.current = -1; if (tooltipRef.current) tooltipRef.current.style.display = "none"; }} className="h-full w-full" />
-        <div ref={tooltipRef} className="pointer-events-none absolute hidden rounded-lg border border-white/20 bg-[#020618]/90 px-3 py-2 text-xs text-white/90" />
+        <canvas
+          ref={canvasRef}
+          onMouseMove={onMove}
+          onMouseLeave={() => {
+            hoveredRef.current = -1;
+            setHoveredIndex(null);
+          }}
+          className="h-full w-full"
+        />
+        <AnimatedTooltip show={hoveredIndex !== null} x={mousePos.x} y={mousePos.y}>
+          {hoveredIndex !== null
+            ? `${nodesRef.current[hoveredIndex]?.repo.name} · ${nodesRef.current[hoveredIndex]?.repo.language || "Unknown"}`
+            : ""}
+        </AnimatedTooltip>
       </div>
     </section>
   );
