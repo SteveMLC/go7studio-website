@@ -90,9 +90,9 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="min-h-screen bg-ink-950 text-white antialiased">
+      <body className="min-h-screen bg-ink-950 text-white antialiased pt-16">
         <Header />
-        <main className="min-h-[calc(100vh-72px)]">{children}</main>
+        <main className="min-h-[calc(100vh-64px)]">{children}</main>
         <Footer />
       </body>
     </html>

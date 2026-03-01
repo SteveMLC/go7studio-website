@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedGames } from "@/components/home/FeaturedGames";
 import { AboutSection } from "@/components/home/AboutSection";
 import { StatsSection } from "@/components/home/StatsSection";
+import { FaqSection } from "@/components/home/FaqSection";
 import { HomepageStructuredData } from "@/components/seo/HomepageStructuredData";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function HomePage() {
       <FeaturedGames />
       <AboutSection />
       <StatsSection />
+      <FaqSection />
     </>
   );
 }
