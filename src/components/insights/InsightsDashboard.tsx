@@ -3,6 +3,9 @@
 import { useMemo } from "react";
 import { Activity, Clock3, GitBranch, Lock, Sparkles } from "lucide-react";
 import { GitHubRepo, LanguageMix, useGitHubInsights } from "./useGithubInsights";
+import { OrbitalNetwork } from "./OrbitalNetwork";
+import { ContributionStream } from "./ContributionStream";
+import { RadialActivityRing } from "./RadialActivityRing";
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
@@ -106,12 +109,16 @@ export function InsightsDashboard() {
         <StatCard label="Active Days" value={totals.activeDays} />
       </div>
 
+      <OrbitalNetwork repos={repos.data || []} loading={repos.loading} />
+
       <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
         <div className="mb-4 flex items-center gap-2 text-white">
           <Activity className="h-4 w-4 text-cyan-300" /> Activity Matrix (365d)
         </div>
         <Heatmap days={contributions.data?.days || []} />
       </section>
+
+      <ContributionStream days={contributions.data?.days || []} loading={contributions.loading} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
@@ -128,6 +135,8 @@ export function InsightsDashboard() {
           <CommitClock hourly={codeStats.data?.hourly_activity || new Array(24).fill(0)} />
         </section>
       </div>
+
+      <RadialActivityRing days={contributions.data?.days || []} loading={contributions.loading} />
 
       <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
         <div className="mb-4 flex items-center gap-2 text-white">

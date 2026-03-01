@@ -4,7 +4,19 @@ import { useEffect, useState } from "react";
 
 export type DayPoint = { date: string; count: number; weekday: number; color?: string };
 export type GitHubUser = { login: string; name: string | null; avatar_url: string | null; bio: string | null };
-export type GitHubRepo = { id: number; name: string; description: string | null; language: string | null; visibility: string; private: boolean };
+export type GitHubRepo = {
+  id: number;
+  name: string;
+  full_name?: string;
+  description: string | null;
+  language: string | null;
+  visibility: string;
+  private: boolean;
+  pushed_at: string;
+  stargazers_count: number;
+  forks_count: number;
+  size: number;
+};
 export type Contributions = { total_contributions: number; days: DayPoint[]; weekly_totals: number[]; total_commits?: number };
 export type CodeStats = { code_frequency: Array<{ week: string; additions: number; deletions: number }>; hourly_activity: number[]; day_hour_activity: number[][] };
 export type LanguageMix = { name: string; bytes: number; percentage: number };
