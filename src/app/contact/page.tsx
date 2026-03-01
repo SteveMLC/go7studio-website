@@ -4,14 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
-// To set up Formspree:
-// 1. Go to https://formspree.io and create a free account
-// 2. Create a new form and add both email recipients:
-//    - stephen@go7studio.com
-//    - walt@go7studio.com
-// 3. Copy your form ID (e.g., "xyzabcde") and set it as NEXT_PUBLIC_FORMSPREE_ID
-// Or replace the hardcoded ID below
-const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID || "YOUR_FORMSPREE_ID";
+// Contact form posts to our own /api/contact endpoint
+// which sends Telegram notifications to the team
 
 const projectTypes = [
   { value: "", label: "Select project type..." },
@@ -46,20 +40,18 @@ export default function ContactPage() {
     const formData = new FormData(form);
 
     try {
-      const response = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      const response = await fetch("/api/contact", {
         method: "POST",
         body: formData,
-        headers: {
-          Accept: "application/json",
-        },
       });
 
-      if (response.ok) {
+      const result = await response.json();
+
+      if (response.ok && result.ok) {
         setStatus("success");
         form.reset();
       } else {
-        const data = await response.json();
-        setErrorMessage(data.error || "Something went wrong. Please try again.");
+        setErrorMessage(result.error || "Something went wrong. Please try again.");
         setStatus("error");
       }
     } catch {
@@ -279,6 +271,15 @@ export default function ContactPage() {
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 outline-none transition-colors focus:border-brand-orange/50 focus:bg-white/[0.07]"
               />
             </div>
+
+            {/* Honeypot (hidden from humans, catches bots) */}
+            <input
+              type="text"
+              name="_gotcha"
+              style={{ display: "none" }}
+              tabIndex={-1}
+              autoComplete="off"
+            />
 
             {/* Submit Button */}
             <button

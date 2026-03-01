@@ -31,7 +31,9 @@ export function Header() {
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
     if (href.startsWith("/#")) return pathname === "/";
-    return pathname.startsWith(href);
+    // For other routes, check for exact match or sub-routes
+    if (href === "/games") return pathname === "/games" || pathname.startsWith("/games/");
+    return pathname === href || pathname.startsWith(href + "/");
   };
 
   return (
