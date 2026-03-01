@@ -2,6 +2,7 @@ export const SCHEMA_IDS = {
   ORG: "https://go7studio.com/#org",
   WEBSITE: "https://go7studio.com/#website",
   GAMES_LIST: "https://go7studio.com/games/#list",
+  SORTBLOOM_GAME: "https://go7studio.com/games/sortbloom/#game",
 } as const;
 
 export const SITE_URL = "https://go7studio.com";
@@ -48,6 +49,7 @@ export function getOrganizationSchema(): SchemaNode {
       "https://x.com/Steve_mlc",
       "https://discord.gg/go7studio",
       "https://github.com/SteveMLC",
+      "https://sortbloom.com",
     ],
     knowsAbout: [
       "Mobile Game Development",
@@ -121,5 +123,54 @@ export function createSchemaGraph(...nodes: object[]) {
   return {
     "@context": "https://schema.org",
     "@graph": nodes,
+  };
+}
+
+export function getVideoGameSchema(game: {
+  name: string;
+  description: string;
+  url: string;
+  image: string;
+  applicationCategory?: string;
+  operatingSystem?: string;
+  offers?: {
+    price: string;
+    priceCurrency: string;
+    availability?: string;
+  };
+  aggregateRating?: {
+    ratingValue: string;
+    ratingCount: string;
+  };
+  publisher?: string;
+}): SchemaNode {
+  return {
+    "@type": "VideoGame",
+    "@id": `${absoluteUrl(game.url)}#game`,
+    name: game.name,
+    description: game.description,
+    url: absoluteUrl(game.url),
+    image: absoluteUrl(game.image),
+    applicationCategory: game.applicationCategory || "GameApplication",
+    operatingSystem: game.operatingSystem || "Android",
+    offers: game.offers
+      ? {
+          "@type": "Offer",
+          price: game.offers.price,
+          priceCurrency: game.offers.priceCurrency,
+          availability: game.offers.availability || "https://schema.org/InStock",
+        }
+      : undefined,
+    aggregateRating: game.aggregateRating
+      ? {
+          "@type": "AggregateRating",
+          ratingValue: game.aggregateRating.ratingValue,
+          ratingCount: game.aggregateRating.ratingCount,
+        }
+      : undefined,
+    publisher: game.publisher || { "@id": SCHEMA_IDS.ORG },
+    genre: ["Puzzle", "Casual", "Zen"],
+    gamePlatform: ["Android"],
+    sameAs: ["https://sortbloom.com"],
   };
 }
