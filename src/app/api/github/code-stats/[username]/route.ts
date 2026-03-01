@@ -7,10 +7,12 @@ export async function GET(_: Request, { params }: { params: { username: string }
   try {
     const data = await fetchCodeStats(params.username);
     return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed" },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({
+      code_frequency: [],
+      hourly_activity: new Array(24).fill(0),
+      day_hour_activity: Array.from({ length: 7 }, () => new Array(24).fill(0)),
+      degraded: true,
+    });
   }
 }

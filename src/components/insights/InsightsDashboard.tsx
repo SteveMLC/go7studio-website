@@ -153,15 +153,15 @@ export function InsightsDashboard() {
     );
   }
 
-  if (user.error || repos.error || contributions.error || codeStats.error) {
+  if (user.error && repos.error) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="rounded-2xl border border-red-400/40 bg-red-500/10 p-6 text-red-100"
       >
         <h3 className="font-semibold">Failed to load insights</h3>
-        <p className="mt-2 text-sm opacity-80">Check GitHub token + API routes.</p>
+        <p className="mt-2 text-sm opacity-80">GitHub APIs are currently unavailable. Try again shortly.</p>
       </motion.div>
     );
   }
@@ -243,6 +243,12 @@ export function InsightsDashboard() {
         <StatCard label="Private (Anonymized)" value={totals.privateRepos} index={2} />
         <StatCard label="Active Days" value={totals.activeDays} index={3} />
       </div>
+
+      {((contributions.data as { degraded?: boolean } | null)?.degraded || (codeStats.data as { degraded?: boolean } | null)?.degraded) && (
+        <div className="rounded-xl border border-amber-300/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-100">
+          Limited mode: add GITHUB_TOKEN in Vercel env for full contribution + code telemetry.
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-white/55">
         <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-3 py-1 text-cyan-200">telemetry</span>

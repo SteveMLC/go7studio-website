@@ -7,10 +7,7 @@ export async function GET(_: Request, { params }: { params: { username: string }
   try {
     const data = await fetchLanguages(params.username);
     return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed" },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json([]);
   }
 }

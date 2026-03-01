@@ -40,10 +40,18 @@ export async function GET(_: Request, { params }: { params: { username: string }
       weekly_totals,
       days,
     });
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed" },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({
+      total_contributions: 0,
+      total_commits: 0,
+      total_prs: 0,
+      total_reviews: 0,
+      total_issues: 0,
+      total_repos_created: 0,
+      restricted_contributions: 0,
+      weekly_totals: [],
+      days: [],
+      degraded: true,
+    });
   }
 }

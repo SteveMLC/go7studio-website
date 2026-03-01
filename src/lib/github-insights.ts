@@ -49,22 +49,20 @@ export type RepoSummary = {
   size: number;
 };
 
-function getToken() {
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) {
-    throw new Error("Missing GITHUB_TOKEN env var");
-  }
-  return token;
+function getToken(): string | null {
+  return process.env.GITHUB_TOKEN || null;
 }
 
 async function githubFetch<T>(path: string): Promise<T> {
   const token = getToken();
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
   const res = await fetch(`${GITHUB_API}${path}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-    },
+    headers,
     next: { revalidate: 300 },
   });
 
@@ -94,10 +92,14 @@ export async function fetchUser(username: string) {
 }
 
 export async function fetchAuthenticatedRepos(username: string): Promise<RepoSummary[]> {
-  const repos = await githubFetch<GitHubRepoResponse[]>("/user/repos?sort=pushed&per_page=100&type=all");
+  const token = getToken();
+  const endpoint = token
+    ? "/user/repos?sort=pushed&per_page=100&type=all"
+    : `/users/${username}/repos?sort=pushed&per_page=100&type=owner`;
+  const repos = await githubFetch<GitHubRepoResponse[]>(endpoint);
 
   return repos
-    .filter((r) => r.owner?.login?.toLowerCase() === username.toLowerCase())
+    .filter((r) => (r.owner?.login || "").toLowerCase() === username.toLowerCase())
     .map((r) => ({
       id: r.id,
       name: r.name,
@@ -134,6 +136,9 @@ export function anonymizePrivateRepos(repos: RepoSummary[]): RepoSummary[] {
 
 export async function fetchContributionCalendar(username: string) {
   const token = getToken();
+  if (!token) {
+    throw new Error("Missing GITHUB_TOKEN for contributions API");
+  }
   const query = `
     query($username: String!) {
       user(login: $username) {
@@ -214,6 +219,7 @@ export async function fetchLanguages(username: string) {
 
 async function fetchCodeFrequency(owner: string, repo: string) {
   const token = getToken();
+  if (!token) return null;
   const res = await fetch(`${GITHUB_API}/repos/${owner}/${repo}/stats/code_frequency`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -227,6 +233,7 @@ async function fetchCodeFrequency(owner: string, repo: string) {
 
 async function fetchPunchCard(owner: string, repo: string) {
   const token = getToken();
+  if (!token) return null;
   const res = await fetch(`${GITHUB_API}/repos/${owner}/${repo}/stats/punch_card`, {
     headers: {
       Authorization: `Bearer ${token}`,
