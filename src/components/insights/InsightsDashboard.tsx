@@ -2,12 +2,12 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Activity, Clock3, GitBranch, Lock } from "lucide-react";
 import { GitHubRepo, LanguageMix, useGitHubInsights } from "./useGithubInsights";
 import { OrbitalNetwork } from "./OrbitalNetwork";
 import { ContributionStream } from "./ContributionStream";
 import { RadialActivityRing } from "./RadialActivityRing";
 
+// LANGUAGE_COLORS for bars
 const LANGUAGE_COLORS: Record<string, string> = {
   TypeScript: "#3178c6",
   JavaScript: "#f1e05a",
@@ -26,48 +26,86 @@ const LANGUAGE_COLORS: Record<string, string> = {
   Dart: "#00B4AB",
 };
 
-const getLanguageColor = (name: string) => LANGUAGE_COLORS[name] || "#22d3ee";
-
-// P0: Motion-enhanced StatCard with lift + glow
+// ENHANCED StatCard with tighter design
 function StatCard({ label, value, index }: { label: string; value: string | number; index: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 * index }}
-      whileHover={{ 
-        y: -4, 
-        scale: 1.02,
-        boxShadow: "0 0 30px rgba(56,189,248,0.15)"
-      }}
-      className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] cursor-default transition-colors hover:border-cyan-300/30"
+      whileHover={{ y: -2, scale: 1.01 }}
+      className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 cursor-default transition-colors hover:border-cyan-500/20"
     >
-      <div className="text-xs uppercase tracking-[0.14em] text-white/60">{label}</div>
-      <div className="mt-2 text-2xl font-bold text-white">{value}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">{label}</div>
+      <div className="mt-1 text-xl font-bold tabular-nums text-white">{value}</div>
     </motion.div>
   );
 }
 
+// ENHANCED Heatmap with month/day labels
 function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
   const max = Math.max(1, ...days.map((d) => d.count));
+  
+  // Calculate month positions
+  const monthLabels = useMemo(() => {
+    const labels: { month: string; index: number }[] = [];
+    let currentMonth = "";
+    days.forEach((d, i) => {
+      const month = new Date(d.date).toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+      if (month !== currentMonth && i % 7 === 0) {
+        currentMonth = month;
+        labels.push({ month, index: Math.floor(i / 7) });
+      }
+    });
+    return labels;
+  }, [days]);
+  
+  const dayLabels = ['MON', 'WED', 'FRI'];
+  
   return (
     <div className="overflow-x-auto">
-      <div className="grid grid-rows-7 grid-flow-col gap-1 min-w-[900px]">
-        {days.map((d, i) => {
-          const p = d.count / max;
-          const bg = d.count === 0 ? "rgba(255,255,255,0.06)" : `rgba(56,189,248,${0.2 + p * 0.8})`;
-          return (
-            <motion.div
-              key={d.date}
-              title={`${d.date}: ${d.count}`}
-              className="h-3 w-3 rounded-sm"
-              style={{ backgroundColor: bg }}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2, delay: Math.min(i * 0.002, 0.5) }}
-            />
-          );
-        })}
+      <div className="min-w-[900px]">
+        {/* Month labels */}
+        <div className="mb-2 flex text-[9px] font-semibold uppercase tracking-[0.15em] text-white/40">
+          {monthLabels.map((m, i) => (
+            <span 
+              key={`${m.month}-${i}`} 
+              style={{ marginLeft: i === 0 ? '28px' : `${(m.index - (monthLabels[i-1]?.index || 0)) * 16 - 28}px` }}
+            >
+              {m.month}
+            </span>
+          ))}
+        </div>
+        
+        <div className="flex gap-1">
+          {/* Day labels */}
+          <div className="flex flex-col justify-around py-1 pr-2 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/40">
+            {dayLabels.map((d) => (
+              <span key={d} className="h-3 leading-3">{d}</span>
+            ))}
+          </div>
+          
+          {/* Grid */}
+          <div className="grid grid-rows-7 grid-flow-col gap-[3px]">
+            {days.map((d, i) => {
+              const p = d.count / max;
+              const bg = d.count === 0 
+                ? "rgba(255,255,255,0.05)" 
+                : `rgba(6,182,212,${0.3 + p * 0.7})`;
+              return (
+                <motion.div 
+                  key={d.date}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.001, duration: 0.2 }}
+                  title={`${d.date}: ${d.count}`}
+                  className="h-3 w-3 rounded-[2px] transition-all duration-200 hover:shadow-[0_0_8px_rgba(6,182,212,0.6)] hover:scale-125"
+                  style={{ backgroundColor: bg }}
+                />
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -78,21 +116,21 @@ function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number;
   const max = Math.max(1, ...data.map((r) => Math.max(r.additions, r.deletions)));
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       {data.map((r, i) => (
-        <div key={r.week} className="flex items-center gap-3 text-xs">
-          <div className="w-20 text-white/50">{r.week.slice(5)}</div>
+        <div key={r.week} className="flex items-center gap-2 text-xs">
+          <div className="w-16 text-[10px] tabular-nums text-white/40">{r.week.slice(5)}</div>
           <motion.div 
             initial={{ width: 0 }}
-            animate={{ width: `${Math.round((r.additions / max) * 220)}px` }}
+            animate={{ width: `${Math.round((r.additions / max) * 180)}px` }}
             transition={{ duration: 0.5, delay: i * 0.02 }}
-            className="h-2 rounded bg-cyan-400/80" 
+            className="h-1.5 rounded-full bg-cyan-400" 
           />
           <motion.div 
             initial={{ width: 0 }}
-            animate={{ width: `${Math.round((r.deletions / max) * 220)}px` }}
+            animate={{ width: `${Math.round((r.deletions / max) * 180)}px` }}
             transition={{ duration: 0.5, delay: i * 0.02 }}
-            className="h-2 rounded bg-pink-400/80" 
+            className="h-1.5 rounded-full bg-fuchsia-400" 
           />
         </div>
       ))}
@@ -108,11 +146,11 @@ function CommitClock({ hourly }: { hourly: number[] }) {
         <div key={i} className="space-y-1 text-center">
           <motion.div 
             initial={{ height: 0 }}
-            animate={{ height: `${Math.max(4, Math.round((v / max) * 48))}px` }}
+            animate={{ height: `${Math.max(4, Math.round((v / max) * 40))}px` }}
             transition={{ duration: 0.3, delay: i * 0.02 }}
-            className="mx-auto w-3 rounded bg-fuchsia-400/80" 
+            className="mx-auto w-2 rounded-full bg-fuchsia-400" 
           />
-          <div className="text-[10px] text-white/40">{i}</div>
+          <div className="text-[9px] tabular-nums text-white/40">{i}</div>
         </div>
       ))}
     </div>
@@ -136,212 +174,265 @@ export function InsightsDashboard() {
 
   if (user.loading || repos.loading || contributions.loading || codeStats.loading) {
     return (
-      <div className="space-y-8">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-          <div className="h-8 w-48 animate-pulse rounded bg-white/10" />
-          <div className="mt-4 h-4 w-96 animate-pulse rounded bg-white/10" />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <div className="h-3 w-20 animate-pulse rounded bg-white/10" />
-              <div className="mt-2 h-8 w-24 animate-pulse rounded bg-white/10" />
-            </div>
-          ))}
+      <div className="mx-auto max-w-5xl space-y-6 px-4 py-6">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+          <div className="h-6 w-48 animate-pulse rounded bg-white/10" />
+          <div className="mt-3 h-3 w-96 animate-pulse rounded bg-white/10" />
         </div>
       </div>
     );
   }
 
-  if (user.error && repos.error) {
+  if (user.error || repos.error || contributions.error || codeStats.error) {
     return (
-      <motion.div
+      <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="rounded-2xl border border-red-400/40 bg-red-500/10 p-6 text-red-100"
+        className="mx-auto max-w-5xl rounded-xl border border-red-400/40 bg-red-500/10 p-6 text-red-100"
       >
         <h3 className="font-semibold">Failed to load insights</h3>
-        <p className="mt-2 text-sm opacity-80">GitHub APIs are currently unavailable. Try again shortly.</p>
       </motion.div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      {/* P0: Cinematic header with particles */}
+    <div className="mx-auto max-w-5xl space-y-6 px-4 py-6">
+      {/* ENHANCED: Cinematic header matching source */}
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="relative overflow-hidden rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-cyan-500/15 via-slate-950 to-fuchsia-500/10 p-8 shadow-[0_0_40px_rgba(56,189,248,0.12)]"
+        className="relative overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-indigo-950 via-slate-950 to-cyan-950 p-6"
       >
+        {/* Deep gradient overlays */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(139,92,246,0.25),transparent_50%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(6,182,212,0.20),transparent_50%)]" />
+        
         {/* Floating particles */}
         <div className="pointer-events-none absolute inset-0">
-          {[...Array(15)].map((_, i) => (
+          {[...Array(12)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute h-1 w-1 rounded-full bg-cyan-400"
               style={{
-                left: `${10 + Math.random() * 80}%`,
-                top: `${10 + Math.random() * 80}%`,
+                left: `${10 + (i * 7) % 80}%`,
+                top: `${20 + (i * 13) % 60}%`,
               }}
               animate={{
-                y: [0, -20 - Math.random() * 20, 0],
-                opacity: [0.1, 0.4 + Math.random() * 0.3, 0.1],
+                y: [0, -15 - (i % 5), 0],
+                opacity: [0.1, 0.5, 0.1],
               }}
               transition={{
-                duration: 3 + Math.random() * 3,
+                duration: 3 + (i % 3),
                 repeat: Infinity,
-                delay: Math.random() * 3,
+                delay: i * 0.2,
                 ease: "easeInOut",
               }}
             />
           ))}
         </div>
         
-        {/* Gradient overlays */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(56,189,248,0.2),transparent_35%),radial-gradient(circle_at_85%_85%,rgba(232,121,249,0.16),transparent_40%)]" />
-        
         <div className="relative">
+          {/* Corner badges */}
+          <div className="absolute right-0 top-0 flex gap-2">
+            <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+              STUDIO
+            </span>
+            <span className="rounded border border-white/20 bg-white/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70">
+              STEVEMLC
+            </span>
+          </div>
+          
+          {/* Eyebrow */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex flex-wrap items-center gap-3 text-white/80"
+            className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-cyan-400"
           >
-            <span className="relative flex h-2 w-2">
+            <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400"></span>
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
             </span>
-            <span className="text-xs uppercase tracking-[0.22em]">Live Engineering Signal</span>
+            Live System Telemetry
           </motion.div>
           
+          {/* Main title */}
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="relative mt-2 text-4xl font-bold tracking-tight text-white"
+            className="mt-2 text-2xl font-bold uppercase tracking-[0.12em] text-white"
           >
-            GitHub Insights
+            Activity Network
           </motion.h1>
           
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
+          {/* Operations counter badge */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="relative mt-2 max-w-3xl text-white/70"
+            transition={{ delay: 0.4 }}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-1.5"
           >
-            Real-time contribution and repository telemetry for Go7Studio. Private repositories are anonymized.
-          </motion.p>
+            <span className="text-lg font-bold tabular-nums text-cyan-300"
+            >
+              {totals.totalContrib.toLocaleString()}
+            </span>
+            <span className="text-[10px] uppercase tracking-wider text-cyan-400/70"
+            >
+              operations logged in current cycle
+            </span>
+          </motion.div>
+          
+          {/* Mini stats row */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-4 flex gap-4"
+          >
+            <StatCard label="Repositories" value={totals.repos} index={0} />
+            <StatCard label="Active Days" value={totals.activeDays} index={1} />
+          </motion.div>
         </div>
       </motion.div>
 
-      {/* Stats with staggered entry */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Total Contributions" value={totals.totalContrib.toLocaleString()} index={0} />
-        <StatCard label="Repositories" value={totals.repos} index={1} />
-        <StatCard label="Private (Anonymized)" value={totals.privateRepos} index={2} />
-        <StatCard label="Active Days" value={totals.activeDays} index={3} />
-      </div>
-
-      {((contributions.data as { degraded?: boolean } | null)?.degraded || (codeStats.data as { degraded?: boolean } | null)?.degraded) && (
-        <div className="rounded-xl border border-amber-300/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-100">
-          Limited mode: add GITHUB_TOKEN in Vercel env for full contribution + code telemetry.
+      {/* ENHANCED: Activity Network (Orbital) */}
+      <section className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+          Activity Network
+        </h3>
+        <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">
+          Repository Constellation · Language Glow Map
+        </p>
+        <div className="mt-4">
+          <OrbitalNetwork repos={repos.data || []} loading={repos.loading} />
         </div>
-      )}
-
-      <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-white/55">
-        <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-3 py-1 text-cyan-200">telemetry</span>
-        <span className="inline-flex items-center gap-2 rounded-full border border-fuchsia-300/30 bg-fuchsia-400/10 px-3 py-1 text-fuchsia-200">activity graph</span>
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-white/70">repo anonymization active</span>
-      </div>
-
-      <OrbitalNetwork repos={repos.data || []} loading={repos.loading} />
-
-      <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-        <div className="mb-4 flex items-center gap-2 text-white">
-          <Activity className="h-4 w-4 text-cyan-300" /> Activity Matrix (365d)
-        </div>
-        <Heatmap days={contributions.data?.days || []} />
       </section>
 
-      <ContributionStream days={contributions.data?.days || []} loading={contributions.loading} />
+      {/* ENHANCED: Activity Matrix with labels */}
+      <section className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+          Activity Matrix
+        </h3>
+        <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">
+          365 Day Contribution History
+        </p>
+        <div className="mt-4">
+          <Heatmap days={contributions.data?.days || []} />
+        </div>
+      </section>
 
+      {/* ENHANCED: Contribution Stream */}
+      <section className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+          Contribution Stream
+        </h3>
+        <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">
+          Last 90 Days — Particle Flow Visualization
+        </p>
+        <div className="mt-4">
+          <ContributionStream days={contributions.data?.days || []} loading={contributions.loading} />
+        </div>
+      </section>
+
+      {/* Code Velocity + Commit Clock */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <div className="mb-4 flex items-center gap-2 text-white">
-            <GitBranch className="h-4 w-4 text-cyan-300" /> Code Velocity
+        <section className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+            Code Velocity
+          </h3>
+          <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">
+            Weekly Additions vs Deletions
+          </p>
+          <div className="mt-4">
+            <CodeVelocity rows={codeStats.data?.code_frequency || []} />
           </div>
-          <CodeVelocity rows={codeStats.data?.code_frequency || []} />
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <div className="mb-4 flex items-center gap-2 text-white">
-            <Clock3 className="h-4 w-4 text-fuchsia-300" /> Commit Clock
+        <section className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+            Commit Clock
+          </h3>
+          <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">
+            Activity by Hour of Day
+          </p>
+          <div className="mt-4">
+            <CommitClock hourly={codeStats.data?.hourly_activity || new Array(24).fill(0)} />
           </div>
-          <CommitClock hourly={codeStats.data?.hourly_activity || new Array(24).fill(0)} />
         </section>
       </div>
 
       <RadialActivityRing days={contributions.data?.days || []} loading={contributions.loading} />
 
-      {/* P1: Repo list with stagger + hover */}
+      {/* Repositories */}
       <motion.section 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="rounded-2xl border border-white/10 bg-white/5 p-5"
+        className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4"
       >
-        <div className="mb-4 flex items-center gap-2 text-white">
-          <Lock className="h-4 w-4 text-amber-300" /> Repositories
-        </div>
-        <div className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+          Repositories
+        </h3>
+        <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">
+          {repos.data?.length || 0} Total — Private Repos Anonymized
+        </p>
+        <div className="mt-4 space-y-1.5">
           {(repos.data || []).slice(0, 24).map((repo: GitHubRepo, i) => (
             <motion.div 
               key={repo.id}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 + i * 0.03 }}
-              whileHover={{ x: 4, backgroundColor: "rgba(255,255,255,0.08)" }}
-              className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2 transition-colors"
+              transition={{ delay: 0.5 + i * 0.02 }}
+              whileHover={{ x: 2 }}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2 transition-colors hover:border-white/10"
             >
-              <div>
-                <div className="font-medium text-white">{repo.name}</div>
-                <div className="text-xs text-white/60">{repo.description || "No description"}</div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-medium text-white">{repo.name}</div>
+                <div className="truncate text-xs text-white/50">{repo.description || "No description"}</div>
               </div>
-              <div className="flex items-center gap-2 text-xs text-white/60">
-                <span className="rounded-full border border-white/10 px-2 py-1">{repo.language || "n/a"}</span>
-                <span className="rounded-full border border-white/10 px-2 py-1">{repo.visibility}</span>
-                <span className="rounded-full border border-white/20 px-2 py-1 text-white/70">No External Link</span>
+              <div className="flex flex-shrink-0 items-center gap-1.5">
+                <span 
+                  className="rounded border border-white/10 px-1.5 py-0.5 text-[10px]"
+                  style={{ color: LANGUAGE_COLORS[repo.language || ''] || '#8b949e' }}
+                >
+                  {repo.language || "n/a"}
+                </span>
+                <span className="rounded border border-white/10 px-1.5 py-0.5 text-[10px] text-white/50">
+                  {repo.visibility}
+                </span>
               </div>
             </motion.div>
           ))}
         </div>
       </motion.section>
 
-      {/* P1: Language bars with animated fill */}
+      {/* Language Mix */}
       <motion.section 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="rounded-2xl border border-white/10 bg-white/5 p-5"
+        className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4"
       >
-        <h3 className="mb-3 text-white">Language Mix</h3>
-        <div className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+          Language Mix
+        </h3>
+        <div className="mt-4 space-y-2">
           {(languages.data || []).map((l: LanguageMix, i) => (
             <div key={l.name} className="space-y-1">
-              <div className="flex justify-between text-xs text-white/70">
-                <span>{l.name}</span>
-                <span>{l.percentage}%</span>
+              <div className="flex justify-between text-xs">
+                <span className="text-white/70">{l.name}</span>
+                <span className="tabular-nums text-white/50">{l.percentage}%</span>
               </div>
-              <div className="h-2 w-full rounded bg-white/10">
-                <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${l.percentage}%` }}
-                transition={{ duration: 0.8, delay: 0.6 + i * 0.1 }}
-                className="h-2 rounded"
-                style={{ backgroundColor: getLanguageColor(l.name), boxShadow: `0 0 10px ${getLanguageColor(l.name)}55` }}
-              />
+              <div className="h-1.5 w-full rounded-full bg-white/10">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${l.percentage}%` }}
+                  transition={{ duration: 0.8, delay: 0.6 + i * 0.1 }}
+                  className="h-1.5 rounded-full"
+                  style={{ backgroundColor: LANGUAGE_COLORS[l.name] || '#38bdf8' }}
+                />
               </div>
             </div>
           ))}
