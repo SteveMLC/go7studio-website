@@ -8,6 +8,26 @@ import { OrbitalNetwork } from "./OrbitalNetwork";
 import { ContributionStream } from "./ContributionStream";
 import { RadialActivityRing } from "./RadialActivityRing";
 
+const LANGUAGE_COLORS: Record<string, string> = {
+  TypeScript: "#3178c6",
+  JavaScript: "#f1e05a",
+  Python: "#3572A5",
+  Lua: "#000080",
+  "C#": "#178600",
+  Java: "#b07219",
+  Go: "#00ADD8",
+  Rust: "#dea584",
+  Ruby: "#701516",
+  HTML: "#e34c26",
+  CSS: "#563d7c",
+  Shell: "#89e051",
+  Swift: "#F05138",
+  Kotlin: "#A97BFF",
+  Dart: "#00B4AB",
+};
+
+const getLanguageColor = (name: string) => LANGUAGE_COLORS[name] || "#22d3ee";
+
 // P0: Motion-enhanced StatCard with lift + glow
 function StatCard({ label, value, index }: { label: string; value: string | number; index: number }) {
   return (
@@ -309,12 +329,13 @@ export function InsightsDashboard() {
                 <span>{l.percentage}%</span>
               </div>
               <div className="h-2 w-full rounded bg-white/10">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${l.percentage}%` }}
-                  transition={{ duration: 0.8, delay: 0.6 + i * 0.1 }}
-                  className="h-2 rounded bg-cyan-400" 
-                />
+                <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${l.percentage}%` }}
+                transition={{ duration: 0.8, delay: 0.6 + i * 0.1 }}
+                className="h-2 rounded"
+                style={{ backgroundColor: getLanguageColor(l.name), boxShadow: `0 0 10px ${getLanguageColor(l.name)}55` }}
+              />
               </div>
             </div>
           ))}
