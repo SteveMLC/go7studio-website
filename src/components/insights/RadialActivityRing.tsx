@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { DayPoint } from "./useGithubInsights";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -9,6 +9,7 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
+  const [hoveredDay, setHoveredDay] = useState<number | null>(null);
 
   const weekdayAverages = useMemo(() => {
     const sums = new Array(7).fill(0);
@@ -57,7 +58,8 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
         const ratio = avg / maxAvg;
         const r = inner + (outer - inner) * ratio * pulse;
 
-        const color = `hsla(${190 + i * 18}, 90%, 62%, 0.9)`;
+        const isHovered = hoveredDay === i;
+        const color = `hsla(${190 + i * 18}, 90%, 62%, ${isHovered ? "1" : "0.9"})`;
         const grad = ctx.createRadialGradient(cx, cy, inner, cx, cy, r);
         grad.addColorStop(0, color.replace("0.9", "0.35"));
         grad.addColorStop(1, color);
@@ -67,7 +69,12 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
         ctx.arc(cx, cy, inner, end, start, true);
         ctx.closePath();
         ctx.fillStyle = grad;
+        if (isHovered) {
+          ctx.shadowColor = "rgba(56,189,248,0.7)";
+          ctx.shadowBlur = 20;
+        }
         ctx.fill();
+        ctx.shadowBlur = 0;
 
         const labelR = r + 15;
         ctx.fillStyle = "rgba(255,255,255,0.75)";
@@ -83,7 +90,7 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
 
     rafRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [weekdayAverages]);
+  }, [weekdayAverages, hoveredDay]);
 
   if (loading) return <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-white/70">Building activity ring…</div>;
 
@@ -91,8 +98,30 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
     <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
       <h3 className="mb-1 text-white">Radial Activity Ring</h3>
       <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Weekly rhythm · average contributions by weekday</p>
-      <div ref={wrapRef} className="mx-auto aspect-square w-full max-w-[340px]">
-        <canvas ref={canvasRef} className="h-full w-full" />
+      <div ref={wrapRef} className="relative mx-auto aspect-square w-full max-w-[340px]">
+        <canvas
+          ref={canvasRef}
+          className="h-full w-full cursor-crosshair"
+          onMouseMove={(e) => {
+            const wrap = wrapRef.current;
+            if (!wrap) return;
+            const rect = (e.currentTarget as HTMLCanvasElement).getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const cx = wrap.clientWidth / 2;
+            const cy = wrap.clientHeight / 2;
+            let angle = Math.atan2(my - cy, mx - cx) + Math.PI / 2;
+            if (angle < 0) angle += Math.PI * 2;
+            const index = Math.floor((angle / (Math.PI * 2)) * 7);
+            setHoveredDay(index >= 0 && index < 7 ? index : null);
+          }}
+          onMouseLeave={() => setHoveredDay(null)}
+        />
+        {hoveredDay !== null && (
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 translate-y-7 rounded-md border border-white/20 bg-[#020618]/85 px-2 py-1 text-[11px] text-white/80">
+            {DAY_LABELS[hoveredDay]} avg: {weekdayAverages[hoveredDay].toFixed(1)}
+          </div>
+        )}
       </div>
     </section>
   );

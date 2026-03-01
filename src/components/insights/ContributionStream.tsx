@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { DayPoint } from "./useGithubInsights";
 
-type Particle = { x: number; y: number; baseY: number; size: number; count: number; r: number; g: number; b: number; t: number };
+type Particle = { x: number; y: number; baseY: number; size: number; count: number; date: string; r: number; g: number; b: number; t: number };
 
 function colorForRatio(ratio: number): [number, number, number] {
   if (ratio <= 0.33) return [56 + ratio * 250, 189 - ratio * 90, 248 - ratio * 140].map(Math.round) as [number, number, number];
@@ -20,6 +20,7 @@ export function ContributionStream({ days, loading }: { days: DayPoint[]; loadin
   const wrapRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const rafRef = useRef<number>(0);
+  const [tooltip, setTooltip] = useState<{ x: number; y: number; count: number; date: string } | null>(null);
 
   const recent = useMemo(() => days.slice(-90), [days]);
 
@@ -34,6 +35,7 @@ export function ContributionStream({ days, loading }: { days: DayPoint[]; loadin
         baseY: 80 + Math.random() * 120,
         size: 1.8 + ratio * 6,
         count: d.count,
+        date: d.date,
         r,
         g,
         b,
@@ -90,12 +92,46 @@ export function ContributionStream({ days, loading }: { days: DayPoint[]; loadin
 
   if (loading) return <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-white/70">Rendering contribution stream…</div>;
 
+  const onMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    let best: Particle | null = null;
+    let bestDist = 22;
+    particlesRef.current.forEach((p) => {
+      const d = Math.hypot(mx - p.x, my - p.y);
+      if (d < bestDist) {
+        best = p;
+        bestDist = d;
+      }
+    });
+
+    if (best) {
+      const hit = best as Particle;
+      setTooltip({ x: hit.x, y: hit.y, count: hit.count, date: hit.date });
+    } else {
+      setTooltip(null);
+    }
+  };
+
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
       <h3 className="mb-1 text-white">Contribution Stream</h3>
       <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Last 90 days · flow intensity by contribution count</p>
-      <div ref={wrapRef} className="h-[220px] w-full overflow-hidden rounded-lg">
-        <canvas ref={canvasRef} className="h-full w-full" />
+      <div ref={wrapRef} className="relative h-[220px] w-full overflow-hidden rounded-lg">
+        <canvas ref={canvasRef} onMouseMove={onMove} onMouseLeave={() => setTooltip(null)} className="h-full w-full cursor-crosshair" />
+        {tooltip && (
+          <div
+            className="pointer-events-none absolute rounded-lg border border-white/20 bg-[#020618]/90 px-3 py-2 text-xs text-white/90 shadow-[0_0_18px_rgba(56,189,248,0.2)]"
+            style={{ left: `${Math.min(tooltip.x + 14, (wrapRef.current?.clientWidth || 300) - 140)}px`, top: `${Math.max(tooltip.y - 44, 8)}px` }}
+          >
+            <div className="font-semibold text-cyan-200">{tooltip.count} contribution{tooltip.count === 1 ? "" : "s"}</div>
+            <div className="text-white/65">{new Date(tooltip.date).toLocaleDateString()}</div>
+          </div>
+        )}
       </div>
     </section>
   );
