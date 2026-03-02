@@ -44,13 +44,14 @@ function StatCard({ label, value, index }: { label: string; value: string | numb
 
 // ENHANCED Heatmap with month/day labels
 function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
-  const max = Math.max(1, ...days.map((d) => d.count));
+  const recentDays = useMemo(() => days.slice(-90), [days]);
+  const max = Math.max(1, ...recentDays.map((d) => d.count));
   
   // Calculate month positions
   const monthLabels = useMemo(() => {
     const labels: { month: string; index: number }[] = [];
     let currentMonth = "";
-    days.forEach((d, i) => {
+    recentDays.forEach((d, i) => {
       const month = new Date(d.date).toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
       if (month !== currentMonth && i % 7 === 0) {
         currentMonth = month;
@@ -58,13 +59,13 @@ function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
       }
     });
     return labels;
-  }, [days]);
+  }, [recentDays]);
   
   const dayLabels = ['MON', 'WED', 'FRI'];
   
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-[900px]">
+      <div className="min-w-[680px]">
         {/* Month labels */}
         <div className="mb-2 flex text-[9px] font-semibold uppercase tracking-[0.15em] text-white/40">
           {monthLabels.map((m, i) => (
@@ -87,7 +88,7 @@ function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
           
           {/* Grid */}
           <div className="grid grid-rows-7 grid-flow-col gap-[3px]">
-            {days.map((d, i) => {
+            {recentDays.map((d, i) => {
               const p = d.count / max;
               const bg = d.count === 0
                 ? "rgba(255,255,255,0.05)"
@@ -106,7 +107,7 @@ function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
                     boxShadow: "0 0 12px rgba(34,211,238,0.8)",
                   }}
                   title={`${d.date}: ${d.count}`}
-                  className="h-3 w-3 rounded-[2px]"
+                  className="h-4 w-4 rounded-[2px]"
                   style={{
                     backgroundColor: bg,
                     boxShadow: d.count > 0
@@ -136,7 +137,7 @@ function buildSmoothPath(points: Array<{ x: number; y: number }>): string {
 }
 
 function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number; deletions: number }> }) {
-  const data = rows.slice(-24);
+  const data = rows.slice(-12);
   const width = 720;
   const height = 220;
   const pad = 18;
@@ -162,7 +163,7 @@ function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number;
     : "";
 
   return (
-    <div className="overflow-x-auto">
+    <div className="space-y-3 overflow-x-auto">
       <svg viewBox={`0 0 ${width} ${height}`} className="h-[220px] w-full min-w-[680px]">
         <defs>
           <linearGradient id="cvAdd" x1="0" y1="0" x2="0" y2="1">
@@ -183,6 +184,15 @@ function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number;
         {addPath && <path d={addPath} fill="none" stroke="rgba(34,211,238,0.95)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
         {delPath && <path d={delPath} fill="none" stroke="rgba(244,114,182,0.95)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
       </svg>
+      <div className="flex min-w-[680px] flex-wrap gap-2 text-[10px] uppercase tracking-[0.12em] text-white/60">
+        {data.map((r) => (
+          <span key={r.week} className="rounded border border-white/10 bg-white/[0.03] px-2 py-1">
+            <span className="text-cyan-400">+{r.additions.toLocaleString()}</span>
+            <span className="px-1 text-white/30">/</span>
+            <span className="text-fuchsia-400">-{r.deletions.toLocaleString()}</span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -231,6 +241,18 @@ function CommitClock({ hourly }: { hourly: number[] }) {
         <text x={cx} y={cy + 16} textAnchor="middle" fill="rgba(255,255,255,0.55)" fontSize="10" style={{ letterSpacing: "0.14em" }}>
           PEAK HOUR
         </text>
+
+        {hourly.map((_, i) => {
+          if (i % 3 !== 0) return null;
+          const angle = (i / 24) * Math.PI * 2 - Math.PI / 2;
+          const tx = cx + Math.cos(angle) * (outer + 14);
+          const ty = cy + Math.sin(angle) * (outer + 14);
+          return (
+            <text key={i} x={tx} y={ty} textAnchor="middle" dominantBaseline="middle" fill="rgba(255,255,255,0.45)" fontSize="9">
+              {i}
+            </text>
+          );
+        })}
       </svg>
     </div>
   );
@@ -317,7 +339,16 @@ export function InsightsDashboard() {
         
         <div className="relative">
           {/* Corner badges */}
-          <div className="absolute right-0 top-0 flex gap-2">
+          <div className="absolute right-4 top-4 hidden gap-2 sm:flex">
+            <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+              STUDIO
+            </span>
+            <span className="rounded border border-white/20 bg-white/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70">
+              STEVEMLC
+            </span>
+          </div>
+
+          <div className="mt-3 flex gap-2 sm:hidden">
             <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
               STUDIO
             </span>
@@ -399,7 +430,7 @@ export function InsightsDashboard() {
           Activity Matrix
         </h3>
         <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">
-          365 Day Contribution History
+          Last 90 Days
         </p>
         <div className="mt-4">
           <Heatmap days={contributions.data?.days || []} />
@@ -473,7 +504,7 @@ export function InsightsDashboard() {
             >
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium text-white">{repo.name}</div>
-                <div className="truncate text-xs text-white/50">{repo.description || "No description"}</div>
+                <div className="hidden truncate text-xs text-white/50 sm:block">{repo.description || "No description"}</div>
               </div>
               <div className="flex flex-shrink-0 items-center gap-1.5">
                 <span 

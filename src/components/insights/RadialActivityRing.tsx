@@ -11,6 +11,8 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
   const rafRef = useRef<number>(0);
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
 
+  const totalCommits = useMemo(() => days.reduce((sum, d) => sum + d.count, 0), [days]);
+
   const weekdayAverages = useMemo(() => {
     const sums = new Array(7).fill(0);
     const counts = new Array(7).fill(0);
@@ -117,8 +119,12 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
           }}
           onMouseLeave={() => setHoveredDay(null)}
         />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+          <div className="text-3xl font-bold text-white sm:text-4xl">{totalCommits.toLocaleString()}</div>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-cyan-400/70">Total Commits</div>
+        </div>
         {hoveredDay !== null && (
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 translate-y-7 rounded-md border border-white/20 bg-[#020618]/85 px-2 py-1 text-[11px] text-white/80">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 translate-y-9 rounded-md border border-white/20 bg-[#020618]/85 px-2 py-1 text-[11px] text-white/80">
             {DAY_LABELS[hoveredDay]} avg: {weekdayAverages[hoveredDay].toFixed(1)}
           </div>
         )}

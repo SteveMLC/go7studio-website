@@ -187,25 +187,21 @@ export function OrbitalNetwork({ repos, loading }: { repos: GitHubRepo[]; loadin
   if (loading) return <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-white/70">Mapping orbital network…</div>;
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-      <h3 className="mb-1 text-white">Orbital Network</h3>
-      <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Repository constellation · language glow map</p>
-      <div ref={wrapperRef} className="relative h-[420px] w-full">
-        <canvas
-          ref={canvasRef}
-          onMouseMove={onMove}
-          onMouseLeave={() => {
-            hoveredRef.current = -1;
-            setHoveredIndex(null);
-          }}
-          className="h-full w-full"
-        />
-        <AnimatedTooltip show={hoveredIndex !== null} x={mousePos.x} y={mousePos.y}>
-          {hoveredIndex !== null
-            ? `${nodesRef.current[hoveredIndex]?.repo.name} · ${nodesRef.current[hoveredIndex]?.repo.language || "Unknown"}`
-            : ""}
-        </AnimatedTooltip>
-      </div>
-    </section>
+    <div ref={wrapperRef} className="relative h-[420px] w-full">
+      <canvas
+        ref={canvasRef}
+        onMouseMove={onMove}
+        onMouseLeave={() => {
+          hoveredRef.current = -1;
+          setHoveredIndex(null);
+        }}
+        className="h-full w-full"
+      />
+      <AnimatedTooltip show={hoveredIndex !== null} x={mousePos.x} y={mousePos.y}>
+        {hoveredIndex !== null
+          ? `${nodesRef.current[hoveredIndex]?.repo.name} · ${nodesRef.current[hoveredIndex]?.repo.language || "Unknown"}`
+          : ""}
+      </AnimatedTooltip>
+    </div>
   );
 }
