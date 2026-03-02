@@ -11,17 +11,19 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
   const rafRef = useRef<number>(0);
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
 
-  const totalCommits = useMemo(() => days.reduce((sum, d) => sum + d.count, 0), [days]);
+  const recentDays = useMemo(() => days.slice(-28), [days]);
+
+  const totalCommits = useMemo(() => recentDays.reduce((sum, d) => sum + d.count, 0), [recentDays]);
 
   const weekdayAverages = useMemo(() => {
     const sums = new Array(7).fill(0);
     const counts = new Array(7).fill(0);
-    days.forEach((d) => {
+    recentDays.forEach((d) => {
       sums[d.weekday] += d.count;
       counts[d.weekday] += 1;
     });
     return sums.map((s, i) => (counts[i] ? s / counts[i] : 0));
-  }, [days]);
+  }, [recentDays]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -99,7 +101,7 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
       <h3 className="mb-1 text-white">Radial Activity Ring</h3>
-      <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Weekly rhythm · average contributions by weekday</p>
+      <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Last 4 weeks · average contributions by weekday</p>
       <div ref={wrapRef} className="relative mx-auto aspect-square w-full max-w-[340px]">
         <canvas
           ref={canvasRef}
