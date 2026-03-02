@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { GitHubRepo, LanguageMix, useGitHubInsights } from "./useGithubInsights";
 import { OrbitalNetwork } from "./OrbitalNetwork";
@@ -27,7 +27,7 @@ const LANGUAGE_COLORS: Record<string, string> = {
 };
 
 // ENHANCED StatCard with tighter design
-function StatCard({ label, value, index }: { label: string; value: string | number; index: number }) {
+function StatCard({ label, value, index, trend }: { label: string; value: string | number; index: number; trend?: { text: string; up: boolean } }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -38,6 +38,11 @@ function StatCard({ label, value, index }: { label: string; value: string | numb
     >
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">{label}</div>
       <div className="mt-1 text-xl font-bold tabular-nums text-white">{value}</div>
+      {trend && (
+        <div className={`mt-1 text-[10px] uppercase tracking-[0.12em] ${trend.up ? "text-emerald-300" : "text-rose-300"}`}>
+          {trend.up ? "▲" : "▼"} {trend.text}
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -265,6 +270,17 @@ function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number;
   );
 }
 
+function formatRelativeTime(iso: string) {
+  const ms = Date.now() - new Date(iso).getTime();
+  const days = Math.max(0, Math.floor(ms / (1000 * 60 * 60 * 24)));
+  if (days < 1) return "today";
+  if (days < 7) return `${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks}w ago`;
+  const months = Math.floor(days / 30);
+  return `${months}mo ago`;
+}
+
 function CommitClock({ hourly }: { hourly: number[] }) {
   const size = 320;
   const cx = size / 2;
@@ -329,15 +345,29 @@ function CommitClock({ hourly }: { hourly: number[] }) {
 export function InsightsDashboard() {
   const username = "SteveMLC";
   const { user, repos, contributions, codeStats, languages } = useGitHubInsights(username);
+  const [showAllRepos, setShowAllRepos] = useState(false);
 
   const totals = useMemo(() => {
     const rs = repos.data || [];
     const privateCount = rs.filter((r) => r.private).length;
+    const now = Date.now();
+    const recentActiveRepos = rs.filter((r) => now - new Date(r.pushed_at).getTime() <= 30 * 24 * 60 * 60 * 1000).length;
+    const previousActiveRepos = rs.filter((r) => {
+      const diff = now - new Date(r.pushed_at).getTime();
+      return diff > 30 * 24 * 60 * 60 * 1000 && diff <= 60 * 24 * 60 * 60 * 1000;
+    }).length;
+
+    const days = contributions.data?.days || [];
+    const recent14 = days.slice(-14).filter((d) => d.count > 0).length;
+    const previous14 = days.slice(-28, -14).filter((d) => d.count > 0).length;
+
     return {
       repos: rs.length,
       privateRepos: privateCount,
       totalContrib: contributions.data?.total_contributions || 0,
-      activeDays: (contributions.data?.days || []).filter((d) => d.count > 0).length,
+      activeDays: days.filter((d) => d.count > 0).length,
+      repoTrendDiff: recentActiveRepos - previousActiveRepos,
+      activeTrendDiff: recent14 - previous14,
     };
   }, [repos.data, contributions.data]);
 
@@ -352,6 +382,8 @@ export function InsightsDashboard() {
     );
   }
 
+  const displayedRepos = showAllRepos ? (repos.data || []) : (repos.data || []).slice(0, 12);
+
   if (user.error || repos.error || contributions.error || codeStats.error) {
     return (
       <motion.div 
@@ -365,7 +397,7 @@ export function InsightsDashboard() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 xl:max-w-6xl 2xl:max-w-7xl">
+    <div className="mx-auto max-w-5xl space-y-8 px-4 py-6 xl:max-w-6xl 2xl:max-w-7xl">
       {/* ENHANCED: Cinematic header matching source */}
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
@@ -473,8 +505,18 @@ export function InsightsDashboard() {
             transition={{ delay: 0.5 }}
             className="mt-4 flex gap-4"
           >
-            <StatCard label="Repositories" value={totals.repos} index={0} />
-            <StatCard label="Active Days" value={totals.activeDays} index={1} />
+            <StatCard
+              label="Repositories"
+              value={totals.repos}
+              index={0}
+              trend={{ text: `${Math.abs(totals.repoTrendDiff)} vs prior 30d`, up: totals.repoTrendDiff >= 0 }}
+            />
+            <StatCard
+              label="Active Days"
+              value={totals.activeDays}
+              index={1}
+              trend={{ text: `${Math.abs(totals.activeTrendDiff)} vs prior 14d`, up: totals.activeTrendDiff >= 0 }}
+            />
           </motion.div>
         </div>
       </motion.div>
@@ -596,7 +638,7 @@ export function InsightsDashboard() {
           {repos.data?.length || 0} Total — Private Repos Anonymized
         </p>
         <div className="mt-4 space-y-1.5">
-          {(repos.data || []).slice(0, 24).map((repo: GitHubRepo, i) => (
+          {displayedRepos.map((repo: GitHubRepo, i) => (
             <motion.div 
               key={repo.id}
               initial={{ opacity: 0, x: -10 }}
@@ -606,8 +648,12 @@ export function InsightsDashboard() {
               className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2 transition-colors hover:border-white/10"
             >
               <div className="min-w-0">
-                <div className="truncate text-sm font-medium text-white">{repo.name}</div>
+                <div className="flex items-center gap-2">
+                  <div className="truncate text-sm font-medium text-white">{repo.name}</div>
+                  {repo.stargazers_count > 0 && <span className="text-[10px] text-amber-300">★ {repo.stargazers_count}</span>}
+                </div>
                 <div className="hidden truncate text-xs text-white/50 sm:block">{repo.description || "No description"}</div>
+                <div className="mt-0.5 text-[10px] uppercase tracking-[0.1em] text-white/35">Last active {formatRelativeTime(repo.pushed_at)}</div>
               </div>
               <div className="flex flex-shrink-0 items-center gap-1.5">
                 <span 
@@ -623,6 +669,14 @@ export function InsightsDashboard() {
             </motion.div>
           ))}
         </div>
+        {(repos.data?.length || 0) > 12 && (
+          <button
+            onClick={() => setShowAllRepos((v) => !v)}
+            className="mt-3 w-full rounded-lg border border-white/10 py-2 text-xs uppercase tracking-wider text-white/60 transition-colors hover:bg-white/5 hover:text-white/80"
+          >
+            {showAllRepos ? "Show less" : `Show all ${repos.data?.length}`}
+          </button>
+        )}
       </motion.section>
 
 
