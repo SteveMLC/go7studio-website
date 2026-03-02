@@ -361,6 +361,29 @@ export function InsightsDashboard() {
     const recent14 = days.slice(-14).filter((d) => d.count > 0).length;
     const previous14 = days.slice(-28, -14).filter((d) => d.count > 0).length;
 
+    // Monthly commits: current calendar month
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const thisMonthCommits = days
+      .filter((d) => {
+        const date = new Date(d.date);
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+      })
+      .reduce((sum, d) => sum + d.count, 0);
+
+    // Previous month commits for trend
+    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    const lastMonthCommits = days
+      .filter((d) => {
+        const date = new Date(d.date);
+        return date.getMonth() === prevMonth && date.getFullYear() === prevYear;
+      })
+      .reduce((sum, d) => sum + d.count, 0);
+
+    const monthName = today.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+
     return {
       repos: rs.length,
       privateRepos: privateCount,
@@ -368,6 +391,9 @@ export function InsightsDashboard() {
       activeDays: days.filter((d) => d.count > 0).length,
       repoTrendDiff: recentActiveRepos - previousActiveRepos,
       activeTrendDiff: recent14 - previous14,
+      monthlyCommits: thisMonthCommits,
+      monthlyCommitsDiff: thisMonthCommits - lastMonthCommits,
+      monthName,
     };
   }, [repos.data, contributions.data]);
 
@@ -506,15 +532,21 @@ export function InsightsDashboard() {
             className="mt-4 flex gap-4"
           >
             <StatCard
+              label={`Commits · ${totals.monthName}`}
+              value={totals.monthlyCommits.toLocaleString()}
+              index={0}
+              trend={{ text: `${Math.abs(totals.monthlyCommitsDiff)} vs prior month`, up: totals.monthlyCommitsDiff >= 0 }}
+            />
+            <StatCard
               label="Repositories"
               value={totals.repos}
-              index={0}
+              index={1}
               trend={{ text: `${Math.abs(totals.repoTrendDiff)} vs prior 30d`, up: totals.repoTrendDiff >= 0 }}
             />
             <StatCard
               label="Active Days"
               value={totals.activeDays}
-              index={1}
+              index={2}
               trend={{ text: `${Math.abs(totals.activeTrendDiff)} vs prior 14d`, up: totals.activeTrendDiff >= 0 }}
             />
           </motion.div>
