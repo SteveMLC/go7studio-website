@@ -64,8 +64,8 @@ function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
   const dayLabels = ['MON', 'WED', 'FRI'];
   
   return (
-    <div className="overflow-x-auto">
-      <div className="min-w-[680px]">
+    <div className="overflow-hidden">
+      <div>
         {/* Month labels */}
         <div className="mb-2 flex text-[9px] font-semibold uppercase tracking-[0.15em] text-white/40">
           {monthLabels.map((m, i) => (
@@ -87,7 +87,7 @@ function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
           </div>
           
           {/* Grid */}
-          <div className="grid grid-rows-7 grid-flow-col gap-[3px]">
+          <div className="grid grid-rows-7 grid-flow-col gap-[2px] sm:gap-[3px]">
             {recentDays.map((d, i) => {
               const p = d.count / max;
               const bg = d.count === 0
@@ -107,7 +107,7 @@ function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
                     boxShadow: "0 0 12px rgba(34,211,238,0.8)",
                   }}
                   title={`${d.date}: ${d.count}`}
-                  className="h-4 w-4 rounded-[2px]"
+                  className="h-3 w-3 rounded-[2px] sm:h-4 sm:w-4"
                   style={{
                     backgroundColor: bg,
                     boxShadow: d.count > 0
@@ -146,13 +146,29 @@ function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number;
   const trimmedRows = useMemo(() => {
     if (!rows.length) return rows;
     const copy = [...rows];
+    const now = Date.now();
+
+    // Drop current incomplete week bucket
     const last = copy[copy.length - 1];
     const lastWeekMs = parseWeekMs(last.week);
-    const now = Date.now();
     const isCurrentBucket = Number.isFinite(lastWeekMs) && lastWeekMs + 7 * 24 * 60 * 60 * 1000 > now;
+    if (isCurrentBucket) copy.pop();
 
-    if (isCurrentBucket) {
-      copy.pop();
+    // Drop trailing empty/near-empty buckets that sometimes appear in API data
+    while (copy.length > 0) {
+      const tail = copy[copy.length - 1];
+      const tailTotal = tail.additions + tail.deletions;
+      if (tailTotal < 10) {
+        copy.pop();
+        continue;
+      }
+
+      const avg = copy.reduce((sum, r) => sum + r.additions + r.deletions, 0) / Math.max(1, copy.length);
+      if (avg > 0 && tailTotal < avg * 0.1) {
+        copy.pop();
+        continue;
+      }
+      break;
     }
 
     return copy;
@@ -184,7 +200,7 @@ function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number;
     : "";
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 overflow-hidden">
       <svg viewBox={`0 0 ${width} ${height}`} className="h-[220px] w-full">
         <defs>
           <linearGradient id="cvAdd" x1="0" y1="0" x2="0" y2="1">
@@ -205,9 +221,9 @@ function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number;
         {addPath && <path d={addPath} fill="none" stroke="rgba(34,211,238,0.95)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
         {delPath && <path d={delPath} fill="none" stroke="rgba(244,114,182,0.95)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
       </svg>
-      <div className="grid grid-cols-2 gap-2 text-[10px] uppercase tracking-[0.12em] text-white/60 sm:flex sm:flex-wrap">
+      <div className="flex flex-wrap gap-1.5 text-[9px] uppercase tracking-[0.12em] text-white/60 sm:gap-2 sm:text-[10px]">
         {data.map((r) => (
-          <span key={r.week} className="rounded border border-white/10 bg-white/[0.03] px-2 py-1">
+          <span key={r.week} className="rounded border border-white/10 bg-white/[0.03] px-1.5 py-0.5 sm:px-2 sm:py-1">
             <span className="text-cyan-400">+{r.additions.toLocaleString()}</span>
             <span className="px-1 text-white/30">/</span>
             <span className="text-fuchsia-400">-{r.deletions.toLocaleString()}</span>
@@ -237,8 +253,8 @@ function CommitClock({ hourly }: { hourly: number[] }) {
   const peakHour = hourly.reduce((best, v, i) => (v > hourly[best] ? i : best), 0);
 
   return (
-    <div className="flex justify-center">
-      <svg viewBox={`0 0 ${size} ${size}`} className="h-[300px] w-[300px]">
+    <div className="flex max-w-full justify-center">
+      <svg viewBox={`0 0 ${size} ${size}`} className="h-[260px] w-[260px] sm:h-[300px] sm:w-[300px]">
         <defs>
           <radialGradient id="clockArea" cx="50%" cy="50%" r="60%">
             <stop offset="0%" stopColor="rgba(168,85,247,0.08)" />
