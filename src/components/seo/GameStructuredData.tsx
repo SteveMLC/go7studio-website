@@ -38,11 +38,9 @@ export function getGameStructuredData(game: Game) {
   const applicationSchema = {
     "@context": "https://schema.org",
     "@id": gameId,
-    "@type": isEmpireTycoon
+    "@type": game.platforms.includes("android")
       ? ["SoftwareApplication", "MobileApplication", "VideoGame"]
-      : game.platforms.includes("android")
-        ? "MobileApplication"
-        : "SoftwareApplication",
+      : ["SoftwareApplication", "VideoGame"],
     name: canonicalName,
     description,
     applicationCategory: "GameApplication",

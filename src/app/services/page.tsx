@@ -10,6 +10,22 @@ import {
   Zap,
   ArrowRight,
 } from "lucide-react";
+import { FAQSchema } from "@/components/seo/FAQSchema";
+
+const serviceFaqs = [
+  {
+    question: "What platforms do you develop games for?",
+    answer: "We specialize in Android mobile games using Flutter and Roblox experiences, with performance-focused production workflows.",
+  },
+  {
+    question: "Do you offer short consulting engagements?",
+    answer: "Yes. We offer focused consulting sprints for architecture, monetization, and production planning.",
+  },
+  {
+    question: "Can you help with monetization strategy?",
+    answer: "Absolutely. We support ad/IAP strategy, placement planning, and retention-oriented monetization design.",
+  },
+];
 
 const services = [
   {
@@ -70,8 +86,26 @@ const services = [
 ];
 
 export default function ServicesPage() {
+  const professionalServiceSchema = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    name: "Go7Studio Game Development Consulting",
+    url: "https://go7studio.com/services",
+    provider: { "@id": "https://go7studio.com/#org" },
+    areaServed: "Worldwide",
+    serviceType: [
+      "Mobile Game Development",
+      "Roblox Development",
+      "Game Monetization Strategy",
+      "Technical Architecture Review",
+      "MVP Prototyping",
+    ],
+  };
+
   return (
     <div className="container-px py-16 sm:py-24">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(professionalServiceSchema) }} />
+      <FAQSchema items={serviceFaqs} />
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
