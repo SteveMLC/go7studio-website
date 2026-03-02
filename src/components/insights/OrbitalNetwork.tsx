@@ -187,7 +187,7 @@ export function OrbitalNetwork({ repos, loading }: { repos: GitHubRepo[]; loadin
   if (loading) return <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-white/70">Mapping orbital network…</div>;
 
   return (
-    <div ref={wrapperRef} className="relative h-[420px] w-full">
+    <div ref={wrapperRef} className="relative h-[320px] w-full sm:h-[380px] lg:h-[520px]">
       <canvas
         ref={canvasRef}
         onMouseMove={onMove}

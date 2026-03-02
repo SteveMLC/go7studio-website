@@ -100,9 +100,9 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
 
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-      <h3 className="mb-1 text-white">Radial Activity Ring</h3>
-      <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Last 4 weeks · average contributions by weekday</p>
-      <div ref={wrapRef} className="relative mx-auto aspect-square w-full max-w-[340px]">
+      <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">Radial Activity</h3>
+      <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">Last 4 Weeks — {totalCommits.toLocaleString()} Total Commits</p>
+      <div ref={wrapRef} className="relative mx-auto mt-4 aspect-square w-full max-w-[280px] sm:max-w-[360px] lg:max-w-[420px]">
         <canvas
           ref={canvasRef}
           className="h-full w-full cursor-crosshair"

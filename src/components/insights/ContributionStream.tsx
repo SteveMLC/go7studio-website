@@ -135,24 +135,20 @@ export function ContributionStream({ days, loading }: { days: DayPoint[]; loadin
   };
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-      <h3 className="mb-1 text-white">Contribution Stream</h3>
-      <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-cyan-200/70">Last 90 days · flow intensity by contribution count</p>
-      <div ref={wrapRef} className="relative h-[220px] w-full overflow-hidden rounded-lg">
-        <canvas ref={canvasRef} onMouseMove={onMove} onMouseLeave={() => setTooltip(null)} className="h-full w-full cursor-crosshair" />
-        <AnimatedTooltip
-          show={tooltip !== null}
-          x={Math.min((tooltip?.x || 0) + 14, (wrapRef.current?.clientWidth || 300) - 160)}
-          y={Math.max((tooltip?.y || 0) - 44, 8)}
-        >
-          {tooltip && (
-            <>
-              <div className="font-semibold text-cyan-200">{tooltip.count} contribution{tooltip.count === 1 ? "" : "s"}</div>
-              <div className="text-white/65">{new Date(tooltip.date).toLocaleDateString()}</div>
-            </>
-          )}
-        </AnimatedTooltip>
-      </div>
-    </section>
+    <div ref={wrapRef} className="relative h-[220px] w-full overflow-hidden rounded-lg">
+      <canvas ref={canvasRef} onMouseMove={onMove} onMouseLeave={() => setTooltip(null)} className="h-full w-full cursor-crosshair" />
+      <AnimatedTooltip
+        show={tooltip !== null}
+        x={Math.min((tooltip?.x || 0) + 14, (wrapRef.current?.clientWidth || 300) - 160)}
+        y={Math.max((tooltip?.y || 0) - 44, 8)}
+      >
+        {tooltip && (
+          <>
+            <div className="font-semibold text-cyan-200">{tooltip.count} contribution{tooltip.count === 1 ? "" : "s"}</div>
+            <div className="text-white/65">{new Date(tooltip.date).toLocaleDateString()}</div>
+          </>
+        )}
+      </AnimatedTooltip>
+    </div>
   );
 }

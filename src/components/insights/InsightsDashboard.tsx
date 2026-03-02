@@ -43,6 +43,28 @@ function StatCard({ label, value, index }: { label: string; value: string | numb
 }
 
 // ENHANCED Heatmap with month/day labels
+function HeatmapLegend({ max }: { max: number }) {
+  const levels = [0, Math.floor(max * 0.25), Math.floor(max * 0.5), Math.floor(max * 0.75), max];
+  return (
+    <div className="mt-3 flex items-center justify-end gap-2 text-[9px] text-white/40">
+      <span>Less</span>
+      <div className="flex gap-[2px]">
+        {levels.map((level, i) => (
+          <div
+            key={i}
+            className="h-3 w-3 rounded-[2px]"
+            style={{
+              backgroundColor: level === 0 ? "rgba(255,255,255,0.05)" : `rgba(34,211,238,${0.3 + (i / 4) * 0.5})`,
+              boxShadow: level > 0 ? `0 0 4px rgba(34,211,238,${0.2 + (i / 4) * 0.3})` : "none",
+            }}
+          />
+        ))}
+      </div>
+      <span>More</span>
+    </div>
+  );
+}
+
 function Heatmap({ days }: { days: Array<{ date: string; count: number }> }) {
   const recentDays = useMemo(() => days.slice(-90), [days]);
   const max = Math.max(1, ...recentDays.map((d) => d.count));
@@ -214,6 +236,15 @@ function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number;
         </defs>
 
         <line x1={pad} y1={height - pad} x2={width - pad} y2={height - pad} stroke="rgba(255,255,255,0.12)" />
+        <text x={pad - 4} y={pad} textAnchor="end" fill="rgba(255,255,255,0.45)" fontSize="9">
+          {max.toLocaleString()}
+        </text>
+        <text x={pad} y={height - pad + 14} fill="rgba(255,255,255,0.45)" fontSize="9">
+          {data[0]?.week?.slice?.(5) || "start"}
+        </text>
+        <text x={width - pad} y={height - pad + 14} textAnchor="end" fill="rgba(255,255,255,0.45)" fontSize="9">
+          {data[data.length - 1]?.week?.slice?.(5) || "now"}
+        </text>
 
         {addArea && <path d={addArea} fill="url(#cvAdd)" />}
         {delArea && <path d={delArea} fill="url(#cvDel)" />}
@@ -334,7 +365,7 @@ export function InsightsDashboard() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 px-4 py-6">
+    <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 xl:max-w-6xl 2xl:max-w-7xl">
       {/* ENHANCED: Cinematic header matching source */}
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
@@ -425,7 +456,7 @@ export function InsightsDashboard() {
             transition={{ delay: 0.4 }}
             className="mt-4 inline-flex items-center gap-2 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-1.5"
           >
-            <span className="text-lg font-bold tabular-nums text-cyan-300"
+            <span className="text-lg font-bold tabular-nums text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]"
             >
               {totals.totalContrib.toLocaleString()}
             </span>
@@ -449,8 +480,9 @@ export function InsightsDashboard() {
       </motion.div>
 
       {/* ENHANCED: Activity Network (Orbital) */}
-      <section className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+      <section className="relative overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 lg:p-6">
+        <div className="pointer-events-none absolute inset-0 opacity-30" style={{ backgroundImage: `radial-gradient(circle at 20% 30%, rgba(34,211,238,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(168,85,247,0.08) 0%, transparent 50%)` }} />
+        <h3 className="relative text-xs font-semibold uppercase tracking-[0.2em] text-white">
           Activity Network
         </h3>
         <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">
@@ -471,6 +503,7 @@ export function InsightsDashboard() {
         </p>
         <div className="mt-4">
           <Heatmap days={contributions.data?.days || []} />
+          <HeatmapLegend max={Math.max(1, ...(contributions.data?.days || []).slice(-90).map((d) => d.count))} />
         </div>
       </section>
 
@@ -514,7 +547,40 @@ export function InsightsDashboard() {
         </section>
       </div>
 
-      <RadialActivityRing days={contributions.data?.days || []} loading={contributions.loading} />
+      <div className="grid gap-4 lg:grid-cols-5">
+        <div className="lg:col-span-3">
+          <RadialActivityRing days={contributions.data?.days || []} loading={contributions.loading} />
+        </div>
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 lg:col-span-2"
+        >
+          <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+            Language Mix
+          </h3>
+          <div className="mt-4 space-y-2">
+            {(languages.data || []).map((l: LanguageMix, i) => (
+              <div key={l.name} className="space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-white/70">{l.name}</span>
+                  <span className="tabular-nums text-white/50">{l.percentage}%</span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-white/10">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${l.percentage}%` }}
+                    transition={{ duration: 0.8, delay: 0.6 + i * 0.1 }}
+                    className="h-1.5 rounded-full"
+                    style={{ backgroundColor: LANGUAGE_COLORS[l.name] || '#38bdf8' }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+      </div>
 
       {/* Repositories */}
       <motion.section 
@@ -559,36 +625,7 @@ export function InsightsDashboard() {
         </div>
       </motion.section>
 
-      {/* Language Mix */}
-      <motion.section 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4"
-      >
-        <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
-          Language Mix
-        </h3>
-        <div className="mt-4 space-y-2">
-          {(languages.data || []).map((l: LanguageMix, i) => (
-            <div key={l.name} className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <span className="text-white/70">{l.name}</span>
-                <span className="tabular-nums text-white/50">{l.percentage}%</span>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-white/10">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${l.percentage}%` }}
-                  transition={{ duration: 0.8, delay: 0.6 + i * 0.1 }}
-                  className="h-1.5 rounded-full"
-                  style={{ backgroundColor: LANGUAGE_COLORS[l.name] || '#38bdf8' }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.section>
+
     </div>
   );
 }
