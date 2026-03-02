@@ -76,7 +76,7 @@ export const GAMES: Game[] = [
     primaryCtaHref: "https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon",
     secondaryCtaLabel: "Meet the Studio",
     secondaryCtaHref: "/#about",
-    trailerUrl: "https://youtu.be/fTPL9IJ-BpI",
+    trailerUrl: "https://youtu.be/_W9W_L2RGnE",
     screenshots: [
       "/images/games/empire-tycoon/screenshots/ScreenOne.png",
       "/images/games/empire-tycoon/screenshots/ScreenTwo.png",
