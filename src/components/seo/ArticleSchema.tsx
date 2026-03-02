@@ -1,0 +1,19 @@
+const SITE = "https://go7studio.com";
+
+export function ArticleSchema({ post }: { post: { title: string; slug: string; excerpt: string; date: string; modified?: string; ogImage?: string } }) {
+  const url = `${SITE}/blog/${post.slug}`;
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.date,
+    dateModified: post.modified ?? post.date,
+    image: post.ogImage ? `${SITE}${post.ogImage}` : undefined,
+    author: { "@type": "Organization", name: "Go7Studio" },
+    publisher: { "@id": "https://go7studio.com/#org" },
+    mainEntityOfPage: url,
+  };
+
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />;
+}
