@@ -137,7 +137,28 @@ function buildSmoothPath(points: Array<{ x: number; y: number }>): string {
 }
 
 function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number; deletions: number }> }) {
-  const data = rows.slice(-12);
+  const parseWeekMs = (week: string) => {
+    const asNumber = Number(week);
+    if (!Number.isNaN(asNumber)) return asNumber < 1e12 ? asNumber * 1000 : asNumber;
+    return new Date(week).getTime();
+  };
+
+  const trimmedRows = useMemo(() => {
+    if (!rows.length) return rows;
+    const copy = [...rows];
+    const last = copy[copy.length - 1];
+    const lastWeekMs = parseWeekMs(last.week);
+    const now = Date.now();
+    const isCurrentBucket = Number.isFinite(lastWeekMs) && lastWeekMs + 7 * 24 * 60 * 60 * 1000 > now;
+
+    if (isCurrentBucket) {
+      copy.pop();
+    }
+
+    return copy;
+  }, [rows]);
+
+  const data = trimmedRows.slice(-12);
   const width = 720;
   const height = 220;
   const pad = 18;
@@ -163,8 +184,8 @@ function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number;
     : "";
 
   return (
-    <div className="space-y-3 overflow-x-auto">
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-[220px] w-full min-w-[680px]">
+    <div className="space-y-3">
+      <svg viewBox={`0 0 ${width} ${height}`} className="h-[220px] w-full">
         <defs>
           <linearGradient id="cvAdd" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="rgba(34,211,238,0.40)" />
@@ -184,7 +205,7 @@ function CodeVelocity({ rows }: { rows: Array<{ week: string; additions: number;
         {addPath && <path d={addPath} fill="none" stroke="rgba(34,211,238,0.95)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
         {delPath && <path d={delPath} fill="none" stroke="rgba(244,114,182,0.95)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
       </svg>
-      <div className="flex min-w-[680px] flex-wrap gap-2 text-[10px] uppercase tracking-[0.12em] text-white/60">
+      <div className="grid grid-cols-2 gap-2 text-[10px] uppercase tracking-[0.12em] text-white/60 sm:flex sm:flex-wrap">
         {data.map((r) => (
           <span key={r.week} className="rounded border border-white/10 bg-white/[0.03] px-2 py-1">
             <span className="text-cyan-400">+{r.additions.toLocaleString()}</span>
