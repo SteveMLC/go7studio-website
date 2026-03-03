@@ -14,6 +14,18 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
   const recentDays = useMemo(() => days.slice(-28), [days]);
 
   const totalCommits = useMemo(() => recentDays.reduce((sum, d) => sum + d.count, 0), [recentDays]);
+  
+  // Calculate actual daily average
+  const dailyAverage = useMemo(() => {
+    if (recentDays.length === 0) return 0;
+    return totalCommits / recentDays.length;
+  }, [recentDays, totalCommits]);
+  
+  // Alternative: calculate per-week average for display
+  const weeklyAverage = useMemo(() => {
+    if (recentDays.length === 0) return 0;
+    return totalCommits / 4; // 4 weeks
+  }, [totalCommits]);
 
   const weekdayAverages = useMemo(() => {
     const sums = new Array(7).fill(0);
@@ -101,7 +113,9 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
       <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white">Radial Activity</h3>
-      <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">Last 4 Weeks — {totalCommits.toLocaleString()} Total Commits</p>
+      <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-cyan-300/70">
+        Last 4 Weeks — {totalCommits.toLocaleString()} Total • {Math.round(weeklyAverage)}/week avg
+      </p>
       <div ref={wrapRef} className="relative mx-auto mt-4 aspect-square w-full max-w-[280px] sm:max-w-[360px] lg:max-w-[420px]">
         <canvas
           ref={canvasRef}
@@ -124,6 +138,7 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
         <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
           <div className="text-3xl font-bold text-white sm:text-4xl">{totalCommits.toLocaleString()}</div>
           <div className="text-[10px] uppercase tracking-[0.2em] text-cyan-400/70">Total Commits</div>
+          <div className="text-[9px] text-white/50 mt-1">~{Math.round(weeklyAverage)}/week</div>
         </div>
         {hoveredDay !== null && (
           <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 translate-y-9 rounded-md border border-white/20 bg-[#020618]/85 px-2 py-1 text-[11px] text-white/80">
