@@ -14,18 +14,6 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
   const recentDays = useMemo(() => days.slice(-28), [days]);
 
   const totalCommits = useMemo(() => recentDays.reduce((sum, d) => sum + d.count, 0), [recentDays]);
-  
-  // Calculate actual daily average
-  const dailyAverage = useMemo(() => {
-    if (recentDays.length === 0) return 0;
-    return totalCommits / recentDays.length;
-  }, [recentDays, totalCommits]);
-  
-  // Alternative: calculate per-week average for display
-  const weeklyAverage = useMemo(() => {
-    if (recentDays.length === 0) return 0;
-    return totalCommits / 4; // 4 weeks
-  }, [totalCommits]);
 
   const weekdayAverages = useMemo(() => {
     const sums = new Array(7).fill(0);

@@ -139,10 +139,16 @@ export async function fetchContributionCalendar(username: string) {
   if (!token) {
     throw new Error("Missing GITHUB_TOKEN for contributions API");
   }
+  
+  // Get date range for last 90 days to capture more data
+  const now = new Date();
+  const fromDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+  const toDate = now;
+  
   const query = `
-    query($username: String!) {
+    query($username: String!, $from: DateTime!, $to: DateTime!) {
       user(login: $username) {
-        contributionsCollection {
+        contributionsCollection(from: $from, to: $to) {
           totalCommitContributions
           totalPullRequestContributions
           totalPullRequestReviewContributions
@@ -164,6 +170,12 @@ export async function fetchContributionCalendar(username: string) {
       }
     }
   `;
+  
+  const variables = { 
+    username, 
+    from: fromDate.toISOString(), 
+    to: toDate.toISOString() 
+  };
 
   const res = await fetch("https://api.github.com/graphql", {
     method: "POST",
@@ -171,7 +183,7 @@ export async function fetchContributionCalendar(username: string) {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ query, variables: { username } }),
+    body: JSON.stringify({ query, variables }),
     next: { revalidate: 600 },
   });
 
