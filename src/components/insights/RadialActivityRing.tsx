@@ -14,6 +14,7 @@ export function RadialActivityRing({ days, loading }: { days: DayPoint[]; loadin
   const recentDays = useMemo(() => days.slice(-28), [days]);
 
   const totalCommits = useMemo(() => recentDays.reduce((sum, d) => sum + d.count, 0), [recentDays]);
+  const weeklyAverage = useMemo(() => totalCommits / 4, [totalCommits]);
 
   const weekdayAverages = useMemo(() => {
     const sums = new Array(7).fill(0);
