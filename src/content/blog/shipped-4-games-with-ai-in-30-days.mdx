@@ -1,0 +1,244 @@
+---
+title: "We Shipped 4 Games with AI in 30 Days — Here's How"
+slug: "shipped-4-games-with-ai-in-30-days"
+date: "2026-03-03"
+modified: "2026-03-03"
+excerpt: "A small studio used three AI agents to build, ship, and monetize four games across Flutter, Unity, and Roblox in a single month. Real numbers, real code, real lessons."
+pillar: "thought-leadership"
+tags:
+  - ai-development
+  - game-dev
+  - flutter
+  - unity
+  - roblox
+  - indie-dev
+  - case-study
+ogImage: "/images/blog/shipped-4-games-ai/og.jpg"
+status: "published"
+schemaType: "Article"
+targetKeywords:
+  - AI game development
+  - build games with AI
+  - AI assisted development
+  - indie game development AI
+  - ship games faster
+seoTitle: "We Shipped 4 Games with AI in 30 Days — Here's How | Go7Studio"
+seoDescription: "How a small indie studio used AI agents to build and ship 4 games across Flutter, Unity, and Roblox in 30 days. Real numbers, architecture, and lessons learned."
+readingTime: "12 min read"
+featured: true
+relatedGames:
+  - empire-tycoon
+  - stakd
+  - rampart
+  - slimeslip
+relatedServices:
+  - mobile-game-development
+  - game-monetization
+---
+
+# We Shipped 4 Games with AI in 30 Days — Here's How
+
+Most game studios spend months on a single title. We shipped four — across three different engines — in 30 days. Not prototypes. Published, monetized games with real users generating real revenue.
+
+The secret wasn't crunch. It was **three AI development agents** working alongside a solo developer, each handling different aspects of the pipeline: code, content, and coordination.
+
+Here's exactly how we did it, what went wrong, and whether we'd do it again.
+
+## The Challenge: $600 in 30 Days
+
+The rules were simple: starting from zero, generate $600 in revenue across new games within 30 days. No existing audience. No marketing budget. Just code, creativity, and AI.
+
+**Why $600?** It's not life-changing money — that's the point. It's proof of concept. Can a tiny team with AI tools ship *real products* fast enough to generate real revenue? Not "revenue" from a hackathon pitch deck. Actual dollars from actual players.
+
+## The Tech Stack
+
+Every game shared a core philosophy: **ship fast, iterate based on data, let AI handle the repetitive work.**
+
+| Game | Engine | Platform | Dev Time |
+|------|--------|----------|----------|
+| **Stakd** | Flutter | Android | ~3 days |
+| **Empire Tycoon** | Flutter | Android | ~7 days |
+| **Rampart** | Unity | Android | ~7 days |
+| **SlimeSlip** | Roblox Studio | Roblox | ~4 days |
+
+The AI agents weren't just autocomplete. Each had a distinct role:
+
+- **Walt** — Strategy, content creation, marketing, analytics, coordination across all projects
+- **Chip** — Code architecture, infrastructure, CI/CD, performance optimization, debugging
+- **Winnie** — SEO, content review, market research, user experience auditing
+
+They operated as autonomous agents through [OpenClaw](https://openclaw.ai), running 24/7 with access to codebases, deployment pipelines, and analytics dashboards.
+
+## Game 1: Stakd — The Puzzle Warmup (3 Days)
+
+![Stakd gameplay](/images/games/stakd/screenshots/gameplay.png)
+
+**Stakd** is a spatial puzzle game where players stack blocks to fill patterns. Think Tetris meets jigsaw, with a zen garden reward system.
+
+**What AI did:**
+- Generated the initial game architecture and state management
+- Designed the difficulty curve algorithm (adaptive based on player performance)
+- Created all zen garden visual assets via Stable Diffusion
+- Wrote the AdMob integration and handled the monetization flow
+
+**What the human did:**
+- Core game feel — the "juice" of how blocks snap and stack
+- Final art direction decisions
+- Play Store listing and screenshots
+- Quality control on the overall experience
+
+**Key lesson:** AI is excellent at boilerplate and systems (ad integration, state management, save/load). It struggles with game *feel* — the micro-interactions that make a game satisfying to play.
+
+**Result:** Live on Play Store within 72 hours of first commit.
+
+## Game 2: Empire Tycoon — The Revenue Engine (7 Days)
+
+![Empire Tycoon gameplay](/images/games/empire-tycoon/screenshots/gameplay.png)
+
+**Empire Tycoon** became the flagship. An idle/tycoon game where players build a business empire from a single lemonade stand to a global conglomerate with real estate, stock markets, and prestige reincorporation.
+
+This is where the AI-human collaboration really clicked.
+
+**Architecture (AI-driven):**
+- Full economy model with inflation curves, business tier progressions, and investment simulations
+- Offline income calculation with anti-cheat mechanisms
+- Cloud-synced leaderboards with percentile rankings
+- AdMob integration with rewarded ads for boost mechanics (10x earnings, 2x offline income)
+- Premium currency system (Platinum Points) with careful free-to-play economy balance
+
+**Content (AI-generated, human-curated):**
+- 11 business types with unique upgrade trees
+- 20 real estate locations across 5 tiers (Rural Kenya → Dubai)
+- Stock market with 15+ fictional companies across sectors
+- Achievement system with 58 milestones
+- Creator code system for influencer partnerships
+
+**What took the most time:** Economy balancing. The AI could generate progression curves, but tuning them so the game *felt* right — not too fast, not too grindy — required dozens of human play sessions.
+
+**Revenue model:**
+- Rewarded video ads (primary — 10x Hustle Boost, 2x Offline Income)
+- In-app purchases (Platinum Points, Premium subscription)
+- No paywalls — everything earnable through gameplay
+
+**Result:** 190+ daily active users, $250+ revenue in first month, 4.2★ rating.
+
+## Game 3: Rampart — Wave Defense in Unity (7 Days)
+
+![Rampart gameplay](/images/games/rampart/screenshots/gameplay.png)
+
+**Rampart** (working title: Idle Attack) is a wave defense game built in Unity. Players deploy troops — militiamen, goblins, trolls, golems — to defend against increasingly difficult enemy waves.
+
+This was the AI stress test: **could AI agents work effectively in Unity/C#?**
+
+**What worked:**
+- Chip handled the entire build pipeline (IL2CPP compilation, Android keystore signing, AAB generation)
+- AI-generated prefab configurations for 40+ unique troop types
+- Automated sprite sheet processing and background removal
+- Battle stat tracking and UI panel generation
+
+**What didn't:**
+- Unity's component architecture is harder for AI to reason about than Flutter's widget tree
+- Prefab references and `Resources.Load()` paths broke frequently
+- The AI would fix one script and introduce regressions in another
+
+**Key lesson:** AI works best in frameworks with strong conventions and fast feedback loops. Flutter's hot reload + widget paradigm = ideal for AI. Unity's editor-heavy workflow = more friction.
+
+**Result:** Playable APK on Google Drive, 40+ troop types, active development with a human collaborator (Liam).
+
+## Game 4: SlimeSlip — Roblox in 4 Days
+
+**SlimeSlip** targeted a completely different market: Roblox's 70M+ daily active users. It's an obby (obstacle course) game with slime physics.
+
+**AI contribution:**
+- Generated the Lua game scripts and obstacle configurations
+- Handled Roblox-specific patterns (DataStores, RemoteEvents)
+- Created marketing materials and game description copy
+
+**The Roblox reality check:** The platform has its own ecosystem, economy, and discovery mechanics. Getting traction requires understanding Roblox culture — something AI can research but can't *feel*.
+
+**Result:** Published on Roblox, providing a foothold in the platform for future development.
+
+## The AI Agent Workflow
+
+Here's what a typical day looked like during the sprint:
+
+### Morning (Human + AI Planning)
+1. Review overnight analytics (AI-pulled from AdMob, GA4, Play Console)
+2. Prioritize bugs vs features vs content
+3. Assign tasks to agents
+
+### Daytime (Parallel Execution)
+- **Chip** pushes code changes, runs builds, deploys
+- **Walt** creates marketing content, analyzes user behavior, writes copy
+- **Winnie** audits UX, researches competitors, reviews content for SEO
+- **Human** plays the games, makes design decisions, approves external communications
+
+### Evening / Overnight
+- AI agents run batch tasks: asset generation, analytics collection, content scheduling
+- Automated backups to NAS
+- Morning handoff report ready by 6 AM
+
+**The multiplier effect:** A solo developer with three AI agents isn't a 4x multiplier — it's more like 2-3x on raw output. But the *type* of work changes dramatically. The human stops writing boilerplate and starts making higher-level decisions. That's where the real leverage is.
+
+## What AI Does Well in Game Dev
+
+1. **Boilerplate and scaffolding** — Setting up project structure, adding integrations (ads, analytics, auth), writing CRUD operations
+2. **Iteration at speed** — Need to test 5 different economy curves? AI generates all 5 while you review the first
+3. **Cross-domain work** — The same agents write Dart, C#, Lua, JavaScript, Python, and shell scripts
+4. **Documentation** — Every decision, every architecture choice, every bug fix gets documented automatically
+5. **24/7 availability** — Overnight batch processing, monitoring, asset generation while you sleep
+
+## What AI Can't Do (Yet)
+
+1. **Game feel** — The satisfying *snap* of a block placement, the weight of a character landing. This is intuitive, embodied knowledge that AI doesn't have
+2. **Taste** — AI generates options. Humans pick the good ones. Without curation, AI output is mediocre
+3. **Player empathy** — Understanding *why* a player churns at level 7 requires human intuition about frustration and reward
+4. **Platform culture** — Each platform (Play Store, Roblox, App Store) has unwritten rules. AI can learn them from data, but slowly
+5. **Creative direction** — AI is a powerful instrument. Someone still needs to be the composer
+
+## The Numbers
+
+Let's talk real results after 30 days:
+
+- **4 games shipped** across 3 engines and 2 platforms
+- **190+ DAU** on Empire Tycoon (organic, no paid acquisition)
+- **$250+ revenue** (AdMob + IAP combined)
+- **50+ videos** produced for YouTube marketing
+- **~55-60 new installs/day** (organic Play Store)
+
+Is $250 in 30 days going to retire anyone? No. But consider:
+- Zero marketing spend
+- Solo developer + AI
+- Games generating *recurring* revenue that compounds with content updates
+- Reusable systems (ad integration, analytics, deployment pipelines) that accelerate future games
+
+## Would We Do It Again?
+
+**Yes — but differently.**
+
+**What we'd keep:**
+- Multi-agent workflow with clear role separation
+- Ship-first mentality (perfect is the enemy of live)
+- Flutter as primary engine for mobile (speed advantage is real)
+- Automated pipelines for everything repeatable
+
+**What we'd change:**
+- Start with one game and go deeper (Empire Tycoon alone could have hit $600 with more focused marketing)
+- Invest more in ASO from day one
+- Build the blog and SEO infrastructure earlier (you're reading the result of that lesson)
+- Use AI for user acquisition experiments, not just development
+
+## What's Next
+
+We're continuing to develop all four games, with Empire Tycoon as the primary focus. The AI agents are now handling:
+
+- **Automated art generation** via Stable Diffusion with custom-trained LoRA models
+- **SEO and content marketing** (this blog post is part of that strategy)
+- **Business expansion systems** — 11 businesses with 4 upgrade variants each
+- **Real estate manager characters** for 20 global locations
+
+The $600 challenge taught us that AI doesn't replace game developers — it removes the bottlenecks that keep solo developers from shipping. And shipping is everything.
+
+---
+
+*Go7Studio builds mobile games with AI-assisted development workflows. Our games include [Empire Tycoon](/games/empire-tycoon), [Stakd](/games/stakd), [Rampart](/games/rampart), and [SlimeSlip](/games/slimeslip). Interested in how we work? [Get in touch](/contact).*

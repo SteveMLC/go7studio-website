@@ -24,6 +24,19 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
     title: post.seoTitle ?? post.title,
     description: post.seoDescription ?? post.excerpt,
     alternates: { canonical: `/blog/${post.slug}` },
+    openGraph: {
+      title: post.seoTitle ?? post.title,
+      description: post.seoDescription ?? post.excerpt,
+      url: `${SITE}/blog/${post.slug}`,
+      type: "article",
+      ...(post.ogImage ? { images: [{ url: `${SITE}${post.ogImage}`, width: 1200, height: 630 }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.seoTitle ?? post.title,
+      description: post.seoDescription ?? post.excerpt,
+      ...(post.ogImage ? { images: [`${SITE}${post.ogImage}`] } : {}),
+    },
   };
 }
 
