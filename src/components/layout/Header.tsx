@@ -88,7 +88,7 @@ export function Header() {
           {/* CTA Buttons */}
           <div className="flex items-center gap-2">
             <a
-              href="https://discord.gg/pRCD6apa"
+              href="https://discord.gg/DzCuJhznWk"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden items-center gap-1.5 rounded-full bg-white/5 px-3 py-2 text-sm font-medium text-white/80 ring-1 ring-white/10 transition-all hover:bg-white/10 hover:text-white sm:inline-flex"
@@ -145,7 +145,7 @@ export function Header() {
               ))}
               
               <a
-                href="https://discord.gg/pRCD6apa"
+                href="https://discord.gg/DzCuJhznWk"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-2 inline-flex items-center gap-2 rounded-xl bg-white/5 px-4 py-3 text-base font-medium text-white/80"

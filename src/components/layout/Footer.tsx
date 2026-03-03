@@ -79,7 +79,7 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <a href="https://discord.gg/pRCD6apa" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              <a href="https://discord.gg/DzCuJhznWk" target="_blank" rel="noopener noreferrer" className="hover:text-white">
                 Discord
               </a>
             </li>
@@ -90,7 +90,7 @@ export function Footer() {
             <div className="mt-3 flex items-center gap-3">
               <a
                 className="grid h-9 w-9 place-items-center rounded-xl bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
-                href="https://discord.gg/pRCD6apa"
+                href="https://discord.gg/DzCuJhznWk"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Discord"
