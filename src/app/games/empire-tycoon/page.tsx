@@ -28,8 +28,8 @@ const moments = [
 
 const testimonials = [
   {
-    quote: "I love that I can check in for a few minutes and still feel real progress.",
-    source: "Google Play review • 5★",
+    quote: "I constantly feel like I am making progress... This is truly a very hidden gem.",
+    source: "Jordan W. • Google Play • 5★",
   },
   {
     quote: "The growth loop is super satisfying without feeling stressful.",
@@ -137,7 +137,23 @@ export default function EmpireTycoonLandingPage() {
 
       <section className="container-px py-12 sm:py-16">
         <h2 className="text-2xl font-semibold sm:text-3xl">What players are saying</h2>
-        <p className="mt-2 text-sm text-white/60">Real 4–5★ Play Store reviews (curated with Walt).</p>
+        <p className="mt-2 text-sm text-white/60">Real 4–5★ Play Store reviews.</p>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
+            <p className="text-xl font-semibold text-[#D4A853]">5,000+</p>
+            <p className="text-sm text-white/70">Downloads</p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
+            <p className="text-xl font-semibold text-[#D4A853]">3.9★</p>
+            <p className="text-sm text-white/70">Google Play rating</p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
+            <p className="text-xl font-semibold text-[#D4A853]">Regular updates</p>
+            <p className="text-sm text-white/70">Actively maintained</p>
+          </div>
+        </div>
+
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {testimonials.map((t, i) => (
             <blockquote key={i} className="rounded-xl border border-white/10 bg-white/5 p-5">
