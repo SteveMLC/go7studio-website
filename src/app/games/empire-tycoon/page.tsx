@@ -145,7 +145,7 @@ export default function EmpireTycoonLandingPage() {
             <p className="text-sm text-white/70">Downloads</p>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
-            <p className="text-xl font-semibold text-[#D4A853]">3.9★</p>
+            <p className="text-xl font-semibold text-[#D4A853]">4.1★</p>
             <p className="text-sm text-white/70">Google Play rating</p>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
