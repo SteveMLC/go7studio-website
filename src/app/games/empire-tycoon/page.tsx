@@ -249,6 +249,54 @@ export default function EmpireTycoonLandingPage() {
         </p>
       </section>
 
+      {/* ── Screenshot Carousel ─────────────────────────────────── */}
+      <section className="py-16 sm:py-20">
+        <div className="container-px">
+          <h2 className="text-center text-3xl font-semibold sm:text-4xl">
+            See it in action
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-lg text-white/70">
+            Clean UI. Satisfying numbers. Built for one-hand play.
+          </p>
+        </div>
+
+        <div className="relative mt-10">
+          {/* Fade edges */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#0F1419] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#0F1419] to-transparent" />
+
+          {/* Scrollable row */}
+          <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-8 pb-4 scrollbar-hide sm:gap-6 sm:px-16">
+            {[
+              { src: "/images/games/empire-tycoon/screenshots/ScreenOne.png", alt: "Hustle — tap to earn" },
+              { src: "/images/games/empire-tycoon/screenshots/ScreenTwo.png", alt: "Businesses — upgrade and automate" },
+              { src: "/images/games/empire-tycoon/screenshots/ScreenThree.png", alt: "Investments — build your portfolio" },
+              { src: "/images/games/empire-tycoon/screenshots/screenfour.png", alt: "Real estate — global properties" },
+              { src: "/images/games/empire-tycoon/screenshots/screenfive.png", alt: "Stats — track your empire" },
+              { src: "/images/games/empire-tycoon/screenshots/screensix.png", alt: "Profile — achievements and prestige" },
+            ].map((shot) => (
+              <div
+                key={shot.src}
+                className="w-56 flex-shrink-0 snap-center sm:w-64"
+              >
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-lg shadow-black/20">
+                  <Image
+                    src={shot.src}
+                    alt={shot.alt}
+                    width={400}
+                    height={800}
+                    className="h-auto w-full"
+                  />
+                </div>
+                <p className="mt-2 text-center text-xs text-white/50">
+                  {shot.alt}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Compact feature grid ────────────────────────────────── */}
       <section className="container-px py-16 sm:py-20">
         <h2 className="text-center text-3xl font-semibold sm:text-4xl">
