@@ -26,8 +26,20 @@ const LANGUAGE_COLORS: Record<string, string> = {
   Dart: "#00B4AB",
 };
 
-// ENHANCED StatCard with tighter design
-function StatCard({ label, value, index, trend }: { label: string; value: string | number; index: number; trend?: { text: string; up: boolean } }) {
+// ENHANCED StatCard with month-to-date and projected display
+function StatCard({ 
+  label, 
+  value, 
+  index, 
+  subtext,
+  projected
+}: { 
+  label: string; 
+  value: string | number; 
+  index: number; 
+  subtext?: string;
+  projected?: string | number;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -38,9 +50,14 @@ function StatCard({ label, value, index, trend }: { label: string; value: string
     >
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">{label}</div>
       <div className="mt-1 text-xl font-bold tabular-nums text-white">{value}</div>
-      {trend && (
-        <div className={`mt-1 text-[10px] uppercase tracking-[0.12em] ${trend.up ? "text-emerald-300" : "text-rose-300"}`}>
-          {trend.up ? "▲" : "▼"} {trend.text}
+      {projected && (
+        <div className="mt-1 text-[10px] uppercase tracking-[0.12em] text-cyan-300/80">
+          On pace for {projected}
+        </div>
+      )}
+      {subtext && (
+        <div className="mt-1 text-[10px] uppercase tracking-[0.12em] text-white/40">
+          {subtext}
         </div>
       )}
     </motion.div>
@@ -365,6 +382,9 @@ export function InsightsDashboard() {
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const daysElapsed = today.getDate();
+    
     const thisMonthCommits = days
       .filter((d) => {
         const date = new Date(d.date);
@@ -372,15 +392,10 @@ export function InsightsDashboard() {
       })
       .reduce((sum, d) => sum + d.count, 0);
 
-    // Previous month commits for trend
-    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-    const lastMonthCommits = days
-      .filter((d) => {
-        const date = new Date(d.date);
-        return date.getMonth() === prevMonth && date.getFullYear() === prevYear;
-      })
-      .reduce((sum, d) => sum + d.count, 0);
+    // Projected monthly total based on current pace
+    const projectedCommits = daysElapsed > 0 
+      ? Math.round((thisMonthCommits / daysElapsed) * daysInMonth)
+      : thisMonthCommits;
 
     const monthName = today.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
 
@@ -392,7 +407,9 @@ export function InsightsDashboard() {
       repoTrendDiff: recentActiveRepos - previousActiveRepos,
       activeTrendDiff: recent14 - previous14,
       monthlyCommits: thisMonthCommits,
-      monthlyCommitsDiff: thisMonthCommits - lastMonthCommits,
+      projectedCommits,
+      daysElapsed,
+      daysInMonth,
       monthName,
     };
   }, [repos.data, contributions.data]);
@@ -535,19 +552,20 @@ export function InsightsDashboard() {
               label={`Commits · ${totals.monthName}`}
               value={totals.monthlyCommits.toLocaleString()}
               index={0}
-              trend={{ text: `${Math.abs(totals.monthlyCommitsDiff)} vs prior month`, up: totals.monthlyCommitsDiff >= 0 }}
+              projected={totals.projectedCommits.toLocaleString()}
+              subtext={`${totals.daysElapsed} of ${totals.daysInMonth} days`}
             />
             <StatCard
               label="Repositories"
               value={totals.repos}
               index={1}
-              trend={{ text: `${Math.abs(totals.repoTrendDiff)} vs prior 30d`, up: totals.repoTrendDiff >= 0 }}
+              subtext={`${totals.repoTrendDiff >= 0 ? '+' : ''}${totals.repoTrendDiff} vs prior 30d`}
             />
             <StatCard
               label="Active Days"
               value={totals.activeDays}
               index={2}
-              trend={{ text: `${Math.abs(totals.activeTrendDiff)} vs prior 14d`, up: totals.activeTrendDiff >= 0 }}
+              subtext={`${totals.activeTrendDiff >= 0 ? '+' : ''}${totals.activeTrendDiff} vs prior 14d`}
             />
           </motion.div>
         </div>
