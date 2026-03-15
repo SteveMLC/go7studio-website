@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     if (!db) return NextResponse.json({ error: "Firebase not configured" }, { status: 500 });
     
     const snap = await db.collection("creator_clicks").get();
-    const data: Record<string, any> = {};
+    const data: Record<string, Record<string, unknown>> = {};
     snap.forEach(doc => { data[doc.id] = doc.data(); });
     return NextResponse.json(data);
   }
