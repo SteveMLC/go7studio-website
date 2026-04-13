@@ -14,6 +14,8 @@ function isExternal(href: string) {
 
 export function ProjectHero({ project }: { project: Project }) {
   const primaryLinks = project.links?.slice(0, 2) ?? [];
+  const heroHeadline = project.heroHeadline ?? project.title;
+  const heroSubhead = project.heroSubhead ?? project.excerpt;
 
   return (
     <>
@@ -53,11 +55,14 @@ export function ProjectHero({ project }: { project: Project }) {
               ) : null}
             </div>
 
-            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <p className="mt-5 text-sm font-semibold uppercase tracking-[0.24em] text-brand-orange">
               {project.title}
+            </p>
+            <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              {heroHeadline}
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-8 text-white/75 sm:text-lg">
-              {project.excerpt}
+              {heroSubhead}
             </p>
 
             {(project.roles?.length || project.industries?.length) ? (

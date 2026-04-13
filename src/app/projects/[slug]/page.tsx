@@ -6,6 +6,7 @@ import { ArrowRight, ExternalLink } from "lucide-react";
 import { ProjectCtaBand } from "@/components/projects/ProjectCtaBand";
 import { ProjectHero } from "@/components/projects/ProjectHero";
 import { ProjectHighlights } from "@/components/projects/ProjectHighlights";
+import { ProjectProofPoints } from "@/components/projects/ProjectProofPoints";
 import { ProjectMediaGallery } from "@/components/projects/ProjectMediaGallery";
 import { ProjectMetrics } from "@/components/projects/ProjectMetrics";
 import { ProjectStructuredData } from "@/components/projects/ProjectStructuredData";
@@ -103,10 +104,10 @@ export default function ProjectDetailPage({ params }: PageProps) {
     : undefined;
   const relatedPosts = getRelatedBlogPostsBySlugs(project.relatedPostSlugs ?? []);
   const ctaPrimary = project.links?.find((link) => link.kind === "primary" || link.kind === "live") ?? project.links?.[0];
-  const ctaSecondary = project.links?.find((link) => link.kind === "contact")
+  const ctaSecondary = project.links?.find((link) => link.kind === "secondary" || link.kind === "case-study")
     ?? (relatedCaseStudy
       ? { label: "Read case study", href: `/case-studies/${relatedCaseStudy.slug}`, kind: "case-study" as const }
-      : undefined);
+      : project.links?.find((link) => link.kind === "contact"));
 
   return (
     <>
@@ -127,6 +128,7 @@ export default function ProjectDetailPage({ params }: PageProps) {
 
           <aside className="space-y-6">
             <ProjectMetrics metrics={project.metrics} className="mt-0" />
+            <ProjectProofPoints proofPoints={project.proofPoints} className="mt-0" />
             <ProjectTechStack stack={project.stack} className="mt-0" />
           </aside>
         </div>

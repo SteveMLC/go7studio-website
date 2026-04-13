@@ -134,4 +134,6 @@ This project is complete when:
 
 ## Notes
 
+- Copy intake note (10:37 EDT): Winnie delivered strong raw positioning blocks. Walt performed a truth/scope pass before implementation handoff to avoid unverified counts and overclaims.
+
 Walt is orchestrating this end to end. Chip handles implementation. Winnie supports copy. Walt owns QA, truthfulness, and final completion tracking.

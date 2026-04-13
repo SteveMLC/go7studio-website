@@ -103,6 +103,8 @@ export type ProjectFrontmatter = {
   slug: string;
   date: string;
   modified?: string;
+  heroHeadline?: string;
+  heroSubhead?: string;
   excerpt: string;
   status?: PublishStatus;
   projectStatus: ProjectStatus;
@@ -120,6 +122,7 @@ export type ProjectFrontmatter = {
   links?: ProjectLink[];
   metrics?: ProjectMetric[];
   highlights?: ProjectHighlight[];
+  proofPoints?: string[];
   media?: ProjectMedia[];
   stack?: string[];
   relatedCaseStudySlug?: string;
@@ -197,6 +200,7 @@ function parseProjectFile(filePath: string): Project {
     links: frontmatter.links ?? [],
     metrics: frontmatter.metrics ?? [],
     highlights: frontmatter.highlights ?? [],
+    proofPoints: frontmatter.proofPoints ?? [],
     media: frontmatter.media ?? [],
     stack: frontmatter.stack ?? [],
     roles: frontmatter.roles ?? [],
