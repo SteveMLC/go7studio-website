@@ -29,11 +29,11 @@ export function FeaturedGames() {
 
   return (
     <section className="container-px py-20">
-      {/* Header */}
       <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-white">
-            Featured Projects
+          <p className="text-sm uppercase tracking-[0.22em] text-white/45">Games</p>
+          <h2 className="mt-2 text-3xl font-bold text-white">
+            Featured Games
           </h2>
           <p className="mt-2 max-w-xl text-base text-white/60">
             Games built to be fast, satisfying, and packed with &ldquo;just try it&rdquo; moments.
@@ -44,16 +44,15 @@ export function FeaturedGames() {
           href="/games"
           className="hidden text-sm font-medium text-white/70 hover:text-white sm:inline-flex"
         >
-          View all projects
+          View all games
         </Link>
       </div>
 
-      {/* Filters */}
       <div className="mb-8 flex flex-wrap gap-2">
         {filters.map((filter) => {
           const Icon = filter.icon;
           const isActive = activeFilter === filter.value;
-          
+
           return (
             <button
               key={filter.value}
@@ -71,7 +70,6 @@ export function FeaturedGames() {
         })}
       </div>
 
-      {/* Games grid */}
       <AnimatePresence mode="popLayout">
         <motion.div
           className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
@@ -103,7 +101,7 @@ export function FeaturedGames() {
           href="/games"
           className="btn-secondary inline-flex w-full items-center justify-center"
         >
-          View all projects
+          View all games
         </Link>
       </div>
     </section>

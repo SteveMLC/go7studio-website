@@ -1,11 +1,16 @@
 import type { MetadataRoute } from "next";
 import { GAMES } from "@/lib/games";
-import { getPublishedBlogPosts, getPublishedCaseStudies } from "@/lib/content";
+import {
+  getPublishedBlogPosts,
+  getPublishedCaseStudies,
+  getPublishedProjects,
+} from "@/lib/content";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl = "https://go7studio.com";
   const blogPosts = getPublishedBlogPosts();
   const caseStudies = getPublishedCaseStudies();
+  const projects = getPublishedProjects();
 
   const routes: MetadataRoute.Sitemap = [
     {
@@ -19,6 +24,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.9,
+    },
+    {
+      url: `${siteUrl}/projects`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.85,
     },
     {
       url: `${siteUrl}/services`,
@@ -49,6 +60,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
+    })),
+    ...projects.map((project) => ({
+      url: `${siteUrl}/projects/${project.slug}`,
+      lastModified: new Date(project.modified ?? project.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
     })),
     {
       url: `${siteUrl}/blog`,

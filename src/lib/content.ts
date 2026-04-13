@@ -5,6 +5,7 @@ import readingTime from "reading-time";
 
 const BLOG_DIR = path.join(process.cwd(), "src/content/blog");
 const CASE_STUDIES_DIR = path.join(process.cwd(), "src/content/case-studies");
+const PROJECTS_DIR = path.join(process.cwd(), "src/content/projects");
 
 export type PublishStatus = "published" | "draft";
 
@@ -48,6 +49,84 @@ export type CaseStudyFrontmatter = {
 };
 
 export type CaseStudy = CaseStudyFrontmatter & {
+  content: string;
+  readingTime: string;
+};
+
+export type ProjectStatus =
+  | "live"
+  | "beta"
+  | "in-development"
+  | "client-work"
+  | "internal";
+
+export type ProjectCategory =
+  | "education-platform"
+  | "learning-hub"
+  | "client-platform"
+  | "internal-product"
+  | "creative-tool"
+  | "saas";
+
+export type ProjectMediaType = "image" | "video" | "embed";
+
+export type ProjectMetric = {
+  label: string;
+  value: string;
+  note?: string;
+};
+
+export type ProjectHighlight = {
+  title: string;
+  description: string;
+  icon?: string;
+};
+
+export type ProjectMedia = {
+  type: ProjectMediaType;
+  src: string;
+  alt: string;
+  caption?: string;
+  poster?: string;
+  aspectRatio?: "16:9" | "4:3" | "3:2" | "1:1" | "phone";
+  featured?: boolean;
+};
+
+export type ProjectLink = {
+  label: string;
+  href: string;
+  kind: "primary" | "secondary" | "case-study" | "live" | "contact";
+};
+
+export type ProjectFrontmatter = {
+  title: string;
+  slug: string;
+  date: string;
+  modified?: string;
+  excerpt: string;
+  status?: PublishStatus;
+  projectStatus: ProjectStatus;
+  category: ProjectCategory;
+  client?: string;
+  featured?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+  ogImage?: string;
+  tags: string[];
+  roles?: string[];
+  platforms?: string[];
+  industries?: string[];
+  featuredVideo?: string;
+  links?: ProjectLink[];
+  metrics?: ProjectMetric[];
+  highlights?: ProjectHighlight[];
+  media?: ProjectMedia[];
+  stack?: string[];
+  relatedCaseStudySlug?: string;
+  relatedPostSlugs?: string[];
+};
+
+export type Project = ProjectFrontmatter & {
   content: string;
   readingTime: string;
 };
@@ -107,6 +186,28 @@ function parseCaseStudyFile(filePath: string): CaseStudy {
   };
 }
 
+function parseProjectFile(filePath: string): Project {
+  const file = fs.readFileSync(filePath, "utf8");
+  const { data, content } = matter(file);
+  const frontmatter = data as ProjectFrontmatter;
+
+  return {
+    ...frontmatter,
+    status: frontmatter.status ?? "draft",
+    links: frontmatter.links ?? [],
+    metrics: frontmatter.metrics ?? [],
+    highlights: frontmatter.highlights ?? [],
+    media: frontmatter.media ?? [],
+    stack: frontmatter.stack ?? [],
+    roles: frontmatter.roles ?? [],
+    platforms: frontmatter.platforms ?? [],
+    industries: frontmatter.industries ?? [],
+    relatedPostSlugs: frontmatter.relatedPostSlugs ?? [],
+    content,
+    readingTime: readingTime(content).text,
+  };
+}
+
 function byDateDesc<T extends { date: string }>(a: T, b: T) {
   return new Date(b.date).getTime() - new Date(a.date).getTime();
 }
@@ -139,6 +240,15 @@ export function getRelatedBlogPosts(post: BlogPost, max = 3): BlogPost[] {
     .map((entry) => entry.post);
 }
 
+export function getRelatedBlogPostsBySlugs(slugs: string[], max = 3): BlogPost[] {
+  if (!slugs.length) return [];
+  const wanted = new Set(slugs);
+  return getPublishedBlogPosts()
+    .filter((post) => wanted.has(post.slug))
+    .sort((a, b) => slugs.indexOf(a.slug) - slugs.indexOf(b.slug))
+    .slice(0, max);
+}
+
 export function getAllCaseStudies(): CaseStudy[] {
   return getFiles(CASE_STUDIES_DIR)
     .map((f) => parseCaseStudyFile(path.join(CASE_STUDIES_DIR, f)))
@@ -151,4 +261,22 @@ export function getPublishedCaseStudies(): CaseStudy[] {
 
 export function getCaseStudyBySlug(slug: string): CaseStudy | undefined {
   return getAllCaseStudies().find((post) => post.slug === slug);
+}
+
+export function getAllProjects(): Project[] {
+  return getFiles(PROJECTS_DIR)
+    .map((f) => parseProjectFile(path.join(PROJECTS_DIR, f)))
+    .sort(byDateDesc);
+}
+
+export function getPublishedProjects(): Project[] {
+  return getAllProjects().filter((project) => project.status === "published");
+}
+
+export function getFeaturedProjects(): Project[] {
+  return getPublishedProjects().filter((project) => project.featured);
+}
+
+export function getProjectBySlug(slug: string): Project | undefined {
+  return getAllProjects().find((project) => project.slug === slug);
 }

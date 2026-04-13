@@ -2,6 +2,7 @@ export const SCHEMA_IDS = {
   ORG: "https://go7studio.com/#org",
   WEBSITE: "https://go7studio.com/#website",
   GAMES_LIST: "https://go7studio.com/games/#list",
+  PROJECTS_LIST: "https://go7studio.com/projects/#list",
   SORTBLOOM_GAME: "https://go7studio.com/games/sortbloom/#game",
 } as const;
 
@@ -53,7 +54,7 @@ export function getOrganizationSchema(): SchemaNode {
     ],
     knowsAbout: [
       "Mobile Game Development",
-      "Flutter Development", 
+      "Flutter Development",
       "Roblox Game Development",
       "Idle Games",
       "Tycoon Games",

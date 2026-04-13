@@ -10,6 +10,7 @@ import { Menu, X, Gamepad2 } from "lucide-react";
 const navItems = [
   { href: "/", label: "Home" },
   { href: "/games", label: "Games" },
+  { href: "/projects", label: "Projects" },
   { href: "/services", label: "Services" },
   { href: "/insights", label: "Insights" },
   { href: "/#about", label: "About" },
@@ -32,8 +33,8 @@ export function Header() {
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
     if (href.startsWith("/#")) return pathname === "/";
-    // For other routes, check for exact match or sub-routes
     if (href === "/games") return pathname === "/games" || pathname.startsWith("/games/");
+    if (href === "/projects") return pathname === "/projects" || pathname.startsWith("/projects/");
     return pathname === href || pathname.startsWith(href + "/");
   };
 
@@ -47,8 +48,7 @@ export function Header() {
         }`}
       >
         <div className="container-px flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
+          <Link href="/" className="group flex items-center gap-2.5">
             <div className="relative">
               <Image
                 src="/images/branding/go7studio-logo-square.png"
@@ -63,7 +63,6 @@ export function Header() {
             </span>
           </Link>
 
-          {/* Desktop Nav */}
           <nav className="hidden items-center gap-1 md:flex">
             {navItems.map((item) => (
               <Link
@@ -85,7 +84,6 @@ export function Header() {
             ))}
           </nav>
 
-          {/* CTA Buttons */}
           <div className="flex items-center gap-2">
             <a
               href="https://discord.gg/DzCuJhznWk"
@@ -98,7 +96,7 @@ export function Header() {
               </svg>
               <span className="hidden lg:inline">Discord</span>
             </a>
-            
+
             <Link
               href="/games"
               className="btn-primary inline-flex items-center gap-1.5 text-sm"
@@ -107,7 +105,6 @@ export function Header() {
               <span className="hidden sm:inline">Play</span>
             </Link>
 
-            {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-white ring-1 ring-white/10 md:hidden"
@@ -122,7 +119,6 @@ export function Header() {
         </div>
       </header>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -143,7 +139,7 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
-              
+
               <a
                 href="https://discord.gg/DzCuJhznWk"
                 target="_blank"

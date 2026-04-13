@@ -1,4 +1,5 @@
 import { GAMES } from "@/lib/games";
+import { getFeaturedProjects } from "@/lib/content";
 import {
   createSchemaGraph,
   getBreadcrumbListSchema,
@@ -6,17 +7,11 @@ import {
   SCHEMA_IDS,
 } from "@/lib/schema";
 
-/**
- * Homepage-specific structured data
- * Note: Organization and WebSite are in root layout
- * This adds: ItemList (games), FAQPage, CollectionPage
- */
 export function getHomepageStructuredData() {
   const breadcrumbs = getBreadcrumbListSchema([
     { name: "Home", url: "/" },
   ]);
 
-  // ItemList of games - shows as carousel in search results
   const gamesList = {
     "@type": "ItemList",
     "@id": SCHEMA_IDS.GAMES_LIST,
@@ -51,20 +46,42 @@ export function getHomepageStructuredData() {
     })),
   };
 
-  // CollectionPage for homepage
+  const featuredProjects = getFeaturedProjects();
+  const projectsList = {
+    "@type": "ItemList",
+    "@id": SCHEMA_IDS.PROJECTS_LIST,
+    name: "Go7Studio Projects",
+    description: "Non-game digital products and learning platforms built by Go7Studio",
+    numberOfItems: featuredProjects.length,
+    itemListElement: featuredProjects.map((project, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: project.title,
+      url: `${SITE_URL}/projects/${project.slug}`,
+      item: {
+        "@type": "SoftwareApplication",
+        name: project.title,
+        description: project.excerpt,
+        applicationCategory: project.category,
+        operatingSystem: project.platforms?.join(", ") || "Web",
+        url: `${SITE_URL}/projects/${project.slug}`,
+      },
+    })),
+  };
+
   const collectionPage = {
     "@type": "CollectionPage",
     "@id": `${SITE_URL}/#page`,
     url: SITE_URL,
     name: "Go7Studio - Game Development Studio & Consulting",
-    description: "Go7Studio builds fun-first mobile and Roblox games with satisfying progression and juicy polish. Expert game development consulting for indie studios.",
+    description: "Go7Studio builds fun-first mobile and Roblox games with satisfying progression and juicy polish, plus polished digital product work for serious learning experiences.",
     isPartOf: { "@id": SCHEMA_IDS.WEBSITE },
     about: { "@id": SCHEMA_IDS.ORG },
     mainEntity: { "@id": SCHEMA_IDS.GAMES_LIST },
     breadcrumb: breadcrumbs,
+    hasPart: [{ "@id": SCHEMA_IDS.GAMES_LIST }, { "@id": SCHEMA_IDS.PROJECTS_LIST }],
   };
 
-  // FAQPage for common questions (helps with featured snippets)
   const faqPage = {
     "@type": "FAQPage",
     mainEntity: [
@@ -81,15 +98,15 @@ export function getHomepageStructuredData() {
         name: "Does Go7Studio offer game development consulting?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes! Go7Studio offers consulting services including game design, Flutter mobile development, Roblox development, monetization strategy, and MVP prototyping for indie studios and creators.",
+          text: "Yes! Go7Studio offers consulting services including game design, Flutter mobile development, Roblox development, monetization strategy, MVP prototyping, and product-oriented UX work for digital experiences.",
         },
       },
       {
         "@type": "Question",
-        name: "What is Empire Tycoon?",
+        name: "What kinds of projects does Go7Studio build besides games?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Empire Tycoon is a free-to-play idle business simulation game for Android. Build businesses, automate income, invest in real estate, and scale from a small shop to a business empire. Available on Google Play.",
+          text: "Go7Studio also showcases non-game digital product work, including learning platforms and course-delivery experiences with strong UX, content structure, and accessibility-minded polish.",
         },
       },
     ],
@@ -98,6 +115,7 @@ export function getHomepageStructuredData() {
   return createSchemaGraph(
     collectionPage,
     gamesList,
+    projectsList,
     faqPage,
     breadcrumbs,
   );
