@@ -1,9 +1,23 @@
+import type { Metadata } from "next";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { getPublishedBlogPosts } from "@/lib/content";
 
-export const metadata = {
-  title: "Blog",
-  description: "Game dev, growth, and product insights from Go7Studio.",
+const title = "Blog";
+const description = "Game dev, growth, and product insights from Go7Studio.";
+
+export const metadata: Metadata = {
+  title,
+  description,
+  alternates: { canonical: "/blog" },
+  openGraph: {
+    title: `${title} | Go7Studio`,
+    description,
+    url: "https://go7studio.com/blog",
+  },
+  twitter: {
+    title: `${title} | Go7Studio`,
+    description,
+  },
 };
 
 export default function BlogIndexPage({ searchParams }: { searchParams: { pillar?: string } }) {
