@@ -6,6 +6,7 @@ import { GAMES, getGameBySlug } from "@/lib/games";
 import { ScreenshotGallery } from "@/components/games/ScreenshotGallery";
 import { GooglePlayBadge } from "@/components/common/GooglePlayBadge";
 import { DownloadButton } from "@/components/common/DownloadButton";
+import { WaitlistForm } from "@/components/common/WaitlistForm";
 import { GameStructuredData } from "@/components/seo/GameStructuredData";
 
 type PageProps = {
@@ -45,7 +46,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
   const baseUrl = "https://go7studio.com";
   const fullUrl = `${baseUrl}/games/${game.slug}`;
   const fullDescription = `${game.tagline} ${game.description}`;
-  const ogImageUrl = game.ogImage ? `${baseUrl}${game.ogImage}` : `${baseUrl}/og-default.png`;
+  const ogImageUrl = game.ogImage ? `${baseUrl}${game.ogImage}` : `${baseUrl}/images/og-default.jpg`;
   
   // Extract YouTube video ID for embed URL
   const videoId = game.trailerUrl?.match(/youtu\.be\/([^?]+)|youtube\.com\/watch\?v=([^&]+)/)?.[1] || 
@@ -225,6 +226,21 @@ export default function GameDetailPage({ params }: PageProps) {
           </dl>
         </aside>
       </section>
+
+      {game.status === "coming-soon" ? (
+        <section id="waitlist" className="mt-10 scroll-mt-24">
+          <div className="glass-card p-6 sm:p-8">
+            <h2 className="text-2xl font-semibold text-white">Join the {game.title} waitlist</h2>
+            <p className="mt-2 text-sm text-white/70 sm:text-base">
+              Drop your email and we&apos;ll let you know the moment it&apos;s ready to play.
+              No spam, no filler — just the launch ping.
+            </p>
+            <div className="mt-5 max-w-xl">
+              <WaitlistForm game={game.slug} />
+            </div>
+          </div>
+        </section>
+      ) : null}
       </div>
 
       {showEnhancedEmpireCta ? (

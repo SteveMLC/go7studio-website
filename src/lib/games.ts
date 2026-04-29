@@ -42,7 +42,7 @@ export const GAMES: Game[] = [
     status: "coming-soon",
     platforms: ["android"],
     primaryCtaLabel: "Join the Waitlist",
-    primaryCtaHref: "#",
+    primaryCtaHref: "#waitlist",
     secondaryCtaLabel: "Meet the Studio",
     secondaryCtaHref: "/#about",
     screenshots: [
@@ -109,6 +109,7 @@ export const GAMES: Game[] = [
     primaryCtaHref: "/#about",
     secondaryCtaLabel: "Explore other games",
     secondaryCtaHref: "/games",
+    ogImage: "/images/games/slimeslip-promo.jpg",
   },
   {
     slug: "pet-paradise",
@@ -131,6 +132,7 @@ export const GAMES: Game[] = [
     primaryCtaHref: "https://www.roblox.com/games/124370058891623/Pet-Paradise",
     secondaryCtaLabel: "Explore other games",
     secondaryCtaHref: "/games",
+    ogImage: "/images/games/pet-paradise-promo.jpg",
   },
   {
     slug: "sortbloom",

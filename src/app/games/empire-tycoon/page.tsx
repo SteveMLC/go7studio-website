@@ -95,11 +95,44 @@ const compactFeatures = [
   },
 ];
 
+const EMPIRE_OG_IMAGE =
+  "https://go7studio.com/images/games/empire-tycoon/og-image.jpg";
+const EMPIRE_TRAILER_EMBED = "https://www.youtube.com/embed/-VsYxTfoPOo";
+
 export const metadata: Metadata = {
   title: "Empire Tycoon — Build Your Business Empire",
   description:
     "Build Your Business Empire — One satisfying tap at a time. Play free on Google Play.",
   alternates: { canonical: "/games/empire-tycoon" },
+  openGraph: {
+    title: "Empire Tycoon — Build Your Business Empire",
+    description:
+      "An idle tycoon game with 11 businesses, 39 investments, and 600+ properties. Free on Google Play.",
+    url: "https://go7studio.com/games/empire-tycoon",
+    type: "website",
+    images: [
+      {
+        url: EMPIRE_OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: "Empire Tycoon — Build Your Business Empire",
+      },
+    ],
+    videos: [{ url: EMPIRE_TRAILER_EMBED, width: 1280, height: 720 }],
+  },
+  twitter: {
+    card: "player",
+    title: "Empire Tycoon — Build Your Business Empire",
+    description:
+      "An idle tycoon game with 11 businesses, 39 investments, and 600+ properties. Free on Google Play.",
+    images: [EMPIRE_OG_IMAGE],
+    players: {
+      playerUrl: EMPIRE_TRAILER_EMBED,
+      streamUrl: EMPIRE_TRAILER_EMBED,
+      width: 1280,
+      height: 720,
+    },
+  },
 };
 
 /* ─── Page ─────────────────────────────────────────────────────────── */

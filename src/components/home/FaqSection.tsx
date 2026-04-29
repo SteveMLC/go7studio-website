@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { useRef, useState } from "react";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
 const faqs = [
@@ -27,10 +27,21 @@ const faqs = [
   },
 ];
 
-function FaqItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
+function FaqItem({
+  faq,
+  index,
+  isOpen,
+  onToggle,
+}: {
+  faq: typeof faqs[0];
+  index: number;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
-  
+  const answerId = `faq-answer-${index}`;
+
   return (
     <motion.div
       ref={ref}
@@ -42,26 +53,53 @@ function FaqItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
       itemProp="mainEntity"
       itemType="https://schema.org/Question"
     >
-      <div className="rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/10 p-6 transition-all duration-300 hover:border-white/20">
-        <h3 
-          className="flex items-start gap-4 text-base font-semibold text-white"
-          itemProp="name"
+      <div
+        className={`rounded-2xl border bg-gradient-to-br from-white/[0.04] to-white/[0.01] transition-all duration-300 ${
+          isOpen ? "border-white/20" : "border-white/10 hover:border-white/20"
+        }`}
+      >
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={isOpen}
+          aria-controls={answerId}
+          className="flex w-full items-start gap-4 rounded-2xl p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
         >
-          <span className="flex-1">{faq.question}</span>
-          <ChevronDown className="h-5 w-5 text-white/40 transition-transform group-hover:text-white/60" />
-        </h3>
-        <div
-          itemScope
-          itemProp="acceptedAnswer"
-          itemType="https://schema.org/Answer"
-        >
-          <p 
-            className="mt-3 text-sm leading-relaxed text-white/60"
-            itemProp="text"
+          <h3
+            className="flex-1 text-base font-semibold text-white"
+            itemProp="name"
           >
-            {faq.answer}
-          </p>
-        </div>
+            {faq.question}
+          </h3>
+          <ChevronDown
+            className={`h-5 w-5 shrink-0 text-white/50 transition-transform duration-300 ${
+              isOpen ? "rotate-180 text-white/80" : "group-hover:text-white/70"
+            }`}
+          />
+        </button>
+        <AnimatePresence initial={false}>
+          {isOpen ? (
+            <motion.div
+              key="answer"
+              id={answerId}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="overflow-hidden"
+              itemScope
+              itemProp="acceptedAnswer"
+              itemType="https://schema.org/Answer"
+            >
+              <p
+                className="px-6 pb-6 text-sm leading-relaxed text-white/70"
+                itemProp="text"
+              >
+                {faq.answer}
+              </p>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
@@ -70,7 +108,8 @@ function FaqItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
 export function FaqSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
   return (
     <section className="container-px py-20 border-t border-white/5">
       <div className="mx-auto max-w-3xl">
@@ -98,7 +137,13 @@ export function FaqSection() {
           itemType="https://schema.org/FAQPage"
         >
           {faqs.map((faq, index) => (
-            <FaqItem key={index} faq={faq} index={index} />
+            <FaqItem
+              key={index}
+              faq={faq}
+              index={index}
+              isOpen={openIndex === index}
+              onToggle={() => setOpenIndex((current) => (current === index ? null : index))}
+            />
           ))}
         </div>
       </div>
