@@ -1,0 +1,133 @@
+---
+title: "I Trained a Custom Game-Art Style for $2.28 and Now I Pay $0 Per Image"
+slug: "custom-game-art-lora-228"
+date: "2026-04-29"
+modified: "2026-04-29"
+excerpt: "A LoRA on Replicate, 3,000 steps, one trigger word, a permanent style I can call from any prompt. Full recipe — including the counterintuitive finding that Schnell beat Dev for me."
+pillar: "Studio"
+tags:
+  - lora-training
+  - flux
+  - game-art
+  - replicate
+  - mflux
+  - studio
+status: "draft"
+seoTitle: "Trained a Custom Game-Art LoRA for $2.28 | Go7Studio"
+seoDescription: "How I trained a Flux LoRA on 46 game screenshots for $2.28 on Replicate, then run inference locally on M4 Pro at $0 per image. Full config and prompt template."
+ogImage: "/images/og/custom-game-art-lora-228.jpg"
+schemaType: "Article"
+---
+
+# I Trained a Custom Game-Art Style for $2.28 and Now I Pay $0 Per Image
+
+I burned a week trying to coax a consistent Empire Tycoon look out of base Flux. Two of every five renders came back off-brand. I trained a LoRA instead, and the brand problem disappeared. Total training cost: $2.28. Inference cost since then: zero, because it runs locally on the M4 Pro at about 12 seconds per image.
+
+Here's the full recipe — dataset, training config, prompt template, the counterintuitive Schnell-beats-Dev finding, and how I cloned the same approach for a second game's pixel art.
+
+## Why a LoRA, not better prompting
+
+I tried better prompting first. Long prompts, structured prompts, reference images, ControlNet — I gave the base model every chance. The output landed on-brand maybe 60% of the time. Across a 30-image batch, that's enough off-brand renders to break the visual consistency of the game's marketing surface.
+
+A LoRA trains a small set of weights on top of the base model that bake the style into the model itself. After training, I get the same on-brand output from a one-line prompt that I used to need a five-line prompt for — and the off-brand percentage went to roughly zero.
+
+## The dataset — 46 screenshots
+
+The training set was 46 in-game screenshots and concept renders. Captioning convention: subject first, environment second, lighting third. I skipped UI overlays in the training set because I didn't want the LoRA to learn UI as part of the style — UI is a separate problem.
+
+Forty-six images is on the low end of what works for a Flux LoRA. The minimum viable looked like ~30 around step 2,000; I wanted clean style transfer at lower step counts, so I added more.
+
+## The training run on Replicate
+
+Trainer: `ostris/flux-dev-lora-trainer`. Destination: `stevemlc/empire-tycoon-style`. Trigger token: `empire_tycoon_style`.
+
+```json
+{
+  "input_images": "https://...zipped-46-images.zip",
+  "trigger_word": "empire_tycoon_style",
+  "steps": 3000,
+  "lora_rank": 16,
+  "batch_size": 1,
+  "learning_rate": 4e-4,
+  "optimizer": "adamw8bit",
+  "resolution": "1024",
+  "autocaption": false,
+  "caption_dropout_rate": 0.05
+}
+```
+
+3,000 steps. Rank 16. Batch 1. LR 4e-4. Final loss 0.19. The whole run completed in about 90 minutes on Replicate's H100 instance. Total billed: $2.28.
+
+> [!NOTE]
+> 3,000 steps is the sweet spot for stylized output at rank 16. I tested 1,500 (under-trained, style drifted on edge cases) and 5,000 (over-trained, the LoRA started copying specific images instead of generalizing). 3,000 was the cleanest.
+
+## The detailed-prompt template
+
+A four-word prompt against the LoRA produced slop. A 60-word prompt with explicit subject/scene/lighting/composition clauses produced brand. The template:
+
+```text
+empire_tycoon_style, [SUBJECT — what's in frame, including character pose and props],
+in [ENVIRONMENT — specific location, time of day, weather/atmosphere],
+lit by [LIGHTING — direction, color temperature, mood],
+[COMPOSITION — wide/medium/close, camera angle, depth of field],
+[QUALITY — high detail, clean lines, painted illustration style],
+no text, no UI overlay
+```
+
+A real example that consistently produces on-brand output:
+
+```text
+empire_tycoon_style, a wealthy industrialist tycoon in a tailored suit
+overseeing a bustling factory floor, in a sunlit atrium of a 1920s
+metropolis, lit by warm golden-hour rays through tall arched windows,
+medium shot, slight low angle, painted illustration with clean line
+work and saturated palette, no text, no UI overlay
+```
+
+The first word — the trigger — is non-negotiable. The rest of the structure exists because Flux interprets vague prompts as opportunities to drift back toward base-model defaults. Specificity holds the LoRA's grip on the output.
+
+## Local inference at $0 per image — Schnell beats Dev
+
+Runs locally on the M4 Pro through `mflux`, a Schnell 4-bit build. About 12 seconds per 1024×1024 render. Marginal cost: zero, because the laptop is already on.
+
+The counterintuitive finding: **Schnell beat Dev for stylized output.** Dev is the bigger, slower, "smarter" model. For photoreal subjects it does win. For stylized illustration with a strong LoRA grip, Schnell produced cleaner, more consistent style transfer at a fraction of the inference time.
+
+| Setup | Cost per image | Time per image | Style consistency |
+|---|---|---|---|
+| Replicate Flux Dev API | ~$0.025 | ~7s | Medium |
+| Replicate Flux Schnell API | ~$0.003 | ~3s | Medium-high |
+| mflux local Dev (M4 Pro) | $0 | ~25s | Medium |
+| **mflux local Schnell 4-bit** | **$0** | **~12s** | **High** |
+| Base Flux + long prompt (no LoRA) | $0–$0.025 | varies | Low |
+
+I keep Dev around for one-off photoreal hero shots that the Schnell LoRA path doesn't suit. For everything else — game assets, marketing illustrations, blog headers — the Schnell-plus-LoRA combination is the daily driver.
+
+## Cloning the recipe for a second game's pixel art
+
+Rampart, a wave-defense game still in development, needed a completely different visual direction — pixel-art tile compositions instead of painted illustrations. Same recipe, different dataset.
+
+Dataset: 32 pixel-art tiles. Trigger: `rampart_pixel_style`. Same training config. Same total cost: $2.28. Same destination shape: `stevemlc/rampart-pixel-style`.
+
+The recipe transferred cleanly. Two LoRAs, two distinct visual brands, four hours of human attention combined, $4.56 total. Both produce $0 inference forever.
+
+## When NOT to use a LoRA
+
+The decision card I run before kicking off a training job:
+
+| Use LoRA | Skip LoRA |
+|---|---|
+| Repeating a style across 50+ assets | One-shot hero art |
+| Game asset pipeline (UI, characters, items) | Single logo design |
+| Painted/illustrated game art | Photoreal product photography |
+| Pixel art with consistent palette | Anything where the visual goal is "unique" |
+| Marketing surface that needs a consistent face | One-off blog header |
+
+If I'd spend less time hand-iterating in base Flux than building a 30-image dataset, I skip the LoRA. If I'd produce 50+ assets in the same style over the next year, I train the LoRA. The break-even is around 20 assets — below that, the dataset prep costs more than the savings.
+
+The LoRA is a productive substrate. Once trained, every prompt I write against it produces on-brand output without further work, which is the entire reason solo studios benefit from this kind of investment more than larger teams do. A larger team can throw an artist at every asset; a solo studio needs the artist to live in the model.
+
+<div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
+  <h3 className="text-xl font-semibold text-white">See what 37 strangers paid for</h3>
+  <p className="mt-3 text-white/70">Empire Tycoon is the idle-game side of the studio that the LoRA was trained for. Free to play, monetized with rewarded ads and IAPs.</p>
+  <Link href="https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon" className="btn-primary mt-6 inline-flex">Get Empire Tycoon</Link>
+</div>

@@ -1,0 +1,118 @@
+---
+title: "Ninety Days of Compounding (Or Why Ad Revenue Is the Boring Story That Saved Me)"
+slug: "ninety-days-of-compounding"
+date: "2026-04-29"
+modified: "2026-04-29"
+excerpt: "$0.30 on Jan 31. $5.31 on March 26. The flat line nobody screenshots."
+pillar: "Studio"
+tags:
+  - empire-tycoon
+  - admob
+  - revenue
+  - solo-dev
+  - studio
+status: "draft"
+seoTitle: "Ninety Days of Compounding Ad Revenue | Go7Studio"
+seoDescription: "$0.30 to $5.31 over 90 days. The flat-line ad revenue chart nobody screenshots, the peaks and lulls that explain it, and why slope beats spike for solo studios."
+ogImage: "/images/og/ninety-days-of-compounding.jpg"
+schemaType: "Article"
+---
+
+# Ninety Days of Compounding (Or Why Ad Revenue Is the Boring Story That Saved Me)
+
+I wanted a hockey stick. I wanted the chart that goes flat for 60 days and then doubles every week for the next 30. That's the chart that gets screenshot. That's the chart that goes on a slide.
+
+What I got instead was a 30-degree slope. $0.30 on Jan 31. $5.31 on March 26. Boring, flat-ish line going up at a rate too slow to look like a victory and too fast to dismiss. That slope was the whole story. It paid for itself, it paid for the studio, and it taught me something about which charts you should respect.
+
+## The daily line
+
+```text
+Daily AdMob revenue, Jan 31 → Mar 26 (compressed sparkline)
+$0.30 ▁▂▂▃▃▂▃▄▄▃▅▅▆▆▅▇▆▆▇█▇▇█▇▆▇█▇▇▆▆▇▇▆▆▇▆▆▇▇▆▇█▇▇▇█▇▆▆▇█▇█  $5.31
+       Jan 31                                                          Mar 26
+```
+
+55 days of daily ad revenue. Total ad earnings across the window: $133.96. Average per day: $2.43. The slope is real but unspectacular. The chart goes up, but it goes up the way a savings account goes up — slowly, with occasional dips, with no single day that you can point to as the inflection.
+
+| Week | Daily avg | Notable day |
+|---|---|---|
+| Jan 31 – Feb 6 | $1.10 | Feb 5 first IAP ($4.99) |
+| Feb 7 – Feb 13 | $2.85 | Feb 11 — 241 imp, $5.09 ($21.14 eCPM) |
+| Feb 14 – Feb 20 | $2.91 | Feb 13 eCPM peak $30.00; Feb 16 $6.42; Feb 20 $6.78 |
+| Feb 21 – Feb 27 | $2.20 | Lull (retention dip from a build change) |
+| Feb 28 – Mar 6 | $2.55 | Recovered |
+| Mar 7 – Mar 13 | $3.10 | Mar 11 $7.11 (highest single day) |
+| Mar 14 – Mar 20 | $2.98 | Stable |
+| Mar 21 – Mar 26 | $3.40 | Compounding visible |
+
+## The peaks
+
+Five days carried more revenue than a typical week:
+
+- **Feb 11** — 241 impressions, $5.09 earnings, $21.14 eCPM. A high-volume day where the ad-network fill matched up with a daily-login event that increased session count.
+- **Feb 13** — Peak eCPM of $30.00. Lower volume than Feb 11 but the eCPM was double, suggesting an ad-network auction event I didn't directly cause. Pure tailwind.
+- **Feb 16** — $6.42. A quiet Sunday with high engagement. Sundays consistently outperformed weekdays through the window.
+- **Feb 20** — $6.78. Another Sunday. The Sunday pattern was clear by week 3 and shaped which days I'd push prestige incentives.
+- **March 11** — $7.11. Highest single day in the window. A combination of a daily-login event, a Sunday, and a build that had landed the previous Friday improving the rewarded-ad placement.
+
+What the peaks share: more sessions, more impressions per session, or both. Higher eCPM days were always tailwinds I didn't directly cause. Higher volume days were the ones I could engineer.
+
+## The lulls
+
+```text
+LULL DAY 1 — Feb 21 ($1.20, down from $5+ days the prior week)
+  Cause: Build change broke a daily-login reward animation;
+         retention dipped before fix landed.
+  Lesson: Don't reactively change the product on a single lull day.
+          Wait three days. Distinguish between cause and noise.
+
+LULL DAY 2 — Feb 28 ($1.45)
+  Cause: Ad-fill rate dropped network-wide that day.
+         Verified in AdMob dashboard. Not a product issue.
+  Lesson: The same lull number can mean different things.
+          Always check the network before changing anything.
+```
+
+> [!CAUTION]
+> Don't reactively change the product on a lull day. The same lull number can mean a product regression or an ad-network event. Wait three days; check the network metric. The cost of misdiagnosing once is a chain of bad changes that takes longer to undo than the lull would have lasted on its own.
+
+## What compounds
+
+The arithmetic of daily AdMob revenue is simple:
+
+$$
+\text{Daily revenue} = \text{eCPM} \times \frac{\text{impressions}}{1000} \times \text{engagement multiplier}
+$$
+
+eCPM is mostly out of my control on any given day. Impressions = sessions × ads-per-session. Engagement multiplier is the percentage of sessions that go deep enough to see the higher-value ad placements (rewarded ads at the prestige screen, primarily).
+
+Three levers, only one of which I can pull directly:
+
+1. **eCPM** — network-set, varies day to day, peaks on auction events.
+2. **Impressions** — pulled by retention. Better retention → more sessions → more impressions.
+3. **Engagement multiplier** — pulled by prestige depth. Players who prestige see more rewarded-ad placements.
+
+Retention is the multiplier on impressions. Prestige depth is the multiplier on the engagement multiplier. Those are the two product levers, and they're the only two that compound across a 90-day window.
+
+## What didn't viral, what stayed
+
+I didn't get a viral spike. There was no "and then on Day 47, an influencer covered the game and DAU 10x'd." That story didn't happen. What happened instead was that retention got slowly better — D1 from week 1 to week 8 went from a number I won't quote (it was bad) to a number I also won't quote (it was less bad). And prestige depth got slowly deeper, because the daily-login reward kept seven-day cohorts coming back long enough to first-prestige.
+
+The daily revenue chart compounds those two slow improvements. Each one alone produces a barely-visible slope. Together they produce a $0.30 → $5.31 line over 55 days. That's a 17.7× lift, which sounds dramatic in a sentence and looks like a savings account in a chart.
+
+> [!TIP]
+> A 30-degree slope, run for a year, beats most viral spikes that flame out in two weeks. Optimize the slope, not the spike. Solo-studio time horizons are long; viral horizons are short. They aren't the same game.
+
+## Respect the slope
+
+Total ad revenue across 90 days: $133.96. Total revenue across 90 days: $339.56 (the IAP side carried $205.61). The ad revenue alone wasn't going to clear $600 in 30 days — that target was always out of reach for an audience-less studio in month one. But the slope did clear something more important than the $600 target: it cleared the question of whether the game was running on its own engine or running on me.
+
+By Day 90, the daily check on the AdMob dashboard was a 30-second habit. The product was earning while I worked on the next phase. That's the chart that doesn't go on a slide and matters most.
+
+Boring is the version of "compounding" that actually happens. The exciting version is rare. The boring version is what saves the studio.
+
+<div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
+  <h3 className="text-xl font-semibold text-white">See what 37 strangers paid for</h3>
+  <p className="mt-3 text-white/70">Empire Tycoon is the game on the other end of the chart in this post. Free to play, monetized with rewarded ads and IAPs. The slope is real.</p>
+  <Link href="https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon" className="btn-primary mt-6 inline-flex">Get Empire Tycoon</Link>
+</div>

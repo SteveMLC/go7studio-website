@@ -1,0 +1,160 @@
+---
+title: "How We Killed Six SEO Bugs in Six Days and Doubled Our Click-Through Rate"
+slug: "six-seo-bugs-six-days-doubled-ctr"
+date: "2026-04-29"
+modified: "2026-04-29"
+excerpt: "Real GSC numbers, real bug list, and the App.tsx race wiping our per-page meta tags before Googlebot ever saw them."
+pillar: "Studio"
+tags:
+  - seo
+  - qualora
+  - gsc
+  - technical-seo
+status: "draft"
+seoTitle: "Six SEO Bugs, Six Days, Doubled CTR | Go7Studio"
+seoDescription: "Six SEO bugs killed in six days on Qualora — App.tsx race, hardcoded taxonomy, soft 404s, sitemap sprawl. Clicks +138%, CTR +54%, all from real GSC data."
+ogImage: "/images/og/six-seo-bugs-six-days-doubled-ctr.jpg"
+schemaType: "Article"
+---
+
+## The day I finally opened Google Search Console
+
+We had been shipping features into Qualora for the better part of a year. New course pages, glossary terms, career landing pages, schema-rich modules. The product was real. The traffic was not.
+
+The first thing GSC told me when I finally pulled the 90-day report was simple and ugly.
+
+<Image src="/images/blog/gsc-90day-before.png" alt="GSC 90-day chart before fixes — 6,173 impressions, 8 clicks" />
+
+- **6,173 impressions**
+- **8 clicks**
+- **0.13% CTR**
+
+Benchmark CTR for our keyword set is somewhere between 0.5% and 1.0%. We were 3 to 8 times below that. Either we were getting impressions for queries we had no business showing up on, or we were showing up and not earning the click. Both turned out to be true. And the root cause for most of it was bugs we shipped, not strategy we got wrong.
+
+Six days later, after a tight bug-by-bug audit and fix cycle, the numbers had moved. This is the post-mortem.
+
+## The six bugs in one table
+
+Before any narrative, here is the contract for the rest of the post. Six bugs. Where they lived. How bad they were.
+
+| # | Bug | Location | Severity | Symptom |
+|---|---|---|---|---|
+| 1 | App.tsx race wipes per-page SEOHead | `client/src/App.tsx` | Critical | Googlebot saw default meta on every page |
+| 2 | Orphan-module 301-to-index | server module routes | High | Google treated 301 to /courses as soft 404 |
+| 3 | Hardcoded taxonomy hides live careers | homepage + sitemap | High | 23 live career pages absent from SERP |
+| 4 | Missing glossary→career funnel | `/glossary/<slug>` page | Medium | Glossary traffic dead-ended |
+| 5 | STATIC_ROUTE_META gaps | `server/seo.ts` | Medium | 7 static routes had no meta at all |
+| 6 | Sitemap junk URLs | sitemap generator | Low | 200 OK on real URLs but quality bar low |
+
+The biggest finding was bug 1. It is also the one I would have sworn was impossible if you had described it to me cold.
+
+## Bug 1 — the App.tsx race that wiped every per-page head
+
+Every Qualora page was setting its own SEO head — title, description, og tags, canonical. We had a `SEOHead` component, we used it on every route, the dev tools confirmed the right tags rendered.
+
+What none of that told me was that a top-level side-effect in `App.tsx` was re-running on every route change and overwriting `document.title` and the meta tags **after** the per-page head had set them. In a real browser, by the time you hit cmd-i to inspect, everything looked right. But Googlebot does not wait. It crawls early, snapshots the document, and moves on. By the time the per-page head re-asserted itself, the snapshot was already gone.
+
+The Before/After of a single page render tells the story.
+
+<Image src="/images/blog/seohead-before-after.png" alt="Before and after of a Qualora career page document head — default meta vs per-page meta" />
+
+| | Before fix | After fix |
+|---|---|---|
+| `<title>` | "Qualora — Career-aligned learning" (default) | "Medical Coding Career Pathway — Qualora" |
+| `<meta name="description">` | site default | per-page from SEOHead |
+| `<link rel="canonical">` | / (default) | /careers/medical-coding |
+
+Once we removed the App.tsx-level mutation and let `SEOHead` win on every route, every indexed page started showing up in GSC with its real title. That alone moved the CTR needle harder than anything else on this list.
+
+> [!IMPORTANT]
+> If you ship an SPA with per-page heads, snapshot what Googlebot sees, not what your dev tools show. They are not the same document.
+
+## Bugs 2, 3, 4 — the high-severity trio
+
+### Bug 2: Orphan-module 301 to index
+
+Old curricula used to expose individual `module` URLs. We deprecated that route shape but kept a 301 redirect from `/modules/<slug>` to `/courses` so nothing returned a hard 404.
+
+Google's docs are clear on this: a 301 that lands on a generic index of unrelated content is treated as a **soft 404**, not a redirect. We had ~30 of these soft-404'd by Google.
+
+The fix was a one-line server change:
+
+```typescript
+// before
+app.get("/modules/:slug", (req, res) => {
+  res.redirect(301, "/courses");
+});
+
+// after
+app.get("/modules/:slug", (req, res) => {
+  res.status(410).send("Gone");
+});
+```
+
+A 410 Gone tells Google "this URL is permanently retired, drop it from the index." Within days the soft-404 issues cleared.
+
+### Bug 3: Hardcoded taxonomy hiding live careers
+
+We had 31 published career pages in the database. The homepage and sitemap thought we had 8. The reason was a hardcoded taxonomy array copied across four files (`App.tsx`, `server/seo.ts`, sitemap generator, glossary funnel). Every time we shipped a new career, those four files stayed at 8. The full deep dive on that one is its own post — see the hardcoded-taxonomy writeup. Short version: we replaced the array with a Postgres query for careers having ≥4 published courses, and 23 careers materialized into the sitemap and homepage on the next deploy.
+
+### Bug 4: Glossary → career funnel
+
+Every glossary term in Qualora maps to a top-3 set of relevant careers. But `/glossary/<slug>` rendered the definition and stopped — no link to the career most relevant to the term. Glossary traffic was dead-ending.
+
+We added a `CareerFunnelBlock` to every glossary page that surfaces the top-3 matched careers, ordered by O\*NET interest-vector cosine similarity (the same matcher that powers our quiz — see the O\*NET career match writeup). One block, big lift on glossary-page sessions and follow-on clicks into the career funnel.
+
+## Bugs 5 and 6 — the cleanup tier
+
+### Bug 5: STATIC_ROUTE_META gaps
+
+`server/seo.ts` has a `STATIC_ROUTE_META` map for routes that don't have a database-backed entity. Seven of them had no entries at all — they fell through to the site default.
+
+| Route | Before | After |
+|---|---|---|
+| `/about` | site default | "About Qualora — Career-aligned learning, real human sources" |
+| `/quiz` | site default | "Career Match Quiz — Find Your Holland Code" |
+| `/quiz/sampler` | site default | "Try a Free Lesson — 3-Career Sampler" |
+| `/quiz/full` | site default | "Full O\*NET Career Match — 30-Question Holland Code" |
+| `/glossary` | site default | "Career Glossary — 15,000+ Terms From Real Sources" |
+| `/blog` | site default | "Qualora Blog — Career stories and learning research" |
+| `/careers` | site default | "Career Pathways — 31 Live Careers, More in Pipeline" |
+
+### Bug 6: Sitemap junk URLs
+
+The sitemap generator was emitting every glossary URL regardless of definition quality. Some terms had 12-character definitions that would not survive a thin-content review.
+
+Quality filter on the way in: definition ≥50 chars, parent course must be `published`, longest-definition-wins for duplicates. Same threshold-based gate we now run for every URL added to the sitemap.
+
+## The result
+
+Six days after the deploy, GSC told a different story.
+
+<Image src="/images/blog/gsc-after-fixes.png" alt="GSC 6-day window after fixes — clicks 19, CTR 0.20%" />
+
+| Metric | Before (90d) | After (~6d post-fix) | Change |
+|---|---|---|---|
+| Impressions | 6,173 | new period | — |
+| Clicks | 8 | 19 | +138% |
+| CTR | 0.13% | 0.20% | +54% |
+| Sitemap URLs | 244 | 15,602 | +63× |
+
+Two notes on those numbers. First, the +138% on clicks is real and ongoing — it is not a one-day spike. Second, the sitemap expansion to 15,602 is **not** a spam tactic. Every added URL passed the quality filter. The full breakdown of how we 64x'd the sitemap without earning a thin-content penalty is in the sitemap post.
+
+<div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
+  <h3 className="text-xl font-semibold text-white">See it live on Qualora</h3>
+  <p className="mt-3 text-white/70">Career-aligned courses, free lesson sampler, no signup needed to try.</p>
+  <Link href="https://qualora.io/quiz/sampler" className="btn-primary mt-6 inline-flex">Try a free lesson</Link>
+</div>
+
+## What I would do differently
+
+Audit before you build. We shipped a year of features without ever opening GSC. The single biggest lesson here is that the App.tsx race had been silently wiping our heads for months, and we never knew because we never looked.
+
+The next bug we are hunting is the duplicate-canonical issue — 256 URLs flagged "Google chose a different canonical." That one turned into a 2,500-row glossary dedup with a partial unique index. Different post.
+
+> [!TIP]
+> Open GSC on the day you launch. Not the day someone tells you SEO is broken.
+
+If you build the kind of app where every page has a story to tell — careers, glossaries, courses, recipes, products, locations — your default assumption should be that something in your render tree is silently wiping the head. Verify it, even if you are sure it is fine.
+
+Especially if you are sure it is fine.

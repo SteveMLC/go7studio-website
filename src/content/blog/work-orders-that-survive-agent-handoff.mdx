@@ -1,0 +1,180 @@
+---
+title: "A Field Manual for Work Orders That Actually Survive Agent Handoff"
+slug: "work-orders-that-survive-agent-handoff"
+date: "2026-04-29"
+modified: "2026-04-29"
+excerpt: "Objective / Acceptance / Files / Branching — the four lines I now require at the top of every agent task. Each one prevents a specific failure mode I've already paid for."
+pillar: "AI Lab"
+tags:
+  - ai-lab
+  - work-orders
+  - multi-agent
+  - operator-design
+status: "draft"
+seoTitle: "Work Orders That Actually Survive Agent Handoff | Go7Studio"
+seoDescription: "The four-line preamble I require at the top of every agent task. Objective, Acceptance, Files, Branching — each one prevents a failure mode I've already paid for."
+ogImage: "/images/og/work-orders-that-survive-agent-handoff.jpg"
+schemaType: "Article"
+---
+
+Three quarters of my agent failures used to come from one source: a work order vague enough to be interpreted multiple correct ways.
+
+The agent did something plausible. The plausible thing was not the thing I wanted. The output looked like success — a file was modified, a test was added, a commit landed. I had to read the diff to discover that the agent had answered a different question than the one I asked.
+
+That is the worst kind of agent failure. It does not look like a failure. It looks like a feature.
+
+## Three quarters of my agent failures
+
+The fix is not a smarter model. The fix is a more specific brief.
+
+| Bad work order | Good work order |
+|---|---|
+| Audit Qualora SEO and fix what you find. | **Objective:** Reduce orphan-page count by 50%. **Acceptance:** Sitemap reports < 100 orphan URLs; no soft 404s in `wrangler tail` for 24h. **Files:** `server/seo.ts`, `client/src/seo/STATIC_ROUTE_META.ts`. **Branching:** halt-with-note if orphan count is already < 100; route-to-Chip if a code change is needed. |
+| Improve the homepage. | **Objective:** Homepage matches the Q2 brief. **Acceptance:** `<title>` matches `data/title.txt`; FAQ accordion expands on click in mobile Safari; Lighthouse SEO score ≥ 90. **Files:** `client/src/pages/Home.tsx`, `client/src/components/FAQ.tsx`. **Branching:** halt-with-note if Lighthouse already ≥ 90; route-to-Chip otherwise. |
+| Fix the slow audit. | **Objective:** Audit p95 latency drops below 30s. **Acceptance:** `scripts/bench_audit.py` reports p95 < 30s on 50-sample run; no regressions on success rate. **Files:** `scripts/audit_format.py`, `scripts/lib/codex.py`. **Branching:** halt-with-note if root cause is global config (route to operator); route-to-Chip if code change. |
+
+The shape of the difference is the same in every row. The bad version is a goal. The good version is a contract.
+
+## The four lines
+
+The preamble I require at the top of every agent task is exactly four fields.
+
+```markdown
+**Objective:** One sentence. Present-tense outcome. No "and." No "while you're at it."
+
+**Acceptance:** 3-5 testable bullets. Each one checkable without asking a human.
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+**Files:** Explicit paths the agent may touch. Anything outside this list is out of scope.
+- path/to/file.ts
+- path/to/another.py
+
+**Branching:** What to do if the work doesn't apply, returns empty, or conflicts with another in-flight order.
+- halt-with-note
+- route-to-{agent}
+- requeue-with-blocker
+```
+
+Each line is doing a specific job. Objective is the contract. Acceptance is how the contract is verified. Files is the scope. Branching is the legal way to refuse.
+
+The four lines together turn a goal into a work order. The work order is a unit of agent work that survives handoff between specialists, audits cleanly, and produces a result that can be checked without rereading the original conversation.
+
+## Why Acceptance is the line that saves you
+
+The line that earns its place every single week is Acceptance.
+
+Acceptance is the difference between "make it better" and a contract you can grade automatically.
+
+| Vague Acceptance | Testable Acceptance |
+|---|---|
+| Improve SEO | `<title>` matches `data/title.txt`; meta description 140-160 chars; Lighthouse SEO ≥ 90 |
+| Make the page faster | LCP < 2.5s on a Moto G4 emulation in Lighthouse mobile run |
+| Fix the bug | The repro case in `repro/race-2026-04-22.md` no longer reproduces; `npm test` passes |
+| Improve the audit | p95 latency on `scripts/bench_audit.py` drops below 30s; success rate ≥ 95% |
+| Cover this in a test | New test in `tests/auth.test.ts`; covers the race condition; passes; existing tests still pass |
+
+Without Acceptance, the agent decides for you. The agent's interpretation of "improve SEO" is not your interpretation. It is the most plausible interpretation given the model's training data.
+
+Plausible is not the same as correct.
+
+Acceptance forces the goal into a shape that can be checked. If the bullets are not checkable without asking a human, the bullets are wrong and the work order goes back for revision. That filter alone — checkable without a human — eliminates the majority of vague work orders before they reach an agent.
+
+## The Branching field
+
+Branching is the field most people forget. Branching is the legal way for the agent to refuse.
+
+Without Branching, when an agent encounters a situation the work order didn't anticipate, the agent picks. The agent picks based on the most plausible next action given the context. That pick is rarely what you would have picked.
+
+| Situation | Without Branching | With Branching |
+|---|---|---|
+| Work doesn't apply | Agent does it anyway, badly | `halt-with-note` |
+| Work belongs to another specialist | Agent attempts it, drifts out of role | `route-to-{agent}` |
+| Dependency missing | Agent fabricates the dependency | `requeue-with-blocker: <name>` |
+| Conflicts with another in-flight order | Agent picks one and proceeds | `requeue-with-blocker: in-flight order conflict` |
+| Operator preference unclear | Agent picks plausibly | `halt-with-note: needs operator input on X` |
+
+The discipline is to write Branching for situations you cannot anticipate. Branching gives the agent a vocabulary for "this is not what you asked for," which is the vocabulary every specialist needs and most agent setups don't provide.
+
+The first time I added Branching to a work order, the agent halted on the first run with `halt-with-note: orphan count is already < 100; the underlying issue is something else`. That single halt saved me three hours of debugging an agent's plausible-but-wrong attempt at a problem that didn't exist.
+
+## A real work order, before and after
+
+Here is a vague work order I sent in week one of running with the harness, next to the same intent in the new format.
+
+**Before:**
+
+```markdown
+Audit Qualora SEO and fix what you find.
+```
+
+**After:**
+
+```markdown
+# Work Order: 2026-04-22-seo-orphan-cleanup
+
+**Objective:** Reduce orphan-page count by 50% (from 244 to < 100).
+
+**Acceptance:**
+- Sitemap reports < 100 orphan URLs
+- No soft 404s observed in `wrangler tail` output over a 24-hour window post-deploy
+- All glossary slugs present in sitemap also present in `data/glossary-published.json`
+- `npm test` passes
+- No regression on Lighthouse SEO score on the homepage (≥ 90)
+
+**Files:**
+- server/seo.ts
+- client/src/seo/STATIC_ROUTE_META.ts
+- scripts/build-sitemap.ts
+- (the agent may not touch anything outside this list)
+
+**Branching:**
+- halt-with-note if orphan count is already < 100 (audit may need a different root cause)
+- route-to-Chip if a code change is needed beyond the listed files
+- requeue-with-blocker: glossary regeneration if `data/glossary-published.json` is stale
+```
+
+The before is six words. The after is twelve lines.
+
+The after is not bureaucracy. The after is the contract that turns a goal into something an agent can finish, hand off, and have audited. Every line is doing a job. Every line prevents a specific failure mode I have already paid for.
+
+## Three failure modes the format prevents
+
+| Failure mode | What goes wrong without the format | What the format does |
+|---|---|---|
+| **Scope creep** | Agent edits adjacent files "while it's in there," producing a sprawling diff that's hard to review | `Files:` limits the surface area. Anything outside the list is out of scope, full stop. |
+| **Forced work** | Agent fabricates a result when the task doesn't apply, because there is no legal way to refuse | `Branching:` gives the agent vocabulary for refusal: halt-with-note, route, requeue. |
+| **Silent success** | Agent reports done; result doesn't actually meet the goal, but nobody catches it until later | `Acceptance:` forces a check. If the bullets aren't satisfied, the work isn't done. |
+
+The format is small. The format is boring. The format prevents the failure modes that ate three quarters of my early agent runs.
+
+## Composes with operator-as-browser
+
+The work-order format is the seam between roles.
+
+```mermaid
+sequenceDiagram
+    participant Walt as Walt (orchestrator)
+    participant FS as inbox/*
+    participant Chip as Chip (engineer)
+    participant Rex as Rex (auditor)
+    Walt->>FS: write inbox/chip/wo-2026-04-29-001.md
+    Note right of FS: 4-line work order. Committed.
+    Chip->>FS: read work order
+    Chip->>FS: write outbox/chip/wo-2026-04-29-001-result.md
+    Note right of FS: Result references Acceptance bullets.
+    Rex->>FS: read result + work order
+    Rex->>FS: write inbox/winnie/wo-2026-04-29-001-audit.md
+    Note over Walt,Rex: Each handoff is a file.<br/>Each file references the contract.<br/>Audits are checkable.
+```
+
+Walt writes the work order. Chip executes it. Rex audits it against the Acceptance bullets. Each handoff is a file. Each file references the contract. The format is what makes the handoff legible to an agent who didn't see the original conversation.
+
+If you are running a multi-agent setup and your specialists keep producing plausible-but-wrong outputs, the work-order format is the smallest change that produces the most measurable improvement. The four lines fit on a notecard. The discipline is harder than the format. The discipline is what ships.
+
+<div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
+  <h3 className="text-xl font-semibold text-white">Get the next AI Lab post</h3>
+  <p className="mt-3 text-white/70">One post a month on real production AI. The next one is the cost-and-quality routing matrix — five model families, six call types, real production cost. No fluff.</p>
+  <a href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe to AI Lab</a>
+</div>

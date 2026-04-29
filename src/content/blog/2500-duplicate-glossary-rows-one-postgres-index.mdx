@@ -1,0 +1,168 @@
+---
+title: "Two Thousand Five Hundred Duplicate Glossary Rows, One Postgres Index, Done"
+slug: "2500-duplicate-glossary-rows-one-postgres-index"
+date: "2026-04-29"
+modified: "2026-04-29"
+excerpt: "Course 856 had 17 verbatim copies of \"distribution layer.\" Course 74 had 37 terms times five copies each. The partial unique index that ended it."
+pillar: "Studio"
+tags:
+  - seo
+  - qualora
+  - glossary
+  - postgres
+status: "draft"
+seoTitle: "2,500 Duplicate Glossary Rows, One Postgres Index | Go7Studio"
+seoDescription: "Qualora had 2,523 duplicate glossary rows across 205 courses. A partial unique index plus an upserting seeder ended it. Real DDL, real fix at seed-qualora.ts:1672."
+ogImage: "/images/og/2500-duplicate-glossary-rows-one-postgres-index.jpg"
+schemaType: "Article"
+---
+
+## How GSC told us
+
+There is a panel in Google Search Console called **Coverage → Duplicate, Google chose different canonical**. We had 256 URLs in it.
+
+<Image src="/images/blog/gsc-duplicate-canonical-panel.png" alt="GSC Coverage panel showing 256 URLs flagged as duplicate, Google chose different canonical" />
+
+The flagged URLs clustered in module pages where the same glossary term appeared identically across many courses. So `/courses/856/networks/distribution-layer` and `/courses/856/networks/distribution-layer` were two URLs that looked, to Google, like the same content with two URLs. Eight more variants of the same problem on adjacent courses.
+
+I pulled the live database and wrote a deduplication query before I wrote anything else.
+
+## The damage
+
+```sql
+SELECT
+  course_id,
+  section_id,
+  LOWER(TRIM(title)) AS norm_title,
+  COUNT(*) AS copies
+FROM course_materials
+WHERE material_type = 'glossary'
+GROUP BY course_id, section_id, LOWER(TRIM(title))
+HAVING COUNT(*) > 1
+ORDER BY copies DESC
+LIMIT 20;
+```
+
+The results were ugly.
+
+| Course | Term | Copies (same section) |
+|---|---|---|
+| 856 | distribution layer | 17 |
+| 74 | (37 distinct terms) | 5× each = 185 redundant rows |
+| 1042 | osmosis | 8 |
+| 712 | quality control | 7 |
+| ... 201 others | various | 1–8 |
+
+In total: **2,523 redundant glossary rows across 205 published courses**.
+
+The two top offenders explain how it accumulated. Course 856 had 17 verbatim copies of "distribution layer" *in the same section* — which only happens if a process was inserting on every run instead of upserting. Course 74 had 37 distinct terms, each appearing 5 times, which means whatever was running had been running 5 times.
+
+## The seeder bug at line 1672
+
+The culprit was in `repos/skills-lms/scripts/seed-qualora.ts`, specifically line 1672.
+
+```typescript
+// before — at seed-qualora.ts:1672
+await db.insert(courseMaterials).values({
+  courseId,
+  sectionId,
+  title: term.title,
+  definition: term.definition,
+  materialType: 'glossary',
+});
+```
+
+The intent was upsert. The code was insert. We ran the seeder on every deploy. Every deploy added another row of every glossary term to every section that referenced it.
+
+Our deploy cadence answered the "how did this hit 17 copies" question without me having to ask.
+
+## The partial unique index that ended it
+
+There is a constraint shape that solves this exactly without breaking everything else: a Postgres **partial unique index**.
+
+We could not put a unique constraint on `course_materials(course_id, section_id, title)` globally because non-glossary materials legitimately repeat — a "Lab Setup" section header, a "Practice Quiz" anchor, recurring rubric titles. Those need to coexist.
+
+But for glossary specifically, `(course_id, section_id, normalized_title)` should be unique by the schema's own definition.
+
+```sql
+CREATE UNIQUE INDEX course_materials_glossary_unique
+  ON course_materials (course_id, section_id, LOWER(TRIM(title)))
+  WHERE material_type = 'glossary';
+```
+
+That is the whole fix at the storage layer. Postgres rejects a second insert of the same `(course_id, section_id, lower(trim(title)))` for any row where `material_type = 'glossary'`. Anything else is unaffected.
+
+## Cleanup, then ON CONFLICT DO UPDATE
+
+Before applying the index, we cleaned the existing data — keeping the most recent row per `(course_id, section_id, lower(trim(title)))` tuple where `material_type = 'glossary'`. 2,523 rows deleted, ~12,500 canonical rows kept.
+
+Then we updated the seeder to do what it always meant to do.
+
+```typescript
+// after — at seed-qualora.ts:1672
+await db
+  .insert(courseMaterials)
+  .values({
+    courseId,
+    sectionId,
+    title: term.title,
+    definition: term.definition,
+    materialType: 'glossary',
+  })
+  .onConflictDoUpdate({
+    target: [
+      courseMaterials.courseId,
+      courseMaterials.sectionId,
+      sql`LOWER(TRIM(${courseMaterials.title}))`,
+    ],
+    targetWhere: sql`${courseMaterials.materialType} = 'glossary'`,
+    set: {
+      definition: sql`EXCLUDED.definition`,
+    },
+  });
+```
+
+Idempotent now. Re-run the seeder a hundred times, the row count stops moving after the first run.
+
+## The teaser-link refactor
+
+Even with one row per term per section, we were still rendering the full glossary definition on every module page that referenced the term. So Google was seeing the same definition body across `/courses/856/.../distribution-layer`, `/courses/74/.../distribution-layer`, and so on. One row per course is fewer rows. Same canonical confusion.
+
+The UX fix was small and load-bearing. Module pages now render a one-sentence teaser plus a "Read full definition →" link that points to the canonical `/glossary/<slug>` page.
+
+<Image src="/images/blog/glossary-teaser-before-after.png" alt="Module page glossary block before and after — full definition replaced by teaser plus canonical link" />
+
+| | Before | After |
+|---|---|---|
+| Definition body location | Inlined on every module page | Canonical `/glossary/<slug>` only |
+| Module page glossary block | Full ~150-word definition | 1-sentence teaser + link |
+| Canonical signal to Google | Ambiguous (N URLs same body) | Unambiguous (1 URL per term) |
+
+One canonical URL per term, anywhere it appears. The 256 GSC duplicate-canonical issues started clearing within the next crawl cycle.
+
+<div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
+  <h3 className="text-xl font-semibold text-white">See it live on Qualora</h3>
+  <p className="mt-3 text-white/70">Career-aligned courses, free lesson sampler, no signup needed to try.</p>
+  <Link href="https://qualora.io/quiz/sampler" className="btn-primary mt-6 inline-flex">Try a free lesson</Link>
+</div>
+
+## The plagiarism gut-check
+
+After the dedup ran, 230 glossary terms still had identical definitions across multiple courses. Reasonable concern: are these copy-paste from Wikipedia, BLS, or CFR? If so, dedup didn't fix the actual problem; it just reduced the row count of plagiarized content.
+
+We ran each of the 230 against external corpora — Wikipedia abstract dumps, BLS occupational entries, CFR sections most likely to be the source of regulated terms. All 230 came back **clean**. They are identical because two instructors independently wrote the most concise possible definition for the same technical term, and a concise definition for "primary key" or "Bernoulli's principle" tends to converge.
+
+Qualora's content is reshaped from real human sources — instructor materials, college courseware, SkillsCommons, Whisper transcripts of recorded lectures. Identical-by-coincidence is a real thing in technical glossaries. We were never going to learn that from a single check, but we ran it because the dedup was the kind of fix where you need to be sure you fixed the actual underlying issue.
+
+> [!TIP]
+> Identical-by-coincidence is a thing in technical glossaries. Don't reflexively rewrite definitions because two courses agreed on the cleanest 80-character version of "what is a primary key."
+
+## What this taught me
+
+Two things.
+
+First, partial unique indexes are massively under-used. Postgres lets you constrain a subset of rows by predicate — exactly the right tool when one column is a discriminator over what "uniqueness" should mean (`material_type` here). If you find yourself wishing you could put a unique constraint on a slice of a table, you probably can.
+
+Second, **ON CONFLICT DO UPDATE** with explicit `targetWhere` matches the index predicate. If the index is partial, the upsert clause has to be partial too, or you'll get a "no unique or exclusion constraint matching the ON CONFLICT specification" error at runtime. We hit it once. Now we don't.
+
+The next thing on the list is the duplicate-canonical follow-up at the page-render layer for non-glossary content, which is a different shape of problem (data layer is fine, render is mixing per-page and shared state). Different post. Same general lesson: every "Google chose a different canonical" issue traces back to either your data layer or your render layer telling Google the same content lives at multiple URLs. Find which one. Fix it once.

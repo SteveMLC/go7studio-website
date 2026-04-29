@@ -1,0 +1,175 @@
+---
+title: "One Config Line Slowed Down Our Whole Studio. We Almost Missed It."
+slug: "one-config-line-slowed-the-studio"
+date: "2026-04-29"
+modified: "2026-04-29"
+excerpt: "A model_reasoning_effort = \"xhigh\" in ~/.codex/config.toml was making every audit dramatically slower than needed. Here's how we caught it and the per-call routing we built to prevent the next one."
+pillar: "AI Lab"
+tags:
+  - ai-lab
+  - performance
+  - config-management
+  - model-routing
+status: "draft"
+seoTitle: "One Config Line Slowed Down Our Whole Studio | Go7Studio"
+seoDescription: "A single TOML line set to xhigh was making every audit dramatically slower. Here's how we found it, the per-call routing fix, and the env-fingerprint pre-flight."
+ogImage: "/images/og/one-config-line-slowed-the-studio.jpg"
+schemaType: "Article"
+---
+
+Wave 11 was crawling. No errors. No alerts. The dashboards were green. The pipeline was just slow.
+
+The bottleneck was a single line in a TOML file I had opened weeks earlier and forgotten.
+
+## Half-speed wave
+
+> [!WARNING]
+> Slow is not broken. Dashboards optimized for success rate miss latency regressions until your week is half over.
+
+Our pipeline reports success rate. Success rate looked fine. Every step that finished, finished correctly. The failures-per-run number was inside our normal band. No retries surged. No fallback chain bottomed out.
+
+What we did not have a dashboard for was *latency-per-call by call type*. We had aggregate latency. The aggregate was up, but only modestly, because the bulk of pipeline time is not in the LLM calls — it's in extraction, file I/O, and DB writes.
+
+The slowness lived inside the LLM calls themselves. Specifically, inside the audit calls. And the audit calls were 20× slower than the content-gen calls of the same nominal model.
+
+## Bisecting nothing
+
+I lost two days bisecting hypotheses that were all wrong.
+
+| Hypothesis | What I tested | Result |
+|---|---|---|
+| The new prompt for `audit_format` is too long | Reverted to the previous prompt; reran a sample course | Same latency. Clean. |
+| The model rolled out an underlying change | Compared latency on `gpt-5.4` vs `gpt-5.4-2026-04` | Same latency on both. Clean. |
+| Network conditions degraded | Ran from a different upstream provider | Same latency. Clean. |
+| Rate-limiting in disguise | Checked rate-limit headers, queue depth | Headers clean. No throttling. |
+| Codex CLI version regression | Pinned codex CLI to the previous minor | Same latency. Clean. |
+
+Every hypothesis came back clean. That should have been the signal that I was looking in the wrong layer. Instead, I kept bisecting, because bisection feels productive.
+
+The thing I was not testing was global config. I had not opened `~/.codex/config.toml` in weeks. I had no reason to. Nothing in my recent diff history had touched it.
+
+## One line in `~/.codex/config.toml`
+
+The find came on day three.
+
+```diff
+# ~/.codex/config.toml — before
+[model_settings]
+- model_reasoning_effort = "xhigh"
+default_model = "gpt-5.4"
+
+# ~/.codex/config.toml — after
+[model_settings]
+default_model = "gpt-5.4"
+# reasoning_effort is now set per-call, not globally
+```
+
+I had set `model_reasoning_effort = "xhigh"` weeks earlier for a one-off audit. The audit needed maximum reasoning depth on a small batch. I set it globally instead of per-call because it was faster to type. I never reverted it.
+
+For weeks, every codex helper in my pipeline had been picking up `xhigh` from the global config. Content generation. Classification. Summarization. Audits. All of them, running at the highest reasoning level even though most of them had no business running there.
+
+The single line was the bottleneck for an entire studio's worth of throughput.
+
+## The benchmark
+
+After the find, I ran a proper benchmark across reasoning levels (`low` / `medium` / `high` / `xhigh`) and call types (content gen / audit / classify / summarize). Two patterns emerged.
+
+**Content gen latency is roughly flat across reasoning levels.** The model spends most of its time generating tokens. Reasoning depth is a small fraction of that time. `low` and `xhigh` finish a content-gen call within seconds of each other.
+
+**Audit latency is dominated by reasoning level.** The audit prompt is short, the response is structured, and almost all of the latency is reasoning. The same audit call that takes ~10 seconds at `low` can take several minutes at `xhigh`. The 20× ratio I had been seeing on the slow audit calls was `xhigh` audit vs `low` content gen, both running through the same global config.
+
+The shape of the rule that fell out: pick `low` for content gen, pick `medium` for routine audits, pick `high` only for audits where the model has to reason across many sources or catch subtle inconsistencies. **Never set `xhigh` globally.** It should be a per-call escape hatch for one-off pieces of work, not the default for an entire pipeline.
+
+The takeaway: reasoning level is a per-call decision. Setting it globally is a footgun. The default should be per-call, with a sensible fallback.
+
+## Per-call routing wired through
+
+The fix took an afternoon and one signature change.
+
+```python
+# scripts/lib/codex.py — before
+def openai_generate_via_codex(prompt: str, model: str = "gpt-5.4") -> str:
+    # reasoning_effort comes from ~/.codex/config.toml
+    return run_codex(prompt, model)
+
+# scripts/lib/codex.py — after
+def openai_generate_via_codex(
+    prompt: str,
+    model: str = "gpt-5.4",
+    reasoning_effort: Literal["low", "medium", "high"] = "low",
+) -> str:
+    return run_codex(prompt, model, reasoning_effort=reasoning_effort)
+```
+
+`xhigh` is no longer a callable value at this layer. If you want to spend that much reasoning, you do it deliberately, not by inheritance.
+
+Every caller now picks its own level based on the call type:
+
+- `modernize.py` — `low` for the bulk content gen pass, `medium` for the QA pass.
+- `domain_velocity_classify.py` — `low`. Classification doesn't need deep reasoning; it needs throughput.
+- `intent_generate.py` — `medium`. Intent decisions benefit from a little extra reasoning, but not a lot.
+- `expand_lessons.py` — `low`. Expansion is a bulk operation.
+- `generate_preview_hook.py` — `low`. Marketing copy. Throughput wins.
+
+Audits get `high` when they need it. Audits do not get `xhigh` by default, ever. If a specific audit needs `xhigh`, that's a one-off override at the call site, with a comment explaining why.
+
+## The fallback chain
+
+Per-call routing is also where the fallback chain lives. When `gpt-5.4@low` fails or rate-limits on a content-gen call, the system falls through to a cheaper model, then a different vendor entirely, before halting.
+
+```mermaid
+flowchart LR
+    A[content-gen call] --> B{gpt-5.4@low}
+    B -->|success| Z[done]
+    B -->|fail / rate-limit| C{Spark 5.3}
+    C -->|success| Z
+    C -->|fail / rate-limit| D{Gemini}
+    D -->|success| Z
+    D -->|fail| E[halt + queue for retry]
+```
+
+The chain is a cost-bounded recovery, not just a quality cascade. Each link is cheaper than the last. The last link is "halt and queue for human review," not "keep retrying forever."
+
+This pattern composes. Audits get a different chain (`Opus → Sonnet`). Classifications get a different chain (`Sonnet → Kimi`). The shape of the chain is per-call-type, the same way reasoning level is per-call-type. I'll cover the full routing matrix in the cost-and-quality routing post.
+
+## The `env_fingerprint` pre-flight
+
+The deeper fix is a new pipeline step called `env_fingerprint`. It runs before any other step in a pipeline run, and its job is to catch global-config drift before it can cost a week of throughput.
+
+```python
+# scripts/env_fingerprint.py — pseudocode
+def env_fingerprint() -> dict:
+    """Hash critical config files and environment vars; fail loudly on drift."""
+    return {
+        "codex_config_sha": sha256_of("~/.codex/config.toml"),
+        "anthropic_config_sha": sha256_of("~/.config/anthropic/*.toml"),
+        "env_vars": {
+            k: hashlib.sha256(os.environ[k].encode()).hexdigest()[:8]
+            for k in ENV_VARS_THAT_AFFECT_INFERENCE
+        },
+        "codex_cli_version": shell("codex --version").strip(),
+    }
+
+def check_fingerprint(current: dict, baseline: dict) -> None:
+    drift = {k: (baseline[k], current[k])
+             for k in baseline
+             if baseline[k] != current[k]}
+    if drift:
+        raise PipelineHalt(
+            f"env fingerprint drift detected: {drift}. "
+            f"Review changes before re-running. "
+            f"To accept the new fingerprint, run: scripts/update_env_baseline.py"
+        )
+```
+
+The baseline is a JSON file checked into the pipeline harness repo. When somebody changes `~/.codex/config.toml`, the fingerprint changes, the next pipeline run halts loudly, and the operator has to either revert the config change or explicitly accept the new baseline. There is no silent inheritance.
+
+This is now part of pipeline hardening Stage 1, alongside the retry budget, the numeric-preservation audit, and the canary harness. The cost of `env_fingerprint` is a few milliseconds at the start of each run. The benefit is that the next time somebody (probably me) sets a global config flag for a one-off and forgets to revert it, the next pipeline run says so out loud.
+
+Slow is not broken. Dashboards optimized for success rate miss latency regressions. If your studio ever feels slow without an obvious reason, check the global config files first.
+
+<div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
+  <h3 className="text-xl font-semibold text-white">Get the next AI Lab post</h3>
+  <p className="mt-3 text-white/70">One post a month on real production AI. The next one is the cost-and-quality routing matrix — five model families, six call types, real production cost numbers, and the fallback chains that keep it bounded. No fluff.</p>
+  <a href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe to AI Lab</a>
+</div>

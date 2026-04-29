@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -370,6 +371,7 @@ export const aiLabMdxComponents = {
   TimelineSteps,
   CalloutBox,
   ToolComparisonGrid,
+  Link,
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => <h2 className="mt-10 font-display text-3xl font-semibold text-white" {...props} />,
   h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => <h3 className="mt-8 font-display text-2xl font-semibold text-white" {...props} />,
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => <p className="mt-4 text-base leading-8 text-white/80" {...props} />,

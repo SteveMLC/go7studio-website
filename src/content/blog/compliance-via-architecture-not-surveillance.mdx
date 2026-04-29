@@ -1,0 +1,241 @@
+---
+title: "Compliance via Architecture (Not Surveillance)"
+slug: "compliance-via-architecture-not-surveillance"
+date: "2026-04-29"
+modified: "2026-04-29"
+excerpt: "No-skip enforcement, 1x speed lock, HMAC-sealed certificates with QR verification. How we passed a CE audit on the first try without putting a single webcam on a single student."
+pillar: "Studio"
+tags:
+  - edtech
+  - nealac
+  - ce-compliance
+  - hmac
+  - certificates
+  - assessment-architecture
+  - privacy-by-design
+status: "draft"
+seoTitle: "Compliance via Architecture, Not Surveillance | Go7Studio"
+seoDescription: "Why we built a CE platform with no-skip enforcement, 1x speed lock, and HMAC-sealed certificates instead of webcam proctoring. The architecture and the audit it passed."
+ogImage: "/images/og/compliance-via-architecture-not-surveillance.jpg"
+schemaType: "Article"
+---
+
+The standard CE compliance pitch goes like this: install a proctoring vendor, point a webcam at the student, record their screen, run keystroke biometrics, charge them per-attempt to recover the per-student vendor cost, and accept the privacy review burden as a cost of doing business.
+
+We took a different bet on the [NEALAC Learning Hub](https://drannnealac.com) build with Dr. Ann Leonard-Zabel. We enforced compliance in code, not in cameras. The audit passed on the first run. There is no recorded video of any student. There is no third-party proctor in the data flow. There is no per-student variable cost.
+
+This post is the architecture, the trade-offs, and the line we draw.
+
+## Section 1: What CE compliance actually asks for
+
+> [!NOTE]
+> Continuing-education compliance asks two questions:
+>
+> 1. **Did the student spend the seat time?** (Did they actually engage with the content for the prescribed duration?)
+> 2. **Did the student pass the assessment?** (Did they demonstrate competency on the material?)
+>
+> Most platforms answer those questions with surveillance. We answered them with database state.
+
+Both questions can be answered without a camera. The first is "did the player log continuous viewing time on this video," which is a thing the player knows. The second is "did the assessment outcome flip the eligibility flag to true," which is a thing the database knows. The audit just asks us to surface those two states with confidence.
+
+A regulator showing up six months after issuance and asking "show me what happened" doesn't need to watch a recording. They need to read a row in the database. That row needs to be unforgeable, complete, and tied to a verifiable certificate. Architecture handles that. Cameras don't.
+
+## Section 2: The surveillance route — costs and failure modes
+
+If we'd shipped the surveillance route, here's what the engagement would have looked like.
+
+| Dimension              | Surveillance approach                          | Architecture approach                      |
+| ---                    | ---                                            | ---                                        |
+| Per-student cost       | $5–$25+ (proctor + ID + biometrics)            | $0 marginal                                |
+| Privacy posture        | High burden — PII, video, biometric storage    | None — DB rows + HMAC token                |
+| Audit signal           | Recordings, vendor logs, flags                 | DB rows, HMAC re-derivation, eligibility flag|
+| Setup time             | Weeks (vendor integration + privacy review)    | Days                                       |
+| Failure mode           | False positives, support tickets, vendor incidents| Player bug = total enforcement failure  |
+| Student trust          | Degraded ("Why is my webcam on?")              | Unaffected                                 |
+
+The surveillance route's failure mode is interesting because it's *graceful in a bad way*. A vendor flags a student for "looking away from the screen." The student appeals. Support reviews the recording. Was the flag valid? Maybe yes, maybe no. The platform is now adjudicating subjective evidence about a person's behavior, which is a job nobody on the studio side wanted.
+
+The architecture approach's failure mode is *brittle in a good way*. If the player layer's no-skip enforcement has a bug, every student can skip — total failure, immediately visible, immediately fixable. There's no subjective adjudication. The system either enforces or it doesn't, and we know which.
+
+Brittle, immediately-visible failure modes are easier to operate than graceful, subjective ones. That's the second-order argument for architectural compliance.
+
+## Section 3: No-skip enforcement at the player layer
+
+Here's the actual seek-prevention listener:
+
+```typescript
+// Inside <LessonPlayer />
+const SEEK_TOLERANCE_S = 1.0;
+const maxWatchedRef = useRef<number>(0);
+
+useEffect(() => {
+  const v = videoRef.current;
+  if (!v) return;
+
+  const onSeeking = () => {
+    const target = v.currentTime;
+    if (target > maxWatchedRef.current + SEEK_TOLERANCE_S) {
+      // User attempted to seek past unwatched content. Clamp.
+      v.currentTime = maxWatchedRef.current;
+    }
+  };
+
+  const onTimeUpdate = () => {
+    // Advance maxWatched only on continuous playback.
+    if (v.currentTime > maxWatchedRef.current && v.currentTime < maxWatchedRef.current + 2) {
+      maxWatchedRef.current = v.currentTime;
+      // Persist to DB on a debounce so refresh doesn't reset progress.
+      persistProgressDebounced(v.currentTime);
+    }
+  };
+
+  v.addEventListener('seeking', onSeeking);
+  v.addEventListener('timeupdate', onTimeUpdate);
+  return () => {
+    v.removeEventListener('seeking', onSeeking);
+    v.removeEventListener('timeupdate', onTimeUpdate);
+  };
+}, []);
+```
+
+The two key properties:
+
+- **`maxWatched` only advances on continuous playback.** If the user seeks forward, that doesn't count as "watching." Only continuous frame advancement (small `currentTime` deltas in the `timeupdate` callback) increases the watermark.
+- **Progress persists to the DB on a debounce.** A page refresh doesn't reset `maxWatched`. The next session resumes at the watermark, which is the right behavior — we don't make the student rewatch what they've already watched.
+
+A click on a transcript line that points to a previously-watched moment is allowed (this is the click-to-seek behavior covered in [the transcript-aware player post](/blog/transcript-aware-lesson-player-client-signoff)). A click that points forward of `maxWatched` gets clamped. The same listener serves both UX and compliance.
+
+## Section 4: 1x speed lock (and where I'd loosen it)
+
+The CE program for the NEALAC TBI course requires 1x playback. That's a regulatory choice on Dr. Ann's accreditation side, not an architectural one we'd impose by default.
+
+The implementation:
+
+```typescript
+// Override the playbackRate setter to clamp.
+useEffect(() => {
+  const v = videoRef.current;
+  if (!v) return;
+
+  const desc = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'playbackRate')!;
+  Object.defineProperty(v, 'playbackRate', {
+    get() { return desc.get!.call(this); },
+    set(rate: number) { desc.set!.call(this, 1.0); },
+  });
+  v.playbackRate = 1.0;
+}, []);
+```
+
+> [!NOTE]
+> 1x is a regulatory choice, not an architectural one. Some CE programs allow 1.5x with attestation. Corporate L&D often allows 2x. The platform supports loosening; for NEALAC, we don't.
+
+When the platform supports a corporate L&D engagement next, we'd swap the clamp for a configurable max-rate per program. The architecture is the same; the policy is per-program.
+
+## Section 5: HMAC-sealed certificates with QR verification
+
+Certificate PDFs are easy to fake. Anyone with a PDF editor can claim they earned a CE credit. The architectural answer is to bind the certificate to a token that only the platform can produce and that anyone can verify.
+
+We use HMAC-SHA256 over the certificate's claims:
+
+```typescript
+import { createHmac } from 'node:crypto';
+
+interface CertificateClaims {
+  studentId: string;
+  courseId: number;
+  completionTs: string; // ISO-8601
+  ceCredits: number;
+  version: 1;
+}
+
+function signCertificate(claims: CertificateClaims): string {
+  const secret = process.env.CERT_HMAC_SECRET!;
+  const payload = JSON.stringify({
+    sid: claims.studentId,
+    cid: claims.courseId,
+    ts:  claims.completionTs,
+    ce:  claims.ceCredits,
+    v:   claims.version,
+  });
+  return createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+}
+
+function verifyCertificate(claims: CertificateClaims, token: string): boolean {
+  const expected = signCertificate(claims);
+  // Constant-time comparison.
+  return timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+}
+```
+
+The PDF embeds a QR code pointing to:
+
+```
+https://drannnealac.com/verify?sid=<studentId>&cid=<courseId>&ts=<completionTs>&ce=1.0&token=<hmac>
+```
+
+A regulator scans the QR. The verification endpoint re-derives the HMAC server-side from the URL parameters and compares it to the token. Match → green check rendered. Mismatch → red X.
+
+The QR-payload schema we settled on:
+
+```typescript
+type VerificationQRPayload = {
+  sid: string;     // studentId
+  cid: number;     // courseId
+  ts:  string;     // completionTs (ISO)
+  ce:  number;     // ceCredits
+  v:   1;          // schema version
+  token: string;   // HMAC-SHA256(secret, payload)
+};
+```
+
+Three properties matter:
+
+- **No third-party service.** The platform issues, the platform verifies. No subscription. No vendor incident can break verification.
+- **Deterministic re-derivation.** Given the same claims and the same secret, the token is the same forever. We can verify a certificate from 2026 just as confidently in 2030.
+- **No PII in the token.** The HMAC binds the *claims* — studentId, courseId, completion timestamp, CE credit count. The token doesn't reveal anything beyond what the certificate already shows on its face.
+
+The student's identity is in their own records; the certificate is a sealed envelope containing the program's claims about them. The seal is the source of truth at issue time.
+
+## Section 6: Audit passing on first try
+
+The verification suite is 10 checks. We wrote it before the platform was finished — programmatic statements of "what 'compliant' means" that we'd want to assert at any point in the platform's life:
+
+1. All 7 quizzes have exactly 3 questions each, each with exactly 1 correct answer.
+2. All 7 flashcard sets exist (37 cards total).
+3. All 7 glossary materials exist (65 terms total).
+4. All 7 reflection prompts exist.
+5. Learning path resolver: 14 rules, no placeholder IDs.
+6. Section-quiz gating: 403 returned until lesson completion flag is set.
+7. Final-exam gating: `eligible: false` until all 7 quizzes are passed.
+8. Video playback chapter-time displays in-video time, not wall-clock.
+9. Final-exam questions: 0 overlap with section-quiz question IDs.
+10. Nested-answer integrity: every question has a non-empty `answers[]` with exactly 1 `isCorrect: true`.
+
+All 10 PASS on the first run. We didn't enter a remediation cycle. We didn't ship checks 1–7 and patch checks 8–10 after a failed audit.
+
+The reason first-try matters: it's the difference between architecture that's *correct as designed* and architecture that's *patched into compliance after a failure*. Both can pass an audit. Only one is what you want owning your CE platform.
+
+## Section 7: When surveillance IS warranted
+
+Architecture-first compliance isn't always the right answer. There are programs where surveillance is genuinely the correct choice:
+
+- **High-stakes credentialing where exam impersonation is a known threat.** Bar exams, medical boards, professional licensure where the credential carries enough weight that someone might impersonate the candidate to take the test.
+- **Programs subject to specific regulatory mandates that require biometric attestation.** Some federal-grant-funded credentials, certain legal-sector certifications.
+- **Programs where the assessment surface itself is the proof.** Skills tests where what's being assessed is "did this person personally perform this action," not "did this person know this material."
+
+For everything else — the vast majority of CE, the vast majority of L&D, the vast majority of professional learning — architecture wins. The cost is lower. The privacy posture is cleaner. The audit signal is more durable. The student experience is dignified.
+
+> [!IMPORTANT]
+> Architecture beats surveillance for *most* CE. Not all. The honest position is: pick the right tool for the regulatory weight of the credential. Don't ship webcam proctoring on a 1-credit CE course because it's how the industry does it. Don't refuse webcam proctoring on a high-stakes licensure exam because architecture is purer. The right shape is per-program.
+
+For the NEALAC TBI course, the architecture is the answer, and the audit confirmed it. For your platform, the right answer might differ. We can build either; we just want to build the one that fits the actual regulatory shape of the credential, not the default shape the industry inherited from the 2010s proctoring vendors.
+
+If you're shipping a CE platform and you'd rather solve compliance with code than with a panopticon, we can do that.
+
+<div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
+  <h3 className="text-xl font-semibold text-white">Build with Go7Studio</h3>
+  <p className="mt-3 text-white/70">A small AI-augmented studio that ships compliance-grade learning platforms in days, not quarters.</p>
+  <Link href="/contact" className="btn-primary mt-6 inline-flex">Book a discovery call</Link>
+</div>

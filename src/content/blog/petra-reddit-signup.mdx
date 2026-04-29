@@ -1,0 +1,159 @@
+---
+title: "I Built a Social Posting Agent Before I Had Social Accounts. Here's the Awkward Repair."
+slug: "petra-reddit-signup"
+date: "2026-04-29"
+modified: "2026-04-29"
+excerpt: "Petra was a finished agent looking for a Reddit account. Three weeks later I created the account. The lesson wasn't \"build less\" — it was \"sequence the build.\""
+pillar: "AI Lab"
+tags:
+  - agent-design
+  - studio-meta
+  - ai-orchestration
+  - sequencing
+status: "draft"
+seoTitle: "I Built a Social Agent Before I Had Social Accounts | Go7Studio"
+seoDescription: "Petra was code-complete for 3 weeks before the Reddit account existed. The gate-state architecture that turned the gap into a feature, and the sequencing rule it produced."
+ogImage: "/images/og/petra-reddit-signup.jpg"
+schemaType: "Article"
+---
+
+# I Built a Social Posting Agent Before I Had Social Accounts. Here's the Awkward Repair.
+
+Petra was the publish tier of a three-agent SEO pipeline. Architecture finished early. Then sat in dry-run mode for roughly three weeks because the Reddit account didn't exist yet. The repair, when it finally happened, was awkward — an automated signup attempt that hit a CAPTCHA wall, a manual completion of the human-verification step, and a careful warmup phase that's still ongoing.
+
+The lesson wasn't "build less." Petra was good code that did its job. The lesson was about sequencing — credentials before code, accounts before agents — and how a gate-state architecture turned what could have been a clean failure into a productive idle.
+
+## Three weeks of dry-run
+
+```mermaid
+timeline
+    title Petra build → live timeline
+    Build complete : Petra architecture done
+                   : rate-limits.json finalized (3/day warmup, 0 posts, 0 links)
+                   : check_brand_account_gates() in poster.py
+                   : secrets/personas/qualora-learning.env template
+    Week 1 dry-run : Petra runs in dry-run on schedule
+                   : Logs everything, posts nothing
+                   : All gates EMAIL_VERIFIED=false etc.
+    Week 2 dry-run : Continued; account still doesn't exist
+                   : Auto-signup attempted via Playwright
+                   : Reddit "Prove your humanity" CAPTCHA blocks
+    Week 3 dry-run : Manual signup completed
+                   : Profile walk; 7 warmup subreddits joined
+                   : First gate flips: SIGNUP_COMPLETE=true
+    Live (warmup)  : EMAIL_VERIFIED=true
+                   : Exactly one approved warmup action
+                   : 3-comment/day cap holds
+```
+
+Petra was "live" the entire time, in the sense that the agent ran on its schedule and went through every step of its decision tree. It was "not posting" because every gate evaluated to false. The dry-run mode wasn't a special state — it was the default state, given that no gate had flipped to true yet.
+
+That distinction matters. Petra didn't need a special "wait for account" code path. The gates were already there for safety reasons. The absence of credentials meant every gate said no, so Petra said no. The agent was correct. The world it was waiting for didn't exist yet.
+
+## What Petra had ready
+
+```python
+# poster.py — gate function (signature simplified)
+
+def check_brand_account_gates() -> GateState:
+    """Returns the current gate state for any brand account.
+    Every gate must be true before any output action is approved.
+    """
+    return GateState(
+        SIGNUP_COMPLETE=env_bool("SIGNUP_COMPLETE"),
+        EMAIL_VERIFIED=env_bool("EMAIL_VERIFIED"),
+        PROFILE_SETUP_COMPLETE=env_bool("PROFILE_SETUP_COMPLETE"),
+        LINK_SHARING_APPROVED=env_bool("LINK_SHARING_APPROVED"),
+        POSTING_APPROVED=env_bool("POSTING_APPROVED"),
+        INTERNAL_ONLY=env_bool("INTERNAL_ONLY"),
+        PHASE=env_str("PHASE"),  # warmup | normal | restricted
+    )
+
+# rate-limits.json — warmup tier
+# {
+#   "comments_per_day": 3,
+#   "posts_per_day": 0,
+#   "links_per_day": 0,
+#   "max_subreddits_engaged_per_day": 2
+# }
+```
+
+Petra's safety floor was a function call away from being readable as a status check. When all gates returned false, the agent's correct behavior was to log and exit. When the first gate flipped, exactly one action became eligible. When the next gate flipped, two actions. The progression from dry-run to live was a sequence of explicit gate transitions, not a deploy event.
+
+The persona file (`secrets/personas/qualora-learning.env`) was already templated at mode 600 (owner read-write only). The rate-limits file was already locked at warmup levels (3 comments/day, 0 posts, 0 link shares). Everything that would matter when the gates flipped was already correct. The thing missing was the account.
+
+## Reddit signup that didn't work
+
+The first attempt at the awkward repair was an automated signup — Playwright in a clean Chrome profile, navigating to Reddit's signup form with a brand email.
+
+It blocked at "Prove your humanity." The CAPTCHA fired before the email field even rendered for input. There was no path through it for an automated browser, and there shouldn't be — that's exactly the failure mode the CAPTCHA exists to catch.
+
+> [!CAUTION]
+> Automated signup is the wrong tool for brand-account creation. Platforms specifically design CAPTCHAs to block automated agents from creating accounts, and the failure is the platform working as designed. Manual signup is the right tool. Treating it otherwise is fighting the platform.
+
+The agent caught the failure cleanly, logged it, and reported back: "automated signup not viable; account creation requires human." Then it kept running in dry-run on schedule, gates all false, doing exactly what it was supposed to do.
+
+## The manual repair
+
+The human-verification step had to be completed by a human. Once that was done, the rest of the profile walk could be a partnership between the human signup completion and the agent's profile-setup discipline.
+
+```text
+PROFILE WALK CHECKLIST — completed by hand, validated by agent
+
+[x] Display name set: "Qualora Learning"
+[x] About text: brand-appropriate, links to qualora.io
+[x] Custom social link added (canonical brand URL)
+[x] Joined 7 warmup subreddits relevant to brand topics
+[x] Initial state captured:
+    - 1 karma
+    - 0 contributions
+    - 0d account age
+[x] Email verified
+[x] Env file updated:
+    - SIGNUP_COMPLETE=true
+    - PROFILE_SETUP_COMPLETE=true
+    - EMAIL_VERIFIED=true
+    - PHASE=warmup
+```
+
+The orchestrator updated the env files. Petra's next scheduled run picked up the new gate state. The first gate that mattered for output (`EMAIL_VERIFIED`) had flipped to true. The rate-limits.json constrained the next 24 hours to exactly three comments, zero posts, zero links. Petra approved exactly one warmup action — a draft comment — and held it for human review.
+
+## The gates that turned the gap into a feature
+
+| Gate | Value before signup | Value after signup | Action enabled |
+|---|---|---|---|
+| `SIGNUP_COMPLETE` | false | true | Account-aware logging |
+| `EMAIL_VERIFIED` | false | true | First warmup comment eligible |
+| `PROFILE_SETUP_COMPLETE` | false | true | Profile-aware draft generation |
+| `LINK_SHARING_APPROVED` | false | false (still warmup) | (link sharing remains gated) |
+| `POSTING_APPROVED` | false | false (still warmup) | (posting remains gated) |
+| `INTERNAL_ONLY` | true | false | Outbound action allowed |
+| `PHASE` | (unset) | `warmup` | Warmup-tier rate limits apply |
+
+The gate architecture turned a missing-credentials situation into a productive idle. While the account didn't exist, every gate was false and Petra correctly did nothing. As credentials became available, gates flipped one at a time, and exactly the right amount of capability came online.
+
+This is the inverse of how I had been thinking about agents — "build the agent, then turn it on." The gate-state architecture made it: "build the agent with explicit gates that everything routes through, and the agent comes online progressively as the world catches up to it." Missing credentials became the gating mechanism, not a bug.
+
+## The sequencing rule
+
+> [!IMPORTANT]
+> Credentials before code, accounts before agents. The rule isn't "build less." It's "build the credential prerequisite first, or accept that the agent will idle until it lands." Petra idled productively because of gate-state architecture. Scout and Ivy ([disabled before they posted anything](/blog/scout-ivy-disabled-before-posting)) didn't have the same gate architecture, so the safe move was to disable them outright.
+
+The two stories — Petra's productive idle and Scout/Ivy's hard disable — are the same lesson at different scales. Both happened because the agent build preceded the surface build. The difference was that Petra had gate-state architecture that made the idle period safe, useful, and ready to flip live the moment the surfaces were real. Scout and Ivy didn't, so the safe move was to leave them off until their surfaces were ready.
+
+The corrected sequence going forward:
+
+1. Identify the destination (which account, which page, which channel).
+2. Create the destination — credentials, profile, gates documented.
+3. Wire the routing (the connector layer that gets approved output to live).
+4. Build the agent with gates that route through every credential check.
+
+Step 4 done before steps 1-3 is what produced three weeks of dry-run for Petra. The gate-state architecture was the safety net that made those three weeks useful instead of wasted. Without the gates, the same situation would have produced 21 days of agent runs hitting fail conditions and burning LLM calls — the situation Scout and Ivy were saved from by being disabled outright.
+
+The publish tier is in warmup now. The middle and top tiers come back online when the warmup phase completes. The whole pipeline will be live within weeks, not because anyone built faster, but because the surfaces finally caught up to the agents that were ready to fire on them.
+
+<div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
+  <h3 className="text-xl font-semibold text-white">Get the next AI Lab post</h3>
+  <p className="mt-3 text-white/70">The lab covers agent sequencing, gate-state architecture, and the routing stack behind a one-person studio. New post every couple of weeks.</p>
+  <Link href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe</Link>
+</div>

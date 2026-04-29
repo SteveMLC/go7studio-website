@@ -10,7 +10,19 @@ import {
   Wrench,
 } from "lucide-react";
 
-const liveAiLabSlugs = new Set(getPublishedBlogPosts().filter((post) => post.pillar.toLowerCase() === "ai lab").map((post) => post.slug));
+const liveAiLabPosts = getPublishedBlogPosts().filter((post) => post.pillar.toLowerCase() === "ai lab");
+const liveAiLabSlugs = new Set(liveAiLabPosts.map((post) => post.slug));
+
+const wave1Slugs = new Set([
+  "harness-engineering-matters-more-than-prompts",
+  "claude-code-without-drowning-in-context",
+  "codex-vs-claude-code-real-software-work",
+  "model-routing-stack-for-real-work",
+]);
+
+const newerAiLabPosts = liveAiLabPosts
+  .filter((post) => !wave1Slugs.has(post.slug))
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 const cornerstonePosts: Array<{
   title: string;
@@ -213,6 +225,35 @@ export default function AiLabPage() {
           ))}
         </div>
       </section>
+
+      {newerAiLabPosts.length > 0 ? (
+        <section className="mt-20">
+          <div className="mb-8 max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-teal">More AI Lab</p>
+            <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">New writing as it lands.</h2>
+            <p className="mt-3 text-white/70">
+              Field notes, postmortems, and patterns from running AI agents in production. Each one is a real incident or working playbook from inside the studio.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {newerAiLabPosts.map((post) => (
+              <article key={post.slug} className="glass-card p-6 transition hover:border-brand-teal/30">
+                <p className="text-xs uppercase tracking-[0.18em] text-brand-teal">AI Lab</p>
+                <h3 className="mt-3 font-display text-xl font-semibold leading-snug">
+                  <Link href={`/ai-lab/${post.slug}`} className="hover:text-brand-teal">{post.title}</Link>
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-white/70">{post.excerpt}</p>
+                <div className="mt-4">
+                  <Link href={`/ai-lab/${post.slug}`} className="inline-flex items-center gap-2 text-sm font-medium text-brand-teal hover:text-white">
+                    Read article
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="mt-20 grid gap-8 lg:grid-cols-[1.1fr,0.9fr] lg:items-start">
         <div>

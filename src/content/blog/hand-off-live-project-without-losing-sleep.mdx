@@ -1,0 +1,138 @@
+---
+title: "How I Hand Off a Live Project to a Client Without Losing Sleep"
+slug: "hand-off-live-project-without-losing-sleep"
+date: "2026-04-29"
+modified: "2026-04-29"
+excerpt: "A nine-item handoff checklist from a real CE platform launch. Password rotation, end-to-end student tests, attribution conversations, and the reproducibility test that turns service revenue into product revenue."
+pillar: "Studio"
+tags:
+  - edtech
+  - nealac
+  - client-handoff
+  - studio-ops
+  - reproducibility
+status: "draft"
+seoTitle: "How I Hand Off a Live Project to a Client Without Losing Sleep | Go7Studio"
+seoDescription: "A real handoff checklist from launching a CE platform: password rotation, end-to-end tests, attribution, hosting strategy, and the reproducibility test that matters."
+ogImage: "/images/og/hand-off-live-project-without-losing-sleep.jpg"
+schemaType: "Article"
+---
+
+The version of "shipped" I've come to trust isn't the day the platform goes live. It's the day I close my laptop for the weekend and don't worry about the platform.
+
+The first day is a release. The second day is a handoff. They are different jobs and the second one is where projects fail in slow motion — credentials still in someone's `.env`, a single admin account that holds the only working session, a video file on a Railway filesystem that's about to bill the client like an AWS surprise.
+
+This post is the nine-item checklist I run at handoff. The example is the [NEALAC Learning Hub](https://drannnealac.com) launch with Dr. Ann Leonard-Zabel — a CE platform that went live and then needed to *stay* live, with a client who is a clinician, not a sysadmin.
+
+## Section 1: State at handoff
+
+The platform is live. The verification suite is green — all 10 PASS lines on the first audit run. The TBI course has 7 lessons, 7 quizzes, 65 glossary terms, 37 flashcards, 88 minutes of seat time, and a 1.0 CE credit anchor.
+
+Handoff isn't "ship it." Handoff is "make this survive without me." That's a different scope and most of the work isn't in the codebase.
+
+## Section 2: The 9-item handoff checklist
+
+| # | Item                                                  | Owner   | Status        | Risk if skipped                              |
+| - | ---                                                   | ---     | ---           | ---                                          |
+| 1 | NeonDB password rotation                              | Studio  | done          | Credential lingering in git history          |
+| 2 | Full student-flow E2E test (non-admin account)        | Studio  | done          | Auth/role bug surfaces post-launch           |
+| 3 | Dr. Ann content review of generated materials         | Client  | in progress   | Wrong attribution language goes to public    |
+| 4 | Video hosting decision (Railway vs S3/CDN)            | Joint   | pending       | Egress-cost spike on traffic growth          |
+| 5 | Admin training session (content edits, course setup)  | Joint   | pending       | Client locked out at first edit attempt      |
+| 6 | Reproducibility test — course 2 from MP4 to live      | Studio  | pending       | Productized offering remains unproven        |
+| 7 | Backup strategy + restore drill                       | Studio  | done          | Data loss without recovery path              |
+| 8 | Domain DNS + SSL cert auto-renew                      | Studio  | done          | Outage at 90 days from cert expiry           |
+| 9 | Handoff doc + walkthrough call                        | Joint   | done          | Tribal knowledge dies with project end       |
+
+Five done, two pending, one in progress, one joint-pending. The point of the table isn't to claim completeness — it's to make the *not-done* visible to both sides at the same time. A pending item the client can see is a pending item the client can ask about. A pending item neither of us has written down is an outage in three months.
+
+## Section 3: NeonDB password rotation (the security item)
+
+Briefly during dev, a `.env` file got committed before `.gitignore` caught up to it. The Neon credential was visible in the git history for a few hours. We caught it, but the credential had been written. The remediation question: how do you make sure that credential isn't valid anymore?
+
+Two options:
+
+1. **Force-push history to remove the file.** Tempting. Wrong. Mirrored copies of the repo (CI, local clones, archives) still have the original blob. Force-push hides the surface but doesn't invalidate the credential.
+2. **Rotate the credential.** Generate a new one, replace the live secret, decommission the old one. Anything that ran with the old credential dies; anything new uses the new credential. The old one is irrelevant whether or not it's still in some clone of the repo.
+
+> [!IMPORTANT]
+> Don't force-push history to hide a credential. Rotate the credential. The exposed string is just a string; what matters is whether it's still authorized. Rotation invalidates it everywhere — in the leaked git blob, in any cached copy, on every machine in the world.
+
+We rotated, updated the live secret in Railway, redeployed. We also added a Husky pre-commit hook that refuses to commit any file matching `*.env` (with exceptions for `.env.example`). Belt-and-braces — we'd already burned the credential, and the hook keeps the next one out.
+
+The handoff doc records: "Old credential `(prefix abc...)` was exposed on `<date>` and rotated on `<date>`. Current credential is in Railway env, not in any repo file."
+
+## Section 4: The student-flow E2E
+
+Every dev cycle, we use admin accounts. Admin accounts mask role-based bugs. Before handoff, we always do a full E2E walk on a freshly-created non-admin student account.
+
+The walkthrough:
+
+- Create new account → email verify → first sign-in
+- Enroll in the course
+- Watch lesson 1 → take quiz 1 → pass
+- Repeat for lessons 2–7
+- Take final exam → pass
+- Generate certificate → download → scan QR → see green check
+
+On the NEALAC E2E we caught two bugs that admin role had hidden:
+
+- A FK constraint in the section_quiz_gating join was using the admin's "all sections unlocked" flag implicitly. Non-admin students with `eligible: false` got a 500, not a 403. Fixed.
+- The certificate download was checking `userRole === 'admin'` for a debug-mode flag that should have been `process.env.NODE_ENV === 'development'`. Non-admin students got a "feature unavailable" stub PDF instead of the real one. Fixed.
+
+Neither bug had ever appeared in dev. Both were trivial. Both would have been a launch-day support fire.
+
+## Section 5: The content-attribution conversation
+
+This is the conversation I've come to expect on every edtech build, and it's the conversation worth having explicitly.
+
+The platform reshapes Dr. Ann's recorded lecture into structured lessons, quiz questions, glossary entries, and flashcards. The work is real engineering: Whisper transcripts, a 3-pass quiz generator, a Bloom-tagged bank. But the *content* is reshaped from her teaching. It is not "AI-generated" in the headline-grabbing sense.
+
+The right language we agreed on for public-facing copy:
+
+> Course materials are reshaped from real human sources — lectures recorded by Dr. Ann Leonard-Zabel — using a structured pipeline that transcribes, indexes, and reorganizes the material into a learnable course format. The cognitive content originates from Dr. Ann's teaching; the platform structures it into lessons, assessments, and study tools.
+
+That sentence is what gets surfaced on the platform's "About this course" page. We don't say "AI-generated." We don't say "machine-written." We say what's true: real human source, structured by software, shaped into a learning surface.
+
+This matters legally and reputationally. CE regulators may have specific stances on machine-generated assessment material. Public perception of "AI courses" is wobbly. The architecture-honest description is also the safest description.
+
+## Section 6: Video hosting — Railway vs S3/CDN
+
+Railway filesystem hosts the video file just fine for one course. At ten courses with a few hundred students each, the egress bill becomes a problem.
+
+| Dimension              | Railway filesystem | S3 + CloudFront                          |
+| ---                    | ---                | ---                                      |
+| Setup time             | Zero (already there)| 1 day                                    |
+| Per-GB egress (typical)| ~$0.085 / GB        | ~$0.02 / GB after CloudFront cache       |
+| Caching                | None               | Edge caching globally                    |
+| Failure isolation      | Coupled to app     | Decoupled — video survives app outage    |
+| Trigger to migrate     | —                  | ~250 GB / mo of video egress (rule of thumb) |
+
+For one course, Railway is the right answer. We documented the migration path and the trigger threshold (~250GB/mo of video egress) in the handoff doc. When the platform crosses that line, the migration runbook is ready to execute.
+
+The handoff principle here: don't pre-optimize, but write the runbook for the optimization you'll need.
+
+## Section 7: Reproducibility — course 2 is the real test
+
+Course 1 was bespoke. We touched code paths, we tweaked prompts, we hand-resolved edge cases that only appeared on this lecture. The first build of anything is bespoke. That's not the productized offering — it's just service revenue with a delivery date.
+
+The productized offering is course 2: same scripts, same handoff timeline, no custom code. If course 2 takes 2 days end-to-end (Dr. Ann hands us an MP4 → platform live with a verified course), the offering is real. If it takes 8 days because three new edge cases appeared, the offering is not yet real and the next build refines the pipeline.
+
+> [!TIP]
+> Bespoke is service revenue. Repeatable is product revenue. The handoff isn't done until the second build proves the first build wasn't a one-off.
+
+This is the test we're running next. The handoff doc has a single line at the bottom: *"The next course tests whether the pipeline is the product."* That's the right framing for any studio engagement that wants to graduate from project work to platform work.
+
+## What this gets us
+
+The platform is live, the audit passed, the credential is rotated, the E2E caught two bugs, the attribution language is agreed, the hosting trigger is documented, and the next course is queued.
+
+I close my laptop on Friday and don't worry about it. That's the handoff bar.
+
+If you're considering an edtech build with us at Go7Studio, the handoff is the part we take most seriously — it's where most studio engagements quietly fail and it's the part our process is most explicit about. The result isn't just a live platform; it's a live platform that survives without us touching it for the next three months.
+
+<div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
+  <h3 className="text-xl font-semibold text-white">Build with Go7Studio</h3>
+  <p className="mt-3 text-white/70">A small AI-augmented studio that ships compliance-grade learning platforms in days, not quarters.</p>
+  <Link href="/contact" className="btn-primary mt-6 inline-flex">Book a discovery call</Link>
+</div>
