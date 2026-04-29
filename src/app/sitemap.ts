@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { GAMES } from "@/lib/games";
 import {
+  getBlogPostHref,
   getPublishedBlogPosts,
   getPublishedCaseStudies,
   getPublishedProjects,
@@ -73,8 +74,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    {
+      url: `${siteUrl}/ai-lab`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
     ...blogPosts.map((post) => ({
-      url: `${siteUrl}/blog/${post.slug}`,
+      url: `${siteUrl}${getBlogPostHref(post)}`,
       lastModified: new Date(post.modified ?? post.date),
       changeFrequency: "weekly" as const,
       priority: 0.7,

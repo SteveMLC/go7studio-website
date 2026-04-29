@@ -79,7 +79,7 @@ Qualora content should be positioned as reshaped from real human source material
 
 ### NEALAC
 Frame as:
-- a polished learning hub / continuing education platform
+- a polished professional learning platform
 - strong course player UX
 - rich transcript, chapter, quiz, flashcard, and video experience
 

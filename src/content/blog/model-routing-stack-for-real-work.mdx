@@ -1,0 +1,347 @@
+---
+title: "My Model-Routing Stack for Real Work"
+slug: "model-routing-stack-for-real-work"
+date: "2026-04-19"
+modified: "2026-04-19"
+excerpt: "The best AI workflow is usually a routed system, not a single favorite model. Here is a practical framework for assigning the right model to each stage of work."
+pillar: "AI Lab"
+tags:
+  - ai-lab
+  - model-routing
+  - ai-workflows
+  - multi-model-systems
+  - operator-systems
+  - practical-ai
+ogImage: "/images/og-default.jpg"
+status: "published"
+schemaType: "Article"
+targetKeywords:
+  - model routing
+  - AI workflow routing
+  - multi-model workflow
+  - model selection for AI tasks
+seoTitle: "My Model-Routing Stack for Real Work | Go7Studio AI Lab"
+seoDescription: "The best AI workflow is usually a routed system, not a single favorite model. Here is a practical framework for assigning the right model to each stage of work."
+readingTime: "10 min read"
+featured: true
+---
+
+The most common AI question used to be:
+
+> Which model is best?
+
+That is not the main question anymore.
+
+If you actually use these systems every day, the more useful question is:
+
+> Which model should own which stage of work?
+
+That is a routing problem.
+
+And once you start treating it like a routing problem, a lot of the noise disappears.
+
+You stop chasing a universal winner. You stop rebuilding your workflow every time a new model drops. You stop expecting one tool to be the best scout, drafter, critic, coder, and final reviewer all at once.
+
+That is the shift.
+
+In real work, I do not want a favorite model. I want a stack that holds up.
+
+<CalloutBox tone="current" title="Current-as-of note">
+  <p>This framework is meant to age better than any specific model name. Pricing, product shape, and vendor posture change quickly. The questions are the durable part.</p>
+</CalloutBox>
+
+<HeroCallout
+  eyebrow="Routing system"
+  title="The stable advantage is not one model. It is knowing who should own which stage."
+  body="A routed stack separates fast passes from final ownership, keeps context cleaner, and makes the workflow more resilient to product churn."
+/>
+
+<KeyTakeaways items='[{"title":"Route by stage","body":"Scout, drafter, critic, implementer, and final owner are different jobs and usually deserve different defaults."},{"title":"Price is secondary to role fit","body":"Cheap and fast models are valuable early. Trusted final-owner posture matters later."},{"title":"Context boundaries are part of routing","body":"Fresh sessions, critic passes, and isolated coding threads often improve quality as much as switching models."},{"title":"Some teams should stay simpler","body":"If the workflow is tiny or the controls are weak, routing complexity can hurt more than it helps."}]' />
+
+## Why single-model thinking breaks down
+
+Single-model thinking feels simple.
+
+One model, one habit, one thread, one answer.
+
+The problem is that real work is not one thing.
+
+A normal pipeline might include:
+
+- research
+- synthesis
+- first drafting
+- code implementation
+- critique
+- polish
+- final approval
+
+Those stages do not reward the same traits.
+
+Some stages reward speed and breadth. Some reward cost efficiency. Some reward judgment, restraint, or review posture. Some benefit less from changing the model than from changing the context boundary.
+
+That is why the most durable setup is usually a routed setup.
+
+## The four routing questions I ask first
+
+Before I assign a stage to a model, I try to answer four questions.
+
+### 1. What is the actual job right now?
+
+Not the overall project. The current stage.
+
+Is this:
+
+- source gathering?
+- first-pass synthesis?
+- code implementation?
+- critique and gap-finding?
+- final polish?
+- high-stakes final ownership?
+
+A lot of routing mistakes happen because people label the entire workflow instead of the current job.
+
+### 2. What matters most here: speed, cost, or trust?
+
+Different stages want different priorities.
+
+For example:
+
+- research often rewards speed and breadth
+- first drafts often reward speed and cheap iteration
+- final publish decisions reward trust and judgment
+- higher-risk code work rewards validation and review discipline
+
+If you do not define the priority, you route emotionally instead of operationally.
+
+### 3. Does this stage need a final owner or just a fast pass?
+
+This question saves both money and confusion.
+
+Not every stage needs the model you trust most.
+
+Sometimes you just need a fast scout.
+Sometimes you need a rough draft.
+Sometimes you need a critic to tell you what is weak.
+Sometimes you need a final owner whose job is to tighten, challenge, or block the output before it matters.
+
+Reserve your strongest final-owner posture for the stages where it actually matters.
+
+### 4. Is context isolation part of the quality strategy?
+
+This is the routing question a lot of people skip.
+
+Sometimes the right move is not changing models. It is splitting contexts.
+
+A fresh session, a dedicated critic pass, or an isolated coding thread can outperform one giant all-purpose thread, even if the underlying model is identical.
+
+Routing is not only about which model you use. It is also about which context boundary you use.
+
+## My current routing stack by role
+
+I try to think in roles first, then choose tools.
+
+<DiagramFrame title="The routed stack I actually care about" eyebrow="Role flow">
+  <TimelineSteps title="Scout -> drafter -> critic -> implementer -> final owner" steps='[{"title":"Scout","body":"Find the material, scan broadly, and reduce blank-page friction.","meta":"speed + breadth"},{"title":"Drafter","body":"Turn raw material into a usable first pass with structure and momentum.","meta":"speed + cost"},{"title":"Critic","body":"Challenge weak claims, missing support, and muddy framing before they harden.","meta":"skepticism"},{"title":"Implementer","body":"Move from words into code, systems, or concrete operational work.","meta":"workflow fit"},{"title":"Final owner","body":"Make the version-good-enough call with stronger judgment and clearer accountability.","meta":"trust"}]' />
+</DiagramFrame>
+
+### Scout
+
+**Purpose:** gather sources, scan broadly, surface patterns, reduce blank-page friction.
+
+**What matters most:** speed, breadth, and low enough cost that I am not precious about usage.
+
+This is where fast research-oriented models often shine.
+
+### Drafter
+
+**Purpose:** turn raw material into a usable first pass with structure and momentum.
+
+**What matters most:** speed, iteration cost, and enough coherence to make revision worthwhile.
+
+This stage is not about perfection. It is about acceleration.
+
+### Critic
+
+**Purpose:** identify weak claims, unsupported leaps, missing context, or structural drift.
+
+**What matters most:** useful skepticism, structure awareness, and the ability to push back on weak work.
+
+This is why I like having a separate critique step instead of asking the same run to generate and approve its own output.
+
+### Implementer
+
+**Purpose:** make the actual code or system change when the task moves from words to work.
+
+**What matters most:** task fit, repo ergonomics, tool access, and how well the model behaves inside the real operating environment.
+
+This is less about “best model” and more about workflow fit.
+
+### Final owner
+
+**Purpose:** make the call on the version that is going out.
+
+**What matters most:** judgment, clarity, trust, and the ability to improve quality without drifting into nonsense.
+
+This is where I care less about raw speed and more about whether I trust the output enough to put my name on it.
+
+## A note on pricing and provider choices
+
+Pricing changes fast enough that I do not think exact numbers belong at the center of a routing philosophy article unless they were checked immediately before publish. As of April 2026, I treat cost commentary here as approximate and secondary to role fit.
+
+That means:
+
+- use lower-cost or faster models aggressively where revision is cheap
+- reserve stronger final-owner posture for work that is expensive to get wrong
+- re-check actual vendor pricing before making procurement decisions
+
+If you use Kimi, MiniMax, or similar vendors in a routed stack, also think about vendor jurisdiction and data-residency requirements in a calm, practical way. For some teams that is manageable. For some teams, especially regulated or contract-sensitive environments, it may narrow what can be used for certain stages.
+
+## A simple starter routing table
+
+<DecisionMatrix title="A starter routing table a solo builder can actually use" columns='["Stage","Main priority","What I want","Typical fit"]' rows='[{"label":"Research / scanning","values":["Speed + breadth","Broad synthesis, cheap exploration","Fast research model"]},{"label":"First-pass drafting","values":["Speed + cost","Structure and momentum","Fast drafting model"]},{"label":"Critique / QC","values":["Skepticism + structure","Missing-claim detection and gap-finding","Separate critic pass"]},{"label":"Code implementation","values":["Workflow fit","Repo ergonomics, tool use, reviewability","Coding agent matched to task"]},{"label":"Final polish","values":["Trust + clarity","Judgment, restraint, cleaner wording","Stronger final-owner model"]},{"label":"Publish-ready review","values":["Trust + caution","Risk awareness and final check","Stronger final-owner model + human review"]}]' />
+
+The names can change over time. The routing logic stays useful.
+
+## If you are building solo, start with this
+
+If you are one builder trying to create a sane system instead of a giant mess, start with a lightweight version.
+
+<ChecklistBlock title="Solo-builder starter stack" items='["Pick one fast model for research and first passes.","Pick one trusted model for final review or polish.","Use a separate critic pass before anything public or risky.","Split code tasks from content tasks instead of using one mega-thread.","Start fresh when context becomes swampy.","Keep one human review gate where the downside is real."]' />
+
+That alone is enough to outperform a lot of single-favorite-model workflows.
+
+## What to route by role vs what to route by context boundary
+
+This distinction matters.
+
+### Route by role when the job itself changes
+
+Examples:
+
+- research -> drafter -> critic -> final owner
+- implementation -> review -> final signoff
+- scout pass -> coding pass -> regression review
+
+### Route by context boundary when the job is similar but contamination risk is high
+
+Examples:
+
+- fresh thread for a second opinion
+- isolated review pass after a long implementation session
+- separate session for architecture discussion vs file edits
+- separate subagent for repo exploration while the main thread stays implementation-focused
+
+A lot of quality gains come from context hygiene, not just model selection.
+
+<CalloutBox tone="caution" title="When not to route">
+  <p>Do not add routing complexity just because it sounds sophisticated. Skip heavy routing when the work is simple, the team is tiny, the workflow is not repeated often enough to justify design work, or the environment is regulated and proper controls are not in place yet.</p>
+</CalloutBox>
+
+## When not to route
+
+A routed stack is powerful, but it is not always the right answer.
+
+Do not add routing complexity just because it sounds sophisticated.
+
+### Skip heavy routing when:
+
+- the job is simple enough for one clean pass
+- the team is very small and the overhead would outweigh the gain
+- the workflow is not repeated often enough to justify system design
+- the environment is regulated and proper controls are not in place yet
+
+If you do not have review boundaries, context discipline, or a clear final owner, adding more models can make the workflow look advanced while making it less trustworthy.
+
+Sometimes the right move is not a four-role stack. Sometimes it is one model, one clean brief, and one careful human review.
+
+## The two most common mistakes
+
+### Mistake 1: using the strongest model for everything
+
+This wastes budget and time on stages that did not need premium judgment.
+
+If the task is just broad scanning, first-pass synthesis, or rough drafting, it usually makes more sense to optimize for speed and iteration.
+
+### Mistake 2: letting the cheapest model be the final owner
+
+This is the opposite failure.
+
+A fast cheap model can be excellent at creating motion. That does not mean it should be the final decider for content, code, or business actions.
+
+Speed is not the same as trust.
+
+## Why the official docs reinforce this mindset
+
+One reason I am comfortable with a routing-first posture is that the official docs for the tools people actually use keep pointing in the same direction.
+
+Codex best-practice guidance emphasizes clear task framing, explicit constraints, and the workflow around the model.
+
+Claude Code’s docs emphasize permissions, sessions, and the agent loop, which also pushes you toward thinking in stages and boundaries rather than one giant all-purpose run.
+
+Even Kimi’s current platform docs are useful in this context, not because they tell you the one true answer, but because they support thinking in terms of fast API-driven passes where cost and throughput matter. If you are considering Kimi, MiniMax, or similar vendors for scout/drafter roles, pair that decision with a basic data-residency and policy check instead of treating all providers as interchangeable.
+
+The products differ. The pattern is consistent.
+
+Workflow shape matters.
+
+## My current rule of thumb
+
+If the work is:
+
+- broad
+- early
+- cheap to revise
+- mostly about option generation
+
+I route toward faster models.
+
+If the work is:
+
+- externally visible
+- expensive to get wrong
+- close to a final decision
+- tied to code risk, brand risk, or operator trust
+
+I route toward a stronger final-owner posture and keep human review in the loop.
+
+That is the whole game.
+
+Not finding the one perfect model.
+Building a system where each model is asked to do the work it is actually good at.
+
+## A practical framework, not a religion
+
+This is the part worth protecting.
+
+The best routing system is not the one with the trendiest model names in it.
+It is the one that lets you keep making sane decisions even as the product landscape changes.
+
+That means the stable part of the system should be the questions:
+
+- what stage is this?
+- what matters most here?
+- does this need a final owner or a fast pass?
+- should I isolate context?
+
+Those questions age better than product loyalty.
+
+## Where I would keep this flexible
+
+I would avoid freezing exact role assignments forever.
+
+Model names change. Capabilities shift. Pricing changes. Product surfaces improve.
+
+What should stay stable is the routing logic, not the fandom.
+
+That is why I prefer talking about **scout**, **drafter**, **critic**, **implementer**, and **final owner** roles instead of pretending one named model should permanently own a category.
+
+## The real takeaway
+
+The question is not which model is best.
+
+The question is whether you have a system that routes work intelligently enough that each stage gets the kind of model, context, and review posture it actually needs.
+
+If you can do that, your workflow becomes much more resilient.
+
+And that is a better long-term advantage than any single-model preference.

@@ -57,6 +57,13 @@ Each game page includes:
 - /terms-of-service
 - /games/[game]/privacy-policy (per-game policies)
 
+### 7. AI Lab (/ai-lab)
+- Home for builder/operator AI content
+- Tool guides, comparisons, field notes, workflow playbooks
+- Supports Go7Studio brand trust, consulting interest, and future AI operator products
+- Selective CTA bridges into Qualora only when a post has a direct learner/career angle
+- Detailed plan: `AI_LAB_PLAN.md`
+
 ## Products to Feature
 
 ### Empire Tycoon (LIVE)

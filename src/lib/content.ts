@@ -230,6 +230,14 @@ export function getBlogPostBySlug(slug: string): BlogPost | undefined {
   return getAllBlogPosts().find((post) => post.slug === slug);
 }
 
+export function isAiLabPost(post?: Pick<BlogPost, "pillar"> | null): boolean {
+  return String(post?.pillar || "").trim().toLowerCase() === "ai lab";
+}
+
+export function getBlogPostHref(post: Pick<BlogPost, "slug" | "pillar">): string {
+  return isAiLabPost(post) ? `/ai-lab/${post.slug}` : `/blog/${post.slug}`;
+}
+
 export function getRelatedBlogPosts(post: BlogPost, max = 3): BlogPost[] {
   const tags = new Set(post.tags);
   return getPublishedBlogPosts()

@@ -1,7 +1,7 @@
 const SITE = "https://go7studio.com";
 
-export function ArticleSchema({ post }: { post: { title: string; slug: string; excerpt: string; date: string; modified?: string; ogImage?: string } }) {
-  const url = `${SITE}/blog/${post.slug}`;
+export function ArticleSchema({ post, url: providedUrl }: { post: { title: string; slug: string; excerpt: string; date: string; modified?: string; ogImage?: string }, url?: string }) {
+  const url = providedUrl ?? `${SITE}/blog/${post.slug}`;
   const schema = {
     "@context": "https://schema.org",
     "@type": "Article",
