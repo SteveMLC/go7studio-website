@@ -30,13 +30,16 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
       description: post.seoDescription ?? post.excerpt,
       url: `${SITE}/ai-lab/${post.slug}`,
       type: "article",
-      ...(post.ogImage ? { images: [{ url: `${SITE}${post.ogImage}`, width: 1200, height: 630 }] } : {}),
+      // images intentionally omitted — opengraph-image.tsx in this folder
+      // generates a per-post branded card via next/og and Next.js auto-wires it
+      // into the openGraph.images metadata for the route.
     },
     twitter: {
       card: "summary_large_image",
       title: post.seoTitle ?? post.title,
       description: post.seoDescription ?? post.excerpt,
-      ...(post.ogImage ? { images: [`${SITE}${post.ogImage}`] } : {}),
+      // images intentionally omitted — Next.js auto-applies the
+      // opengraph-image.tsx output to twitter.images for summary_large_image.
     },
   };
 }

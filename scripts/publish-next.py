@@ -1,26 +1,20 @@
 #!/usr/bin/env python3
 """
-publish-next.py — promote the next "ready" blog post to "published".
+publish-next.py — promote the next blog post on the publish queue.
 
-The 3-state workflow:
-  - status: "draft"     → still being written / reviewed
-  - status: "ready"     → Steve has approved, queued for next publish slot
-  - status: "published" → live on the site
+The queue is a plain text file at `scripts/publish-queue.txt`, one slug per
+line. Lines starting with `#` are comments. Blank lines are skipped.
 
-This script finds the oldest post with status: "ready" (sorted by `date`
-field, ties broken alphabetically by filename) and flips it to "published",
-also bumping `modified` to today. Prints the slug it flipped, or exits
-with code 78 (EX_NOPERM in BSD convention; we use it to mean "nothing to
-do") if no posts are ready.
+Workflow:
+  1. Read the first non-blank, non-comment line as the next slug.
+  2. Find the matching .mdx file in src/content/blog/.
+  3. If the file exists AND has status:"draft", flip to "published",
+     bump `modified` to today, remove the line from the queue.
+  4. If the file doesn't exist (Tier 1 not yet written by Steve), skip it
+     and try the next line. Don't remove skipped lines.
+  5. If no eligible line is found, exit 78 (no-op).
 
-Designed to be called by a daily GitHub Actions workflow:
-
-    python3 scripts/publish-next.py
-    if [ $? -eq 0 ]; then
-      git add src/content/blog/*.mdx
-      git commit -m "publish: $(cat /tmp/published-slug)"
-      git push
-    fi
+Output `/tmp/published-slug` for the workflow to read.
 """
 
 import re
@@ -28,76 +22,72 @@ import sys
 from datetime import date
 from pathlib import Path
 
-BLOG_DIR = Path(__file__).resolve().parent.parent / "src" / "content" / "blog"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+BLOG_DIR = REPO_ROOT / "src" / "content" / "blog"
+QUEUE_FILE = REPO_ROOT / "scripts" / "publish-queue.txt"
 TODAY = date.today().isoformat()
 SLUG_OUTPUT = Path("/tmp/published-slug")
 
-FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n", re.DOTALL)
-DATE_RE = re.compile(r'^date:\s*"?(\d{4}-\d{2}-\d{2})"?\s*$', re.MULTILINE)
-STATUS_RE = re.compile(r'^status:\s*"?(\w+)"?\s*$', re.MULTILINE)
-SLUG_RE = re.compile(r'^slug:\s*"?([\w-]+)"?\s*$', re.MULTILINE)
+STATUS_RE = re.compile(r'^(status:\s*)"draft"\s*$', re.MULTILINE)
+MODIFIED_RE = re.compile(r'^modified:\s*"[^"]*"\s*$', re.MULTILINE)
 
 
-def parse(path: Path):
-    text = path.read_text()
-    m = FRONTMATTER_RE.match(text)
-    if not m:
-        return None
-    fm = m.group(1)
-    status = STATUS_RE.search(fm)
-    date_match = DATE_RE.search(fm)
-    slug = SLUG_RE.search(fm)
-    if not (status and date_match and slug):
-        return None
-    return {
-        "path": path,
-        "status": status.group(1),
-        "date": date_match.group(1),
-        "slug": slug.group(1),
-        "text": text,
-    }
+def read_queue():
+    """Return list of (line_index, slug) for non-blank, non-comment lines."""
+    if not QUEUE_FILE.exists():
+        return []
+    lines = QUEUE_FILE.read_text().splitlines()
+    return [
+        (idx, line.strip())
+        for idx, line in enumerate(lines)
+        if line.strip() and not line.strip().startswith("#")
+    ]
 
 
 def main() -> int:
-    candidates = []
-    for path in sorted(BLOG_DIR.glob("*.mdx")):
-        post = parse(path)
-        if post and post["status"] == "ready":
-            candidates.append(post)
-
-    if not candidates:
-        print("publish-next: no posts in 'ready' state — nothing to publish today")
+    queue = read_queue()
+    if not queue:
+        print("publish-next: queue is empty — nothing to publish today")
         return 78
 
-    candidates.sort(key=lambda p: (p["date"], p["slug"]))
-    target = candidates[0]
+    skipped = []
+    for idx, slug in queue:
+        post_path = BLOG_DIR / f"{slug}.mdx"
+        if not post_path.exists():
+            print(f"publish-next: skip — '{slug}' not yet written, leaving in queue")
+            skipped.append(slug)
+            continue
 
-    new_text = re.sub(
-        r'^status:\s*"ready"\s*$',
-        'status: "published"',
-        target["text"],
-        count=1,
-        flags=re.MULTILINE,
-    )
-    new_text = re.sub(
-        r'^modified:\s*"[^"]*"\s*$',
-        f'modified: "{TODAY}"',
-        new_text,
-        count=1,
-        flags=re.MULTILINE,
-    )
+        text = post_path.read_text()
+        if not STATUS_RE.search(text):
+            # Already published, or status is "ready" or other — skip but warn
+            print(f"publish-next: skip — '{slug}' has no status:'draft' (already published or unexpected state), leaving in queue")
+            skipped.append(slug)
+            continue
 
-    if new_text == target["text"]:
-        print(f"publish-next: ERROR — could not flip status on {target['slug']}")
-        return 1
+        # Flip the status and bump modified
+        new_text = STATUS_RE.sub(r'\1"published"', text, count=1)
+        new_text = MODIFIED_RE.sub(f'modified: "{TODAY}"', new_text, count=1)
+        if new_text == text:
+            print(f"publish-next: ERROR — could not rewrite frontmatter for '{slug}'")
+            return 1
 
-    target["path"].write_text(new_text)
-    SLUG_OUTPUT.write_text(target["slug"])
-    print(f"publish-next: flipped '{target['slug']}' → published")
-    print(f"  source: {target['path'].name}")
-    print(f"  date:   {target['date']}")
-    print(f"  url:    /blog/{target['slug']} or /ai-lab/{target['slug']}")
-    return 0
+        post_path.write_text(new_text)
+
+        # Remove this slug from the queue (preserve everything else verbatim)
+        original_lines = QUEUE_FILE.read_text().splitlines()
+        new_lines = [line for i, line in enumerate(original_lines) if i != idx]
+        QUEUE_FILE.write_text("\n".join(new_lines) + ("\n" if new_lines else ""))
+
+        SLUG_OUTPUT.write_text(slug)
+        print(f"publish-next: flipped '{slug}' → published")
+        print(f"  source: {post_path.name}")
+        if skipped:
+            print(f"  skipped (left in queue): {', '.join(skipped)}")
+        return 0
+
+    print("publish-next: nothing publishable in queue (all entries skipped — likely all Tier 1 posts not yet written)")
+    return 78
 
 
 if __name__ == "__main__":

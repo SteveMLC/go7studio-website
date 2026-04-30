@@ -1,0 +1,69 @@
+# Go7Studio publish queue — one slug per line, in publish order.
+# Lines starting with # are ignored. Blank lines are ignored.
+# The daily publisher (.github/workflows/daily-publish.yml) processes
+# the first eligible line each day and removes it on success.
+#
+# Tier 1 posts (Steve's voice-defining pieces) are commented out below
+# until the .mdx files exist. Steve writes them, drops the .mdx in
+# src/content/blog/, and uncomments the line here.
+#
+# Last updated 2026-04-29 with all 36 polished drafts plus Tier 1
+# placeholders in calendar order from CONTENT_CALENDAR_50DAY_2026-04-30.
+# ───────────────────────────────────────────────────────────────────
+
+# Day 1 (Steve's Tier 1)
+# empire-tycoon-ninety-days-thirty-seven-buyers
+empire-tycoon-first-dollar
+# Day 3 (Steve's Tier 1)
+# the-day-i-stopped-building-and-started-selling
+# Day 4 (Steve's Tier 1)
+# i-audited-my-own-studio-site-this-morning
+# Day 5 (Steve's Tier 1)
+# why-moonlightcapital-is-now-go7studio
+views-vs-buyers
+# Day 7 (Steve's Tier 1)
+# i-caught-my-lead-ai-agent-writing-the-same-mutation-twenty-one-times
+scout-ivy-disabled-before-posting
+petra-reddit-signup
+work-orders-that-survive-agent-handoff
+# Day 15 (Steve's Tier 1)
+# how-a-two-person-studio-shipped-a-compliance-grade-ce-platform
+transcript-aware-lesson-player-client-signoff
+hand-off-live-project-without-losing-sleep
+whisper-three-pass-quiz-generator-21-questions
+bloom-tagged-question-bank-beats-llm-on-demand
+compliance-via-architecture-not-surveillance
+custom-game-art-lora-228
+sixty-python-script-factory-cleans-real-public-courses
+sixteen-extractors-eight-formats-cost-matrix
+government-disclaimers-hiding-32-percent-published-courses
+standalone-backfill-scripts-pipeline-gaps
+two-pipelines-generated-garbage-two-generated-gold
+nineteen-bugs-failure-pattern-atlas
+six-hundred-sixty-two-courses-silent-exclusion-bug
+six-seo-bugs-six-days-doubled-ctr
+2500-duplicate-glossary-rows-one-postgres-index
+sitemap-244-to-15602-without-spam
+hardcoded-taxonomy-hiding-career-pages-from-google
+blog-bundle-premium-flywheel-auto-promotes
+visual-archetype-system-ai-generated-lessons
+career-match-quizzes-onet-implementation
+five-game-portfolio
+pet-paradise-on-hold
+# Day 38 (Steve's Tier 1)
+# things-i-shipped-that-made-zero-and-why-i-kept-them
+picking-mobile-game-names
+# Day 40 (Steve's Tier 1)
+# a-12-institution-endgame-for-an-idle-game
+cost-and-quality-routing-five-model-families
+one-config-line-slowed-the-studio
+daily-memory-file
+reading-audit-logs-highest-roi-habit
+state-file-architecture-memory
+decide-ship-or-pause-ai-tool
+three-conversations-stopped-having
+# Day 48 (Steve's Tier 1)
+# what-25-linkedin-outreach-messages-got-me-on-day-7
+# Day 49 (Steve's Tier 1)
+# the-six-hundred-dollar-challenge-that-built-a-studio
+ninety-days-of-compounding
