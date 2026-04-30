@@ -100,14 +100,14 @@ export function HeroSection() {
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             <Link
-              href="/games/rampart"
+              href="/ai-lab"
               className="group mx-auto inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-xs text-white/80 ring-1 ring-white/10 backdrop-blur-sm transition-all hover:bg-white/10 hover:ring-white/20"
             >
               <span className="flex h-2 w-2">
-                <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-400"></span>
+                <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
               </span>
-              <span>New: Rampart Wave Defense — Join the beta</span>
+              <span>New: AI Lab — field reports from real production</span>
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </motion.div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedGames } from "@/components/home/FeaturedGames";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
+import { FeaturedAiLab } from "@/components/home/FeaturedAiLab";
 import { AboutSection } from "@/components/home/AboutSection";
 import { StatsSection } from "@/components/home/StatsSection";
 import { FaqSection } from "@/components/home/FaqSection";
@@ -20,6 +21,7 @@ export default function HomePage() {
     <>
       <HomepageStructuredData />
       <HeroSection />
+      <FeaturedAiLab />
       <FeaturedGames />
       <FeaturedProjects />
       <AboutSection />
