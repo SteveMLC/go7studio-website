@@ -95,3 +95,76 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* AI Lab MDX content styling — overrides defaults for blog post bodies */
+.ai-lab-mdx .markdown-alert {
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 1rem;
+  border-left-width: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgb(226, 232, 240);
+}
+.ai-lab-mdx .markdown-alert > :last-child {
+  margin-bottom: 0 !important;
+}
+.ai-lab-mdx .markdown-alert .markdown-alert-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.ai-lab-mdx .markdown-alert .markdown-alert-title svg.octicon {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
+}
+.ai-lab-mdx .markdown-alert p {
+  margin-top: 0.25rem;
+  line-height: 1.7;
+}
+
+.ai-lab-mdx .markdown-alert-note {
+  border-left-color: rgba(56, 189, 248, 0.7);
+  background: rgba(56, 189, 248, 0.06);
+}
+.ai-lab-mdx .markdown-alert-note .markdown-alert-title {
+  color: #7dd3fc;
+}
+
+.ai-lab-mdx .markdown-alert-tip {
+  border-left-color: rgba(49, 151, 149, 0.85);
+  background: rgba(49, 151, 149, 0.08);
+}
+.ai-lab-mdx .markdown-alert-tip .markdown-alert-title {
+  color: #5eead4;
+}
+
+.ai-lab-mdx .markdown-alert-important {
+  border-left-color: rgba(232, 121, 249, 0.75);
+  background: rgba(232, 121, 249, 0.06);
+}
+.ai-lab-mdx .markdown-alert-important .markdown-alert-title {
+  color: #f0abfc;
+}
+
+.ai-lab-mdx .markdown-alert-warning {
+  border-left-color: rgba(251, 146, 60, 0.85);
+  background: rgba(251, 146, 60, 0.07);
+}
+.ai-lab-mdx .markdown-alert-warning .markdown-alert-title {
+  color: #fdba74;
+}
+
+.ai-lab-mdx .markdown-alert-caution {
+  border-left-color: rgba(244, 114, 182, 0.85);
+  background: rgba(244, 114, 182, 0.07);
+}
+.ai-lab-mdx .markdown-alert-caution .markdown-alert-title {
+  color: #fda4af;
+}
