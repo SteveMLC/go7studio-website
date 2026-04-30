@@ -1,0 +1,61 @@
+name: Daily blog publisher
+
+on:
+  schedule:
+    # 14:00 UTC = 10:00 ET (standard) / 09:00 ET (daylight savings).
+    # Adjust per cadence preference. GitHub cron may delay by a few minutes.
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+    # Manual trigger for ad-hoc flips.
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run publish-next.py
+        id: publisher
+        run: |
+          set +e
+          python3 scripts/publish-next.py
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          set -e
+
+      - name: Commit + push the flip
+        if: steps.publisher.outputs.exit_code == '0'
+        env:
+          PUBLISHED_SLUG_FILE: /tmp/published-slug
+        run: |
+          slug=$(cat "$PUBLISHED_SLUG_FILE")
+          git config user.name 'Go7Studio Publisher'
+          git config user.email 'walt@go7studio.com'
+          git add src/content/blog/*.mdx
+          git commit -m "publish(blog): ${slug} goes live
+
+          Daily automated promotion from status:ready → status:published.
+          Triggered by .github/workflows/daily-publish.yml.
+
+          Co-Authored-By: Daily Publisher <walt@go7studio.com>"
+          git push origin main
+
+      - name: No-op summary
+        if: steps.publisher.outputs.exit_code == '78'
+        run: echo "No posts in status:ready state. Skipping today."
+
+      - name: Failure summary
+        if: steps.publisher.outputs.exit_code != '0' && steps.publisher.outputs.exit_code != '78'
+        run: |
+          echo "publish-next.py exited with unexpected code ${{ steps.publisher.outputs.exit_code }}"
+          exit 1
