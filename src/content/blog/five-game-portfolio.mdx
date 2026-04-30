@@ -19,9 +19,9 @@ schemaType: "Article"
 
 # A Five-Game Portfolio for a One-Person Studio
 
-Conventional advice for solo developers: pick one game and go deep. The advice has a real basis — divided attention is the most common failure mode for indie devs, and most solo studios that try to ship multiple titles end up shipping zero.
+Conventional solo-dev advice: pick one game, go deep. There's real reasoning behind it — divided attention is the most common failure mode for indie devs, and most solo studios that try to ship multiple titles end up shipping zero.
 
-I run five anyway. Not because I disagree with the advice, but because the cost of running a second, third, fourth, and fifth game is much lower than the advice assumes — *if* the studio is built around shared infrastructure. And because for a solo studio, picking the one bet is the highest-variance decision you can make. The portfolio is variance reduction.
+I run five anyway. Not because I disagree, but because the cost of running a second, third, fourth, and fifth game is much lower than the advice assumes — *if* the studio is built around shared infrastructure. And for a solo studio, picking the one bet is the highest-variance decision you can make. The portfolio is variance reduction.
 
 This post is the five games, why each one is at the stage it's at, the four cost-controls that make a five-game portfolio operable for one person, the kill criteria that keep paused games from drifting into abandoned, and the sequence that ties it all together.
 
@@ -35,7 +35,7 @@ This post is the five games, why each one is at the stage it's at, the four cost
 | Pet Paradise | On hold (80-90%) | Pet-breeding mutation system on Roblox | Highest-upside; gated on 4 resume conditions |
 | Rampart | Pre-launch | Wave-defense title; in development | Pre-launch hold; ships when soft-launch metrics justify |
 
-Five entries, five different stages, one shared studio. None of these are "abandoned." All are at the stage that's currently right for them, given the daily revenue, the time budget, and the resume gates I've written.
+Five entries, five different stages, one shared studio. None of these are abandoned. Each one sits at the stage that's right for it given the daily revenue, the time budget, and the resume gates I've written down.
 
 ## Why one bet is too many bets
 
@@ -55,11 +55,11 @@ quadrantChart
     Rampart: [0.55, 0.5]
 ```
 
-A solo studio can't predict the hit. The picker is wrong more often than it's right. That's not a flaw in the picker — it's the base rate for indie games. Three of every four shipped solo games earn under a thousand dollars lifetime. The probability that *my* one bet is the one that breaks the trend is, all things equal, about one in four.
+A solo studio can't predict the hit. The picker is wrong more often than it's right. That's not a flaw in me — it's the base rate for indie games. Three of every four shipped solo games earn under a thousand dollars lifetime. The probability that *my* one bet breaks the trend is, all else equal, about one in four.
 
-Portfolio strategy doesn't fix that one-in-four. It makes it a portfolio-level number instead of a personal-level catastrophe. Four shots at one-in-four better than one shot at one-in-four, mathematically. Five even better, until the operational cost of running a fifth project breaks the math.
+A portfolio doesn't fix one-in-four. It makes it a portfolio-level number instead of a personal-level catastrophe. Four shots are better than one. Five better still, until the operational cost of running a fifth project starts to break the math.
 
-The honest test: am I diluting attention from a single bet that would otherwise compound, or am I working on things that compound *with each other*? If the answer is the second, the portfolio isn't procrastination — it's structure.
+Honest test: am I diluting attention from a single bet that would otherwise compound, or am I working on things that compound *with each other*? If the answer is the second, the portfolio isn't procrastination — it's structure.
 
 ## How I keep the portfolio cheap
 
@@ -93,7 +93,7 @@ mindmap
       Rampart
 ```
 
-Four cost-controls make the difference. Take any one of them away and a five-game portfolio breaks under the operational load.
+Four cost-controls make the difference. Pull any one of them out and a five-game portfolio collapses under operational load.
 
 | Cost layer | Shared mechanism | What it saves |
 |---|---|---|
@@ -102,11 +102,11 @@ Four cost-controls make the difference. Take any one of them away and a five-gam
 | Art | Empire LoRA + Rampart LoRA on shared mflux stack | $0 marginal cost per asset after $4.56 training |
 | Infrastructure | Walt + Chip + shared CI/deploy | One pipeline serves all games |
 
-The shared art pipeline is the most concrete example. Every game in the portfolio gets art from the same shared system — either through one of the trained LoRAs ([the LoRA cost $2.28 to train](/blog/custom-game-art-lora-228)) or through the same Replicate/mflux stack with a different prompt. Per-asset marginal cost is zero across all five games.
+The shared art pipeline is the most concrete example. Every game pulls from the same system — either one of the trained LoRAs ([the LoRA cost $2.28 to train](/blog/custom-game-art-lora-228)) or the same Replicate/mflux stack with a different prompt. Per-asset marginal cost is zero across all five games.
 
 ## Kill criteria — paused isn't abandoned
 
-The real risk of running multiple games isn't picking the wrong one. It's letting one drift from "paused for a real reason" to "abandoned by neglect." The fix is writing a resume gate for every paused project before pausing it.
+The real risk of running multiple games isn't picking the wrong one. It's letting one drift from "paused for a real reason" to "abandoned by neglect." The fix is cheap and unforgiving: write a resume gate for every paused project, before you pause it.
 
 | Paused game | Resume criteria | Met? |
 |---|---|---|
@@ -116,7 +116,7 @@ The real risk of running multiple games isn't picking the wrong one. It's lettin
 | Pet Paradise | Animation pipeline prototyped on a non-PP project | No |
 | SlimeSlip | (Dormant; paced by collaborator availability — no fixed gate) | n/a |
 
-Pet Paradise has four conditions ([all four covered in the on-hold writeup](/blog/pet-paradise-on-hold)). All four must be true before the thaw. SlimeSlip is dormant for a different reason — pace is set by a young collaborator's availability, and the project is intentionally not gated on revenue. That's a documented choice, not a default.
+Pet Paradise has four conditions ([all four covered in the on-hold writeup](/blog/pet-paradise-on-hold)). All four must be true before the thaw. SlimeSlip is dormant for a different reason — pace is set by a young collaborator's availability, and the project is intentionally not gated on revenue. That's a documented choice, not a drift.
 
 > [!IMPORTANT]
 > If a paused project doesn't have a written resume gate, it's not paused — it's abandoned by drift. The gate is what distinguishes a portfolio from procrastination.
@@ -144,9 +144,9 @@ gantt
     Collaborator-paced              :        l1, 2026-04-29, 365d
 ```
 
-The sequence isn't a commitment. It's a default. If Empire's revenue compounds faster than expected, the Pet Paradise gate trips earlier and the sequence shifts. If Sortbloom's soft launch underperforms, Rampart slides into its slot. The gantt is the planning artifact; the kill criteria are the actual decision logic.
+The sequence isn't a commitment. It's a default. If Empire's revenue compounds faster than expected, the Pet Paradise gate trips earlier and the sequence shifts. If Sortbloom's soft launch underperforms, Rampart slides into its slot. The gantt is the planning artifact; the kill criteria are the real decision logic.
 
-The compounding works because each project's progress feeds the next. Empire's revenue gates Pet Paradise. The animation pipeline I'd build to thaw Pet Paradise also benefits Rampart's character animation. The shared LoRA serves Empire's marketing, Sortbloom's onboarding visuals, and Rampart's loading screens. Five games is operationally five times more work than one in exactly the surfaces that don't share — playtesting, balance tuning, store listings — and roughly the same amount of work in the surfaces that do share.
+The compounding works because each project feeds the next. Empire's revenue gates Pet Paradise. The animation pipeline I'd build to thaw Pet Paradise also benefits Rampart's character animation. The shared LoRA serves Empire's marketing, Sortbloom's onboarding visuals, and Rampart's loading screens. Five games is operationally five times the work of one only in the surfaces that don't share — playtesting, balance tuning, store listings — and roughly the same amount of work in the surfaces that do.
 
 ## When to consolidate
 
@@ -160,6 +160,6 @@ None of those have fired. Until they do, the five-game portfolio is the studio's
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">See what 37 strangers paid for</h3>
-  <p className="mt-3 text-white/70">Empire Tycoon is the revenue driver that gates the rest of the portfolio. Free to play, monetized with rewarded ads and IAPs.</p>
+  <p className="mt-3 text-white/70">Empire Tycoon is the revenue driver that gates the rest of the portfolio. Free to play, monetized with rewarded ads and IAPs — and the daily check that decides what ships next.</p>
   <Link href="https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon" className="btn-primary mt-6 inline-flex">Get Empire Tycoon</Link>
 </div>

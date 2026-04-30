@@ -17,15 +17,15 @@ ogImage: "/images/og/work-orders-that-survive-agent-handoff.jpg"
 schemaType: "Article"
 ---
 
-Three quarters of my agent failures used to come from one source: a work order vague enough to be interpreted multiple correct ways.
+Three quarters of my agent failures used to come from one source: a work order vague enough to be read multiple correct ways.
 
-The agent did something plausible. The plausible thing was not the thing I wanted. The output looked like success — a file was modified, a test was added, a commit landed. I had to read the diff to discover that the agent had answered a different question than the one I asked.
+The agent did something plausible. The plausible thing wasn't what I wanted. A file got modified, a test got added, a commit landed. Then I'd read the diff and realize the agent had answered a different question than the one I asked.
 
-That is the worst kind of agent failure. It does not look like a failure. It looks like a feature.
+That's the worst kind of agent failure. It doesn't look like a failure. It looks like a feature.
 
 ## Three quarters of my agent failures
 
-The fix is not a smarter model. The fix is a more specific brief.
+The fix isn't a smarter model. It's a more specific brief.
 
 | Bad work order | Good work order |
 |---|---|
@@ -57,9 +57,9 @@ The preamble I require at the top of every agent task is exactly four fields.
 - requeue-with-blocker
 ```
 
-Each line is doing a specific job. Objective is the contract. Acceptance is how the contract is verified. Files is the scope. Branching is the legal way to refuse.
+Each line does a specific job. Objective is the contract. Acceptance is how the contract is verified. Files is the scope. Branching is the legal way to refuse.
 
-The four lines together turn a goal into a work order. The work order is a unit of agent work that survives handoff between specialists, audits cleanly, and produces a result that can be checked without rereading the original conversation.
+Together, the four lines turn a goal into a work order — a unit of agent work that survives handoff between specialists, audits cleanly, and produces a result you can check without rereading the original conversation.
 
 ## Why Acceptance is the line that saves you
 
@@ -75,17 +75,17 @@ Acceptance is the difference between "make it better" and a contract you can gra
 | Improve the audit | p95 latency on `scripts/bench_audit.py` drops below 30s; success rate ≥ 95% |
 | Cover this in a test | New test in `tests/auth.test.ts`; covers the race condition; passes; existing tests still pass |
 
-Without Acceptance, the agent decides for you. The agent's interpretation of "improve SEO" is not your interpretation. It is the most plausible interpretation given the model's training data.
+Without Acceptance, the agent decides for you. The agent's read of "improve SEO" is not your read. It's the most plausible interpretation given the model's training data.
 
-Plausible is not the same as correct.
+Plausible is not correct.
 
-Acceptance forces the goal into a shape that can be checked. If the bullets are not checkable without asking a human, the bullets are wrong and the work order goes back for revision. That filter alone — checkable without a human — eliminates the majority of vague work orders before they reach an agent.
+Acceptance forces the goal into a checkable shape. If a bullet can't be checked without asking a human, the bullet is wrong and the work order goes back for revision. That single filter — checkable without a human — kills most vague work orders before they reach an agent.
 
 ## The Branching field
 
-Branching is the field most people forget. Branching is the legal way for the agent to refuse.
+Branching is the field most people forget. It's the legal way for the agent to refuse.
 
-Without Branching, when an agent encounters a situation the work order didn't anticipate, the agent picks. The agent picks based on the most plausible next action given the context. That pick is rarely what you would have picked.
+Without Branching, when an agent hits a situation the work order didn't anticipate, the agent picks. It picks based on the most plausible next action given the context. That pick is rarely what you would have picked.
 
 | Situation | Without Branching | With Branching |
 |---|---|---|
@@ -95,9 +95,9 @@ Without Branching, when an agent encounters a situation the work order didn't an
 | Conflicts with another in-flight order | Agent picks one and proceeds | `requeue-with-blocker: in-flight order conflict` |
 | Operator preference unclear | Agent picks plausibly | `halt-with-note: needs operator input on X` |
 
-The discipline is to write Branching for situations you cannot anticipate. Branching gives the agent a vocabulary for "this is not what you asked for," which is the vocabulary every specialist needs and most agent setups don't provide.
+The discipline is writing Branching for situations you can't anticipate. Branching gives the agent a vocabulary for "this isn't what you asked for" — the vocabulary every specialist needs and most agent setups don't provide.
 
-The first time I added Branching to a work order, the agent halted on the first run with `halt-with-note: orphan count is already < 100; the underlying issue is something else`. That single halt saved me three hours of debugging an agent's plausible-but-wrong attempt at a problem that didn't exist.
+First time I added Branching to a work order, the agent halted on the first run: `halt-with-note: orphan count is already < 100; the underlying issue is something else`. One halt. Three hours of "plausible-but-wrong" debugging I never had to do.
 
 ## A real work order, before and after
 
@@ -135,9 +135,9 @@ Audit Qualora SEO and fix what you find.
 - requeue-with-blocker: glossary regeneration if `data/glossary-published.json` is stale
 ```
 
-The before is six words. The after is twelve lines.
+Six words versus twelve lines.
 
-The after is not bureaucracy. The after is the contract that turns a goal into something an agent can finish, hand off, and have audited. Every line is doing a job. Every line prevents a specific failure mode I have already paid for.
+The after isn't bureaucracy. It's the contract that turns a goal into something an agent can finish, hand off, and have audited. Every line is doing a job. Every line prevents a specific failure mode I've already paid for.
 
 ## Three failure modes the format prevents
 
@@ -171,10 +171,10 @@ sequenceDiagram
 
 Walt writes the work order. Chip executes it. Rex audits it against the Acceptance bullets. Each handoff is a file. Each file references the contract. The format is what makes the handoff legible to an agent who didn't see the original conversation.
 
-If you are running a multi-agent setup and your specialists keep producing plausible-but-wrong outputs, the work-order format is the smallest change that produces the most measurable improvement. The four lines fit on a notecard. The discipline is harder than the format. The discipline is what ships.
+If you're running a multi-agent setup and your specialists keep producing plausible-but-wrong outputs, the work-order format is the smallest change with the biggest measurable lift. The four lines fit on a notecard. The discipline is harder than the format — and it's the discipline that ships.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Get the next AI Lab post</h3>
-  <p className="mt-3 text-white/70">One post a month on real production AI. The next one is the cost-and-quality routing matrix — five model families, six call types, real production cost. No fluff.</p>
+  <p className="mt-3 text-white/70">One post a month from a production system that's currently breaking and getting fixed. Next up: the cost-and-quality routing matrix — five model families, six call types, real production cost numbers, and the fallback chains that keep a fixed-budget studio shipping.</p>
   <a href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe to AI Lab</a>
 </div>

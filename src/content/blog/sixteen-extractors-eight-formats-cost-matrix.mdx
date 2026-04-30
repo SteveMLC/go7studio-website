@@ -17,13 +17,13 @@ ogImage: "/images/og/sixteen-extractors-eight-formats-cost-matrix.jpg"
 schemaType: "Article"
 ---
 
-When you ingest real public-domain courses — not curated benchmark datasets — they don't arrive in one format. They arrive in eight. We've ended up with sixteen extractors across those eight formats, plus an OCR fallback for the cases where there isn't actually any text in the file.
+When you ingest real public-domain courses — not curated benchmark datasets — they don't arrive in one format. They arrive in eight.
 
-This post is the cost matrix. What each format looks like in the wild, which extractor handles it, what it costs to run per course, and the gotchas we've discovered the hard way. The numbers are real. The Storyline 2+ gap is real and currently unfixed.
+I've ended up with sixteen extractors across those eight formats, plus an OCR fallback for the cases where there isn't actually any text in the file. This is the cost matrix: what each format looks like in the wild, which extractor handles it, real per-course numbers, and the gotchas I learned the hard way. The Storyline 2+ gap is real and currently unfixed.
 
 ## §1 The format zoo
 
-Real public-domain content does not arrive in one format. It arrives in whatever the original grantee, instructor, or community college had on their authoring tool when they exported. Eight years of TAACCCT-funded courseware means eight years of every authoring tool in education exporting in their preferred format.
+Real public-domain content arrives in whatever the original grantee, instructor, or community college had on their authoring tool when they hit export. Eight years of TAACCCT-funded courseware means eight years of every authoring tool in education shipping its preferred format.
 
 ```mermaid
 flowchart LR
@@ -41,11 +41,11 @@ flowchart LR
     style H fill:#ff9800,color:#000
 ```
 
-The orange highlight on Storyline 2+ is the known gap. The amber on image-only PDF is what OCR fallback solves. The rest are working, with extractor-specific quirks documented per-script.
+The orange highlight on Storyline 2+ is the known gap. The amber on image-only PDF is what OCR fallback solves. The rest are working, with extractor-specific quirks documented per script.
 
 ## §2 The 16 extractors
 
-Each extractor has its own quirks — its own format-specific tricks for finding actual content in whatever the source authoring tool produced.
+Each extractor has its own quirks — its own format-specific tricks for digging actual content out of whatever the source authoring tool produced.
 
 | Extractor | Format | Notable tricks |
 | --- | --- | --- |
@@ -128,11 +128,11 @@ The two anchor numbers worth remembering:
 - **Course 6702 (Moodle MBZ): 19,482 words at $0.01.** The fast path. Most of the cost is the modernize LLM call; extraction itself is essentially free.
 - **SME Review PDF: 1,710 words at $0.008.** This was an image-only scanned PDF that produced zero words on the text-layer extractor. OCR fallback at ~$0.001/page recovered the entire document. It cost roughly the same as a 1,710-word text-layer PDF would have cost.
 
-The cost-per-word for OCR is higher than for text-layer (about 4× per word), but the alternative is zero words. The economics are: **OCR is the unlock, not the optimization.** Image-only PDFs were producing nothing before this fallback existed.
+Cost-per-word for OCR is higher than text-layer — about 4× — but the alternative is zero words. The economics are clean: **OCR is the unlock, not the optimization.** Image-only PDFs produced nothing before this fallback existed.
 
 ## §4 PDF-OCR economics
 
-The OCR fallback is the single most-impactful extractor in the matrix. It is also the cheapest LLM-vision call we make.
+The OCR fallback is the single most impactful extractor in the matrix. It's also the cheapest LLM-vision call we make.
 
 ```python
 # extract_pdf.py — OCR fallback decision
@@ -152,15 +152,15 @@ def extract_with_ocr_fallback(pdf_path: Path) -> ExtractedContent:
 MIN_WORDS_FOR_TEXT_LAYER = 200  # under this, OCR fallback
 ```
 
-DeepInfra's Llama-3.2-90B-Vision at ~$0.001 per page. A typical 50-page community-college syllabus PDF costs about $0.05 to OCR. A short 8-page reference handout costs less than a cent.
+DeepInfra's Llama-3.2-90B-Vision at ~$0.001 per page. A typical 50-page community-college syllabus PDF costs about $0.05 to OCR. A short 8-page reference handout runs under a cent.
 
-Validation cluster: AGRI domain validated at 88.6% real-content recovery via OCR fallback. HIS-280 (a multi-course historical-document series with all-image PDFs) went from 0% real content to 100% real content. The before-after on HIS-280 is the strongest single argument for adding OCR fallback to any pipeline that ingests real-world PDFs.
+Validation cluster: AGRI domain validated at 88.6% real-content recovery via OCR fallback. HIS-280 — a multi-course historical-document series with all-image PDFs — went from 0% real content to 100% real content. That before-after on HIS-280 is the strongest single argument for adding OCR fallback to any pipeline that ingests real-world PDFs.
 
 ## §5 Dispatcher order matters
 
 Dispatching is routing logic, but it's also safety logic.
 
-Articulate Storyline output is a `.zip` file. IMSCC packages are also `.zip` files (renamed `.imscc`, but `.zip` works too — and historical Articulate exports sometimes ship as plain `.zip`). For a long time, the dispatcher tried IMSCC extraction first because it was the most common case. When a Storyline zip arrived, IMSCC extraction wouldn't error — it would just return empty content. Pipeline continued. Modernize generated coherent garbage from titles.
+Articulate Storyline output is a `.zip` file. IMSCC packages are also `.zip` files (renamed `.imscc`, but `.zip` works too — and historical Articulate exports sometimes ship as plain `.zip`). For a long time, the dispatcher tried IMSCC extraction first because it was the most common case. When a Storyline zip arrived, IMSCC extraction wouldn't error — it would just return empty content. Pipeline continued. Modernize generated coherent garbage from the titles.
 
 The fix: Storyline detection runs *before* IMSCC dispatch. Specificity-first ordering. The dispatcher now looks for Storyline-specific signature paths (`sco_content/`, `scormcontent/`, `meta.xml` with Articulate signatures) and routes to `extract_storyline.py` if any match. Only if no match does it fall through to IMSCC.
 
@@ -177,7 +177,7 @@ Storyline 2+ produces a different structure. Lesson content lives in a `data.js`
 
 Our detection logic correctly identifies Storyline 2+ files (signature paths in the zip — `mobile/`, `lib/`, `assets/data.js` with eval-pack signatures) and routes them to `extract_storyline.py`. The extractor then returns empty content because it only handles the older XML format.
 
-Real impact: items 223, 4229, and 4976 (a medical training series) are blocked. Detection is right; extraction is incomplete. The detection-correct-extraction-empty pattern looks identical to "this format isn't supported" until you read the dispatcher logs and see "routed to extract_storyline" and "returned 0 words" and realize it tried.
+Real impact: items 223, 4229, and 4976 — a medical training series — are blocked. Detection is right; extraction is incomplete. The detection-correct-extraction-empty pattern looks identical to "this format isn't supported" until you read the dispatcher logs and see "routed to extract_storyline" and "returned 0 words" and realize it tried.
 
 ```python
 # extract_storyline.py — current state
@@ -218,14 +218,14 @@ Twenty-nine regression tests exist across the extractor suite. Most are extracto
 
 The biggest single unlock for the next 100 courses is the Storyline 2+ extractor. Headless V8 to evaluate `data.js`, snapshot state, walk the lesson tree. The medical-series blockers (items 223 / 4229 / 4976) are high-value courses sitting in triage waiting on this.
 
-Second priority: a `.dat` parser improvement for Blackboard. The current implementation handles the common case. Some Blackboard exports use newer `.dat` schemas with embedded XML islands; we currently pass those to the generic walker and lose structure. About 12 courses in triage are blocked here.
+Second priority: a `.dat` parser improvement for Blackboard. The current implementation handles the common case. Some Blackboard exports use newer `.dat` schemas with embedded XML islands; we currently pass those to the generic walker and lose structure. About 12 courses in triage are blocked there.
 
-Third priority: a real EPUB extractor for the long-form coursework that comes as EPUBs. We have a thin wrapper around the spine but lose embedded media. Probably 6-8 courses blocked.
+Third priority: a real EPUB extractor for the long-form coursework that arrives as EPUBs. There's a thin wrapper around the spine but it loses embedded media. Probably 6-8 courses blocked.
 
-The pattern across all three: each new extractor is a constant cost ($0.01-$0.10/course) for an entire blocked cluster of courses. The unit economics work out in single-digit dollars to unlock dozens of courses. Compared to the cost of *not* extracting them (zero published content from those bundles), the math is straightforward.
+The pattern across all three: each new extractor is a constant cost ($0.01-$0.10/course) for an entire blocked cluster. Single-digit dollars to unlock dozens of courses. Compared to the cost of *not* extracting them — zero published content from those bundles — the math is straightforward.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Pipeline-engineering as a service</h3>
-  <p className="mt-3 text-white/70">Storyline 2+ unlock is in our roadmap. If your corpus is blocked on a format we haven't covered yet — Captivate, Lectora, custom HTML5 wrappers, anything — talk to us.</p>
+  <p className="mt-3 text-white/70">Storyline 2+ is on the roadmap. If your corpus is blocked on a format I haven't covered yet — Captivate, Lectora, custom HTML5 wrappers, anything — that's the kind of work Go7Studio takes on. Small studio, real receipts.</p>
   <Link href="/contact" className="btn-primary mt-6 inline-flex">Talk to Go7Studio</Link>
 </div>

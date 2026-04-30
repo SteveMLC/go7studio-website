@@ -19,13 +19,13 @@ schemaType: "Article"
 
 # I Built Two SEO Agents and Disabled Them Before They Posted Anything
 
-Scout and Ivy were architecturally finished. Tests passed. Cron lines were ready. Both were going to push content under brand accounts on a recurring schedule. Neither posted anything. I disabled both on day two of their build.
+Scout and Ivy were architecturally finished. Tests passed. Cron lines were ready. Both were about to push content to brand accounts on a recurring schedule.
 
-This post is why that happened, the four-question pre-flight test that would have caught it earlier, and the negative-space lesson that came out of building two finished agents that weren't ready to be alive.
+I disabled both on day two of their build, before they posted a single word. This post is why — and the four-question pre-flight test that would have caught it earlier than day two.
 
 ## Two finished agents on the shelf
 
-Scout and Ivy were the first two-thirds of a three-stage SEO pipeline. Scout was supposed to scan target communities (Qualora-relevant subreddits, Quora topics) on a six-hour cron, score posts, and fill a queue. Ivy was supposed to pick from the queue, draft platform-native replies, and hold them for human approval.
+Scout and Ivy were the first two-thirds of a three-stage SEO pipeline. Scout would scan target communities (Qualora-relevant subreddits, Quora topics) on a six-hour cron, score posts, and fill a queue. Ivy would pick from the queue, draft platform-native replies, and hold them for human approval.
 
 ```text
 # Cron lines, both currently disabled
@@ -65,9 +65,9 @@ The architecture was clean. The business case was clear (Qualora's organic distr
 | Postiz routing | Not yet wired | Approved drafts had no destination |
 | Daily reply cap (Reddit) | Defined (3-5/day) | Theoretical, untested against real account |
 
-An agent without an output channel generates costs without value. Eight runs per day at LLM-call rates is non-trivial spend with no offsetting output. Worse, eight runs per day of draft generation against an empty downstream pipeline means a queue that grows indefinitely, dry-run logs that fill disk, and an agent that *looks* productive while accomplishing nothing.
+An agent without an output channel generates cost without value. Eight runs/day at LLM-call rates is non-trivial spend with no offsetting output. Worse, an agent drafting into an empty downstream pipeline produces a queue that grows indefinitely, dry-run logs that fill disk, and the *appearance* of productivity while accomplishing nothing.
 
-The decision was the right one within hours. Disable both. Document the prerequisites. Wait until the surfaces are real. Re-enable when the four-question pre-flight passes.
+The decision became obvious within hours. Disable both. Document the prerequisites. Wait until the surfaces are real. Re-enable when the four-question pre-flight passes.
 
 ## The 4-question pre-flight test
 
@@ -97,9 +97,9 @@ Any "no" means don't run. Scout and Ivy failed Q1 (surfaces didn't exist) and Q2
 ## What I learned after 6 months
 
 > [!IMPORTANT]
-> Build the surface area, then audit if it deserves to be live. Most failed agents weren't bad code — they were correct code without a real-world hook. Scout and Ivy will come back online after Petra's warmup phase completes ([the awkward repair on the publish tier](/blog/petra-reddit-signup)).
+> Build the surface, then audit whether it deserves to be live. Most failed agents weren't bad code — they were correct code without a real-world hook. Scout and Ivy will come back online after Petra's warmup phase completes ([the awkward repair on the publish tier](/blog/petra-reddit-signup)).
 
-The deeper lesson is about the order I built things in. I built the agents before I built the accounts. That feels backwards now, but in the moment it felt natural — agents are the interesting work, accounts are paperwork. Building the agents first meant the agents were ready to fire before there was anywhere for them to fire at, which is exactly the failure mode the pre-flight test catches.
+The deeper lesson is about the order I built things in. I built the agents before I built the accounts. That feels backwards now, but in the moment it felt natural — agents are the interesting work, accounts are paperwork. The result: the agents were ready to fire before there was anywhere for them to fire at. That's exactly the failure mode the pre-flight test catches.
 
 The corrected order, going forward:
 
@@ -108,7 +108,7 @@ The corrected order, going forward:
 3. Wire the routing (Postiz, scheduler, whatever the connector is).
 4. *Then* build the agent that fills the destination.
 
-The publish tier (Petra) is now mid-warmup on a real Reddit account. Once Petra's gates clear, Scout and Ivy come back online — not because the agents got better, but because the surfaces became real.
+The publish tier (Petra) is now mid-warmup on a real Reddit account. Once Petra's gates clear, Scout and Ivy come back online — not because the agents got better, but because the surfaces caught up.
 
 ## Fire-able-agent criteria
 
@@ -124,12 +124,12 @@ FIRE-ABLE SIGNALS — take this agent offline
 [ ] Heartbeats green but no novel output for >14 days (cognition dead)
 ```
 
-Cron-running agents with no fire-able output are worse than no agents — they generate cost, fill logs, and create a false sense of activity that masks real bottlenecks. Better to disable cleanly with a written re-enable plan than to leave them running because shutting them down feels like admitting failure.
+Cron-running agents with no fire-able output are worse than no agents — they generate cost, fill logs, and produce a false sense of activity that masks the real bottlenecks. Better to disable cleanly with a written re-enable plan than to keep them running because shutting them down feels like admitting failure.
 
 Scout and Ivy weren't a failure. They were a sequence error. The fix is the four-question test, applied before the cron starts firing. The agents will run when the surfaces deserve them.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Get the next AI Lab post</h3>
-  <p className="mt-3 text-white/70">The lab covers agent design, fire-able signals, and the routing stack behind a one-person studio. New post every couple of weeks.</p>
-  <Link href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe</Link>
+  <p className="mt-3 text-white/70">One post every couple of weeks from a one-person studio that's been disabling its own agents long enough to know when to. Agent design, fire-able signals, and the routing stack behind it all.</p>
+  <Link href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe to AI Lab</Link>
 </div>

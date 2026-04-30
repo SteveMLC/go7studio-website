@@ -18,13 +18,13 @@ schemaType: "Article"
 
 Two routes. Four courses. Two outcomes.
 
-Two of those courses produced excellent learner-facing material. Two produced fluent, plausible, completely-disconnected-from-source garbage. The difference between them was a threshold we had not yet named, sitting silently in a `_manifest_docs/` word count we weren't reading.
+Two produced excellent learner-facing material. Two produced fluent, plausible, completely-disconnected-from-source garbage. The difference was a threshold I hadn't yet named, sitting quietly inside a `_manifest_docs/` word count nobody was reading.
 
-This post is the story of how we discovered that threshold, the rich-source guard we now require, and the 16 pipeline commits behind one routing decision.
+This is the story of how I found that threshold, the rich-source guard I now require, and the 16 pipeline commits behind one routing decision.
 
 ## §1 Two pipelines, four courses
 
-We have two routes for moving a course from extracted source to publishable lesson:
+There are two routes for moving a course from extracted source to publishable lesson:
 
 |   | Skeleton modernize works | Skeleton modernize lies |
 | :-: | :-: | :-: |
@@ -35,15 +35,15 @@ We have two routes for moving a course from extracted source to publishable less
 
 The two interesting cells are the diagonal: **course 769 worked on skeleton because the source was thin and the title structure was strong**, and **course 918 needed content-first because it had 94K words of real source material that skeleton would have ignored**.
 
-What surprised me was that we shipped course 918 on the skeleton route initially, and it produced fluent, plausible, generic survey content. It read like a textbook. It bore essentially no relationship to the actual 94K-word IMSCC source.
+The thing that surprised me: I shipped course 918 on the skeleton route initially. It produced fluent, plausible, generic survey content. Read like a textbook. Bore essentially no relationship to the actual 94K-word IMSCC source.
 
-That was when I learned what `skeleton_modernize` actually did.
+That was the day I learned what `skeleton_modernize` actually did.
 
 ## §2 What skeleton_modernize actually does
 
-The misconception I'd been operating under: "skeleton_modernize uses the source material lightly — it preserves the lesson structure but smooths the prose and adds modern pedagogical scaffolding."
+The misconception I'd been operating under: "skeleton_modernize uses the source material lightly — it preserves lesson structure but smooths the prose and adds modern pedagogical scaffolding."
 
-The reality:
+Wrong. Here's the reality:
 
 > [!CAUTION]
 > `skeleton_modernize` does NOT consume `_manifest_docs/` PDF or PPTX content. It generates lesson bodies from titles, learning objectives, and standard pedagogical templates for the topic. The source material in `_manifest_docs/` is not in the prompt. It is not in the context. It does not influence the output.
@@ -70,11 +70,11 @@ Do NOT invent specific case studies or named examples.
 """
 ```
 
-Notice what's not there: the source content. The actual material in `_manifest_docs/`. The original lessons from the source bundle.
+Notice what's missing: the source content. The actual material in `_manifest_docs/`. The original lessons from the source bundle.
 
-This is *fine* when the source is thin — when there are 1,500 words of brittle, fragmentary source material with strong titles, and you want the LLM to fill in around the structural skeleton. The titles and learning objectives are real (preserved from source). The body is generated to match.
+This is *fine* when the source is thin — 1,500 words of brittle, fragmentary material with strong titles, where you want the LLM to fill in around the structural skeleton. Titles and learning objectives are real (preserved from source). Body is generated to match.
 
-It is *catastrophic* when the source is rich — when there are 94K words of real source material that would have been the actual lesson content, and instead the LLM generates a generic substitute that ignores all of it.
+It's *catastrophic* when the source is rich — 94K words of real material that would have been the actual lesson content, replaced by a generic substitute that ignores all of it.
 
 ## §3 When skeleton works — Course 769
 
@@ -105,7 +105,7 @@ Sample lesson opening from course 769:
 >
 > The most common defect by far is porosity...
 
-That content is reasonable. It is not from any specific source — it is what a competent curriculum writer would produce for "Identifying Common Welding Defects" if asked. The pedagogy is standard. The factual claims are general and true. There are no fabricated specifics.
+That content is reasonable. It's not from any specific source — it's what a competent curriculum writer would produce for "Identifying Common Welding Defects" if asked. The pedagogy is standard. The factual claims are general and true. No fabricated specifics.
 
 The course shipped on this route. Learner outcomes were good. **Course 769 is the skeleton-route archetype.**
 
@@ -136,7 +136,7 @@ Side-by-side comparison of the same lesson title, skeleton output vs content-fir
 
 > Reconstruction failed for many reasons. The federal government's commitment wavered as Northern attention shifted to economic concerns. Southern white resistance, including violence by groups like the Ku Klux Klan, undermined Black political participation. The withdrawal of federal troops in 1877 marked a turning point...
 
-That's a textbook paragraph. It's accurate. It's also generic. Any high-school US History textbook contains this paragraph.
+That's a textbook paragraph. Accurate. Also generic. Any high-school US History textbook contains a version of this paragraph.
 
 **Content-first rebuild output (same lesson):**
 
@@ -148,9 +148,9 @@ That's a textbook paragraph. It's accurate. It's also generic. Any high-school U
 >
 > Each speaker frames Reconstruction's failure differently. Douglass argues for political rights as the foundation; the Mississippi Plan documents the violent strategy that undid those rights; Tourgée writes after the fact about what was lost...
 
-That's the actual lesson the original instructor wrote. It's specific. It's grounded in primary sources. It teaches the lesson the original course was built to teach.
+That's the actual lesson the original instructor wrote. Specific. Grounded in primary sources. Teaching the lesson the original course was built to teach.
 
-The difference is not pedagogy. The difference is whether the LLM saw the source material.
+The difference isn't pedagogy. The difference is whether the LLM ever saw the source material.
 
 ## §5 The threshold
 
@@ -235,14 +235,14 @@ The decision wasn't a single commit. It was a 16-commit refactor of the routing 
 
 Your routing logic IS your safety logic.
 
-When we route a course to `skeleton_modernize`, we are making a claim: this course has thin source, and the LLM should fill in around the structural skeleton. The claim is binding. If we route a course wrong, the LLM faithfully executes a wrong claim — fluently, plausibly, irrecoverably.
+When I route a course to `skeleton_modernize`, I'm making a claim: this course has thin source, and the LLM should fill in around the structural skeleton. The claim is binding. Route a course wrong and the LLM faithfully executes the wrong claim — fluently, plausibly, irrecoverably.
 
-The 5K/20K threshold is not a tuning parameter. It is a guard. The rich-source guard in `skeleton_modernize.py` is what makes the threshold real. The env-flag override is what makes the guard auditable. The canary test (`canary_skeleton_rich_source_guard`) is what makes the override impossible to silently regress.
+The 5K/20K threshold isn't a tuning parameter. It's a guard. The rich-source guard in `skeleton_modernize.py` is what makes the threshold real. The env-flag override is what makes the guard auditable. The canary test (`canary_skeleton_rich_source_guard`) is what makes the override impossible to silently regress.
 
 In any LLM pipeline that has multiple routes — fast path / slow path, summarize / synthesize, paraphrase / rewrite — the route decision is itself a safety decision. Build the guard at the script level. Make the override accountable. Plant a canary. Then sleep at night.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Pipeline-engineering as a service</h3>
-  <p className="mt-3 text-white/70">"When to let the LLM fill in vs when to extract real source" is the central question for any content-pipeline buyer. If your pipeline has multiple routes, talk to us.</p>
+  <p className="mt-3 text-white/70">"When to let the LLM fill in vs when to extract real source" is the central question for any content-pipeline buyer. If your pipeline has multiple routes and the wrong one would lie convincingly, that's the work Go7Studio takes on. Small studio, real receipts.</p>
   <Link href="/contact" className="btn-primary mt-6 inline-flex">Talk to Go7Studio</Link>
 </div>

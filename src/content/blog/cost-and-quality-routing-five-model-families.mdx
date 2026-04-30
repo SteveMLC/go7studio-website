@@ -17,9 +17,9 @@ ogImage: "/images/og/cost-and-quality-routing-five-model-families.jpg"
 schemaType: "Article"
 ---
 
-If you are running a fixed-budget AI studio, you cannot afford to route everything to the strongest model.
+If you're running a fixed-budget AI studio, you can't afford to route everything to the strongest model. I learned that the expensive way.
 
-The interesting question is not which model is best. The interesting question is which model goes where. Best-model-per-call beats best-model-overall every time, because the cost difference between routing well and routing badly compounds across thousands of calls per day.
+The interesting question isn't which model is best. It's which model goes where. Best-model-per-call beats best-model-overall every time, because the cost difference between routing well and routing badly compounds across thousands of calls per day.
 
 This is the routing layer I run today. Five model families, six call types, real production cost numbers, and the fallback chains that keep the whole thing bounded.
 
@@ -41,9 +41,9 @@ flowchart LR
 
 The routing layer is the seam. The routing layer makes per-call decisions about which model to use, what reasoning level to spend, and what the fallback chain looks like if the primary fails.
 
-The five families are wired through one harness because none of them is best at everything. Opus catches errors GPT-5.4 misses. GPT-5.4 produces content faster than Opus. Kimi handles long contexts cheaper than either. MiniMax runs heartbeat-rate inference for less than the price of a coffee per month. Sonnet is the workhorse middle that fills the gaps.
+Five families wired through one harness because none of them is best at everything. Opus catches errors GPT-5.4 misses. GPT-5.4 produces content faster than Opus. Kimi handles long contexts cheaper than either. MiniMax runs heartbeat-rate inference for less than the price of a coffee per month. Sonnet is the workhorse middle that fills the gaps.
 
-If I tried to route every call to Opus, I'd be out of budget in a week. If I tried to route every call to MiniMax, my audit calls would miss things that matter. The routing layer is the answer to "how do you afford to ship this much content."
+Route every call to Opus and I'm out of budget in a week. Route every call to MiniMax and my audit calls miss things that matter. The routing layer is the answer to "how do you afford to ship this much content."
 
 ## The model card
 
@@ -74,7 +74,7 @@ Six call types. Each one has a primary, a secondary, and a fallback.
 
 The taxonomy is the routing rule. The model selection follows from the taxonomy, not the other way around.
 
-When somebody on the team asks "which model should I use for X," the answer is not a model name. The answer is "what call type is this?" Once you know the call type, the model is determined. The discipline is in classifying the call correctly.
+When somebody on the team asks "which model should I use for X," the answer isn't a model name. It's "what call type is this?" Once you know the call type, the model is determined. The discipline is classifying the call correctly.
 
 ## Per-call `reasoning_effort`
 
@@ -99,7 +99,7 @@ The previous post covered why. Setting `model_reasoning_effort = "xhigh"` global
 
 MiniMax is the family in this stack that surprises people most.
 
-Hydra (my multi-strategy trading desk) runs on MiniMax. The numbers: 4.5s per call, $30/month, 15K calls per window, started at roughly 1% utilization (31 calls per hour against a 3000 calls per hour ceiling).
+Hydra — my multi-strategy trading desk — runs on MiniMax. Numbers: 4.5s per call, $30/month, 15K calls per window, currently at about 1% utilization (31 calls/hr against a 3,000 calls/hr ceiling).
 
 ```mermaid
 quadrantChart
@@ -119,9 +119,9 @@ quadrantChart
 
 MiniMax sits in the bottom-right: high-frequency, low-stakes. That's where it earns its keep. It's the right model for tight loops where you need an inference every few seconds and the cost of a single shallow answer is roughly nothing.
 
-It's the wrong model for one-shot reasoning. If you need a single answer that has to be right, do not call MiniMax. The shallow-but-cheap profile is the whole point; trying to use it for review or audit is using a hammer to drive screws.
+It's the wrong model for one-shot reasoning. If you need a single answer that has to be right, don't call MiniMax. The shallow-but-cheap profile is the whole point; using it for review or audit is using a hammer to drive screws.
 
-The pattern that works: route any high-frequency low-stakes inference to MiniMax. Examples include: heartbeat probes for agent liveness, novelty hashes on agent output, light classification of incoming events, "should this trigger a deeper review?" gates. None of those needs Opus. All of them benefit from MiniMax's cost structure.
+The pattern that works: route any high-frequency low-stakes inference to MiniMax. Heartbeat probes for agent liveness. Novelty hashes on agent output. Light classification of incoming events. "Should this trigger a deeper review?" gates. None of those needs Opus. All of them love MiniMax's cost structure.
 
 ## Fallback chains
 
@@ -150,9 +150,9 @@ The review chain is shorter than the content-gen chain because there are fewer c
 
 The number that matters is not cost-per-call. The number that matters is cost-per-*accepted*-output, which factors in retries.
 
-A call type with a 95% accept rate has a cost-per-accepted-output close to its cost-per-call. A call type with an 80% accept rate has a cost-per-accepted-output that's 25% higher than naive cost-per-call would suggest. The 5% of calls you re-run are real money.
+A call type with 95% accept rate has cost-per-accepted-output close to its cost-per-call. A call type at 80% accept rate runs 25% higher than naive cost-per-call would suggest. The 5% of calls you re-run are real money.
 
-The takeaway: accept rate is part of the cost model. A model that's 20% cheaper but has a 70% accept rate is worse than a model that's 20% more expensive at 95% accept rate. Cost-per-call is a vanity metric. Cost-per-accepted-output is the metric that survives a budget meeting.
+Accept rate is part of the cost model. A 20%-cheaper model at 70% accept rate is worse than a 20%-more-expensive model at 95% accept rate. Cost-per-call is a vanity metric. Cost-per-accepted-output is the metric that survives a budget meeting.
 
 In practice this means tracking three numbers per call type, not one:
 
@@ -189,10 +189,10 @@ I will revisit this when one of three things happens:
 
 Until then: five families, one harness, per-call routing, fallback chains. The routing layer is what makes the rest of the studio possible.
 
-If you are running a fixed-budget AI shop and you find yourself routing everything to the strongest model, the leverage is in routing better, not in finding a stronger model. The strongest model isn't the one your budget rewards. The strongest routing is.
+If you're running a fixed-budget AI shop and you find yourself routing everything to the strongest model, the leverage isn't in finding a stronger model. It's in routing better. The strongest model isn't the one your budget rewards. The strongest routing is.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Get the next AI Lab post</h3>
-  <p className="mt-3 text-white/70">One post a month on real production AI. No fluff. The series so far covers the agent harness, the bypass casualty, the operator role, the config bottleneck, the work-order field manual, and now the routing matrix.</p>
+  <p className="mt-3 text-white/70">One post a month from a production system that's currently breaking and getting fixed. The series so far: the agent harness, the bypass casualty, the operator role, the config bottleneck, the work-order field manual, and now the routing matrix. No fluff.</p>
   <a href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe to AI Lab</a>
 </div>

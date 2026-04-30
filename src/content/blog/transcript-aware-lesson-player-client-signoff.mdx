@@ -23,7 +23,7 @@ There's a moment in every client demo where you find out whether you've shipped.
 
 For our [NEALAC Learning Hub](https://drannnealac.com) build with Dr. Ann Leonard-Zabel, that moment came at minute four. She paused the video, clicked a sentence in the transcript pane, and the video jumped to that timestamp. She watched the seek happen, looked back at me, and said yes.
 
-Three UX choices closed that demo. None of them are novel. All of them are missing from the default video player every other CE platform ships. This post is the engineering breakdown.
+Three UX choices closed that demo. None of them are novel. All of them are missing from the default video player every other CE platform ships. Here's the engineering breakdown.
 
 ## Section 1: Default video UX is for entertainment, not learning
 
@@ -37,7 +37,7 @@ A learner is not along for the ride. A learner is asking:
 
 The default player makes them scrub. They drag the seek bar around, watching frames flash by, hoping to land on the right point. They miss it, overshoot, scrub back, miss again. After three rounds of that, they give up and watch the section over from the start.
 
-That's a 15-minute cost on a 60-second question. It's the friction that makes professional learners hate online CE.
+That's a 15-minute cost on a 60-second question. It's the friction that makes professional learners hate online CE — and quietly walk away from any platform that ships it.
 
 The fix is to give them the document — the transcript — as the navigation surface, and tie it to the video. The video plays linearly; the transcript is searchable, scrollable, and clickable. When you click a sentence, the video moves there. When the video reaches a sentence, the transcript highlights it. Two surfaces, one source of truth.
 
@@ -45,13 +45,13 @@ The fix is to give them the document — the transcript — as the navigation su
 
 That's the headline. Here's the implementation breakdown.
 
-**1. Auto-scroll.** As the video plays, the transcript pane scrolls so the active line stays centered. The learner doesn't have to chase the cursor; the cursor stays in their gaze and the text moves under it.
+**1. Auto-scroll.** As the video plays, the transcript pane scrolls so the active line stays centered. The learner doesn't chase the cursor; the cursor stays in their gaze and the text moves under it.
 
 **2. Click-to-seek.** Click any sentence in the transcript. Video jumps to that timestamp. No scrubbing. No "approximately the right place." Sentence-precise navigation.
 
 **3. Sticky-on-scroll.** Scroll the lesson body downward to read instructor notes or examine a diagram. The video player and transcript stay pinned to the top of the viewport. The learner never loses access to the lecture while reading the surrounding study material.
 
-Three features. Conceptually small. UX-significant. And the same component layer hosts the compliance enforcement, which is the second-order win.
+Three features. Conceptually small. UX-significant. And the same component layer hosts compliance enforcement — which is the second-order win.
 
 ## Section 3: How we built it
 
@@ -143,7 +143,7 @@ flowchart TD
     OK --> UPDATE
 ```
 
-UX and compliance share an enforcement layer. That's not a coincidence — it's the design. If we'd built UX in one component and compliance in another, we'd have two implementations of "what does seek mean," they'd drift, and a future refactor would silently break one of the two contracts. By making the player layer the only place that touches `videoEl.currentTime`, both contracts hold together.
+UX and compliance share an enforcement layer. Not a coincidence — that's the design. If we'd built UX in one component and compliance in another, we'd have two implementations of "what does seek mean," they'd drift, and a future refactor would silently break one of the two contracts. By making the player layer the only place that touches `videoEl.currentTime`, both contracts hold together.
 
 ## Section 5: The chapter-time bug
 
@@ -169,9 +169,9 @@ One line. Biggest single perceived improvement of the whole UX pass. The lesson:
 
 Every client demo since NEALAC has had the same arc. We get to the lesson player. The client clicks a transcript line. The video jumps. They lean forward.
 
-The reason it works as a closer is that it solves the actual job-to-be-done in two seconds, in front of them. Most edtech demos involve a lot of words about "engagement" and "outcomes" and "retention." Click-to-seek is just the platform doing the obvious right thing, visibly, immediately.
+The reason it works as a closer: it solves the actual job-to-be-done in two seconds, in front of them. Most edtech demos involve a lot of words about "engagement" and "outcomes" and "retention." Click-to-seek is just the platform doing the obvious right thing, visibly, immediately.
 
-If you're building an edtech platform, this is what we recommend you ship first. Whisper transcripts cost roughly $0.36 per hour of audio at large-v3. The player layer is a day. The conversion-rate lift on demo close is the difference between "let me think about it" and "yes."
+If you're building an edtech platform, this is the thing to ship first. Whisper transcripts cost roughly $0.36 per hour of audio at large-v3. The player layer is a day. The conversion lift on demo close is the difference between "let me think about it" and "yes."
 
 We built it for [drannnealac.com](https://drannnealac.com) because the audience is professional learners who actually *use* the transcript. Every Go7Studio edtech build since has shipped with the same player. If you want one for your platform, we'll build it.
 

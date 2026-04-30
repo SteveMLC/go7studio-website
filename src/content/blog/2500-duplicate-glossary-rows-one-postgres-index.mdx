@@ -19,11 +19,11 @@ schemaType: "Article"
 
 ## How GSC told us
 
-There is a panel in Google Search Console called **Coverage → Duplicate, Google chose different canonical**. We had 256 URLs in it.
+There's a panel in Google Search Console called **Coverage → Duplicate, Google chose different canonical**. We had 256 URLs sitting in it.
 
 <Image src="/images/blog/gsc-duplicate-canonical-panel.png" alt="GSC Coverage panel showing 256 URLs flagged as duplicate, Google chose different canonical" />
 
-The flagged URLs clustered in module pages where the same glossary term appeared identically across many courses. So `/courses/856/networks/distribution-layer` and `/courses/856/networks/distribution-layer` were two URLs that looked, to Google, like the same content with two URLs. Eight more variants of the same problem on adjacent courses.
+The flagged URLs clustered in module pages where the same glossary term appeared identically across many courses. To Google, eight URLs were serving the same paragraph. Eight more variants of the same problem on adjacent courses.
 
 I pulled the live database and wrote a deduplication query before I wrote anything else.
 
@@ -55,7 +55,7 @@ The results were ugly.
 
 In total: **2,523 redundant glossary rows across 205 published courses**.
 
-The two top offenders explain how it accumulated. Course 856 had 17 verbatim copies of "distribution layer" *in the same section* — which only happens if a process was inserting on every run instead of upserting. Course 74 had 37 distinct terms, each appearing 5 times, which means whatever was running had been running 5 times.
+The two top offenders tell the story. Course 856 had 17 verbatim copies of "distribution layer" *in the same section* — which only happens when a process inserts on every run instead of upserting. Course 74 had 37 distinct terms, each appearing 5 times, which means whatever was running had been running 5 times.
 
 ## The seeder bug at line 1672
 
@@ -78,9 +78,9 @@ Our deploy cadence answered the "how did this hit 17 copies" question without me
 
 ## The partial unique index that ended it
 
-There is a constraint shape that solves this exactly without breaking everything else: a Postgres **partial unique index**.
+There's a constraint shape that solves this exactly without breaking everything else: a Postgres **partial unique index**.
 
-We could not put a unique constraint on `course_materials(course_id, section_id, title)` globally because non-glossary materials legitimately repeat — a "Lab Setup" section header, a "Practice Quiz" anchor, recurring rubric titles. Those need to coexist.
+We couldn't put a unique constraint on `course_materials(course_id, section_id, title)` globally because non-glossary materials legitimately repeat — "Lab Setup" section headers, "Practice Quiz" anchors, recurring rubric titles. Those need to coexist.
 
 But for glossary specifically, `(course_id, section_id, normalized_title)` should be unique by the schema's own definition.
 
@@ -161,8 +161,8 @@ Qualora's content is reshaped from real human sources — instructor materials, 
 
 Two things.
 
-First, partial unique indexes are massively under-used. Postgres lets you constrain a subset of rows by predicate — exactly the right tool when one column is a discriminator over what "uniqueness" should mean (`material_type` here). If you find yourself wishing you could put a unique constraint on a slice of a table, you probably can.
+First, partial unique indexes are massively under-used. Postgres lets you constrain a subset of rows by predicate — exactly the right tool when one column is a discriminator over what "uniqueness" should mean (`material_type` here). If you ever wish you could put a unique constraint on a slice of a table, you probably can.
 
-Second, **ON CONFLICT DO UPDATE** with explicit `targetWhere` matches the index predicate. If the index is partial, the upsert clause has to be partial too, or you'll get a "no unique or exclusion constraint matching the ON CONFLICT specification" error at runtime. We hit it once. Now we don't.
+Second, **ON CONFLICT DO UPDATE** needs a `targetWhere` that matches the index predicate. If the index is partial, the upsert clause has to be partial too, or you'll get a "no unique or exclusion constraint matching the ON CONFLICT specification" error at runtime. We hit it once. Now we don't.
 
-The next thing on the list is the duplicate-canonical follow-up at the page-render layer for non-glossary content, which is a different shape of problem (data layer is fine, render is mixing per-page and shared state). Different post. Same general lesson: every "Google chose a different canonical" issue traces back to either your data layer or your render layer telling Google the same content lives at multiple URLs. Find which one. Fix it once.
+The next item is the duplicate-canonical follow-up at the page-render layer for non-glossary content — a different shape of problem (data layer is fine, render is mixing per-page and shared state). Different post. Same general lesson: every "Google chose a different canonical" issue traces back to either your data layer or your render layer telling Google the same content lives at multiple URLs. Find which one. Fix it once.

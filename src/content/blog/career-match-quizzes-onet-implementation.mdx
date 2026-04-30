@@ -19,12 +19,12 @@ schemaType: "Article"
 
 ## BuzzFeed quizzes are not assessment
 
-"Which Disney princess matches your work style?" is entertainment. It produces engagement, not direction. Most career quizzes that ship as features for engagement metrics fall in the same bucket — they're optimized for completion rate and shares, not for telling somebody something true.
+"Which Disney princess matches your work style?" is entertainment. It produces engagement, not direction. Most career quizzes that ship as engagement features fall in the same bucket — optimized for completion rate and shares, not for telling somebody something true about their career.
 
 > [!NOTE]
 > Engagement metric ≠ assessment quality. A quiz can be 100% completion rate and 0% useful for the question it pretends to answer.
 
-We wanted assessment. The user comes to Qualora because they want to figure out what to do with the next phase of their working life. A quiz that hands them a vibes-based answer is worse than no quiz — it produces false confidence and routes them toward courses that don't actually fit.
+We wanted assessment. The person taking the quiz on Qualora is usually trying to figure out what to do with the next phase of their working life. A vibes-based answer is worse than no quiz — it produces false confidence and routes them toward courses that don't fit.
 
 The standard for "real career assessment" already exists. We didn't have to invent it. We just had to implement it correctly.
 
@@ -67,7 +67,7 @@ flowchart LR
 
 No new assessment yet — the existing (less rigorous) quiz drove this. The point was to prove the funnel converted before paying the assessment-engineering cost.
 
-This is a thing I keep having to relearn. The temptation is always to build the best version of the feature first. The right move is to ship the lowest-quality version that proves the funnel, and only invest in the feature itself once you've measured the funnel converting at any quality bar. Phase 1 had Phase 1 traffic data before we wrote a Phase 2 question.
+This is a lesson I keep having to relearn. The temptation is always to build the best version of the feature first. The right move is to ship the lowest-quality version that proves the funnel, then invest in the feature itself once you've measured the funnel converting at any quality bar. Phase 1 had Phase 1 traffic data before we wrote a Phase 2 question.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">See it live on Qualora</h3>
@@ -129,7 +129,7 @@ function matchCareers(userVector: number[], profiles: CareerProfile[]) {
 }
 ```
 
-That's the whole matcher at the math layer. Eleven lines. The thing that makes it work is not the code — it is that the 34 career-profile vectors are seeded from O\*NET-SOC, which is the dataset states use to make labor-policy decisions. The signal lives in the input data, not the algorithm.
+That's the whole matcher at the math layer. Eleven lines. The thing that makes it work isn't the code — it's that the 34 career-profile vectors are seeded from O\*NET-SOC, the dataset states use to make labor-policy decisions. The signal lives in the input data, not the algorithm.
 
 ## The verification numbers
 
@@ -143,9 +143,9 @@ Three test profiles, three verifications. Each profile is a clean Holland Code w
 
 Each of those is a textbook O\*NET match. ICR is the canonical Medical Coder profile (analytical + procedure-driven + handling physical/digital records). RSI is the canonical EMT profile (hands-on + helping + analytical under pressure). ESA is the canonical Entrepreneurship profile (selling + people-oriented + creative problem-solving).
 
-Three matches at 98–99% is not noise. It is the system reproducing established, externally-verified mappings from a public-domain occupation database.
+Three matches at 98–99% isn't noise. It's the system reproducing established, externally-verified mappings from a public-domain occupation database.
 
-If the matcher had returned, say, "ICR → Welder, 87%," that would be a sign we had a bug — Welder is more Realistic-dominant. The fact that the canonical matches come back at 98%+ on canonical inputs tells us the vector seeding is faithful to the source data and the cosine math is doing what it should.
+If the matcher had returned "ICR → Welder, 87%," that would be a bug signal — Welder is more Realistic-dominant. The canonical matches coming back at 98%+ on canonical inputs tells us the vector seeding is faithful to the source data and the cosine math is doing what it should.
 
 ## Why Phase 1 first
 
@@ -156,10 +156,10 @@ The right order for revenue. If the funnel doesn't convert at any quality bar, a
 
 Three takeaways for anybody building career assessment, education products, or really any "match the user to a recommended path" feature:
 
-1. **Use the existing standard.** O\*NET is free, public domain, validated, and is the data state workforce systems are already using. If you're inventing your own framework, you're either inventing a worse O\*NET or marketing a brand around what amounts to the same six dimensions with different names.
+1. **Use the existing standard.** O\*NET is free, public domain, validated, and the dataset state workforce systems already use. If you're inventing your own framework, you're either inventing a worse O\*NET or marketing a brand around the same six dimensions with different names.
 2. **Cosine similarity is the right shape.** When you have a user-vector and a set of profile-vectors and want top-K matches, cosine similarity is the boring correct answer. Don't over-engineer it.
 3. **Ship the funnel first.** The best assessment in the world doesn't help if the user has nowhere productive to go after the result page. Build the post-quiz funnel before you build the quiz.
 
 Both phases shipped 2026-04-15. The O\*NET implementation has been live for two weeks at the time of this writing. The verification numbers above are from the matcher itself — same code path users hit.
 
-If you've taken our quiz, the math above is what produced your results. If you haven't yet, the link's a few paragraphs up.
+If you've taken our quiz, the math above is what produced your results. If you haven't, the link's a few paragraphs up.

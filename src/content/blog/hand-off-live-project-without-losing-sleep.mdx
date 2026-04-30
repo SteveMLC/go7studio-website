@@ -18,11 +18,11 @@ ogImage: "/images/og/hand-off-live-project-without-losing-sleep.jpg"
 schemaType: "Article"
 ---
 
-The version of "shipped" I've come to trust isn't the day the platform goes live. It's the day I close my laptop for the weekend and don't worry about the platform.
+The version of "shipped" I've come to trust isn't the day the platform goes live. It's the day I close my laptop for the weekend and don't worry about it.
 
-The first day is a release. The second day is a handoff. They are different jobs and the second one is where projects fail in slow motion — credentials still in someone's `.env`, a single admin account that holds the only working session, a video file on a Railway filesystem that's about to bill the client like an AWS surprise.
+Launch day is a release. The day after is a handoff. Different jobs — and the second one is where projects fail in slow motion. Credentials still in someone's `.env`. A single admin account that holds the only working session. A video file on a Railway filesystem that's about to bill the client like an AWS surprise.
 
-This post is the nine-item checklist I run at handoff. The example is the [NEALAC Learning Hub](https://drannnealac.com) launch with Dr. Ann Leonard-Zabel — a CE platform that went live and then needed to *stay* live, with a client who is a clinician, not a sysadmin.
+This is the nine-item checklist I run at handoff. The example is the [NEALAC Learning Hub](https://drannnealac.com) launch with Dr. Ann Leonard-Zabel — a CE platform that went live and then needed to *stay* live, with a client who is a clinician, not a sysadmin.
 
 ## Section 1: State at handoff
 
@@ -44,11 +44,11 @@ Handoff isn't "ship it." Handoff is "make this survive without me." That's a dif
 | 8 | Domain DNS + SSL cert auto-renew                      | Studio  | done          | Outage at 90 days from cert expiry           |
 | 9 | Handoff doc + walkthrough call                        | Joint   | done          | Tribal knowledge dies with project end       |
 
-Five done, two pending, one in progress, one joint-pending. The point of the table isn't to claim completeness — it's to make the *not-done* visible to both sides at the same time. A pending item the client can see is a pending item the client can ask about. A pending item neither of us has written down is an outage in three months.
+Five done, two pending, one in progress, one joint-pending. The point of the table isn't to claim completeness — it's to make the *not-done* visible to both sides at the same time. A pending item the client can see is a pending item the client can ask about. A pending item neither of us has written down is an outage three months from now.
 
 ## Section 3: NeonDB password rotation (the security item)
 
-Briefly during dev, a `.env` file got committed before `.gitignore` caught up to it. The Neon credential was visible in the git history for a few hours. We caught it, but the credential had been written. The remediation question: how do you make sure that credential isn't valid anymore?
+Briefly during dev, a `.env` file got committed before `.gitignore` caught up to it. The Neon credential was visible in the git history for a few hours. We caught it, but the credential had been written. The remediation question: how do you make sure that credential isn't valid anywhere anymore?
 
 Two options:
 
@@ -80,7 +80,7 @@ On the NEALAC E2E we caught two bugs that admin role had hidden:
 - A FK constraint in the section_quiz_gating join was using the admin's "all sections unlocked" flag implicitly. Non-admin students with `eligible: false` got a 500, not a 403. Fixed.
 - The certificate download was checking `userRole === 'admin'` for a debug-mode flag that should have been `process.env.NODE_ENV === 'development'`. Non-admin students got a "feature unavailable" stub PDF instead of the real one. Fixed.
 
-Neither bug had ever appeared in dev. Both were trivial. Both would have been a launch-day support fire.
+Neither bug had ever appeared in dev. Both were trivial. Both would have been a launch-day support fire on a clinician's calendar — exactly the moment you don't want one.
 
 ## Section 5: The content-attribution conversation
 
@@ -129,7 +129,7 @@ The platform is live, the audit passed, the credential is rotated, the E2E caugh
 
 I close my laptop on Friday and don't worry about it. That's the handoff bar.
 
-If you're considering an edtech build with us at Go7Studio, the handoff is the part we take most seriously — it's where most studio engagements quietly fail and it's the part our process is most explicit about. The result isn't just a live platform; it's a live platform that survives without us touching it for the next three months.
+If you're considering an edtech build with Go7Studio, the handoff is the part we take most seriously — it's where most studio engagements quietly fail, and it's the part of our process we're most explicit about. The result isn't just a live platform; it's a live platform that survives without us touching it for the next three months.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Build with Go7Studio</h3>

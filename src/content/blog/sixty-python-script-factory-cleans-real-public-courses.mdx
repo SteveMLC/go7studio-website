@@ -17,13 +17,13 @@ ogImage: "/images/og/sixty-python-script-factory-cleans-real-public-courses.jpg"
 schemaType: "Article"
 ---
 
-There are over sixty Python scripts in this pipeline. They have moved more than 700 public-domain courses from raw bundles to publishable lessons. The whole thing is operated by one person.
+Sixty Python scripts. Seven hundred public-domain courses moved from raw bundles to publishable lessons. One operator.
 
-That last sentence is doing a lot of work. The reason it works is that the pipeline is not a script. It is a state machine with refusal rights, scripts hanging off it, and a contract for what each script promises and what it can refuse to produce.
+That last number is the one doing all the work. It only holds up because the pipeline isn't a script — it's a state machine with refusal rights, scripts hanging off it, and a contract for what each script promises and what it's allowed to refuse.
 
-This post is the tour. The 11 phases. The 12-status state machine that came after script 40 and rewrote how the rest of the system worked. The 16 extractors hidden behind one dispatcher. The halt conditions per phase that turn silent failure into loud refusal. And the canary harness that keeps every postmortem from recurring.
+This is the tour. The 11 phases. The 12-status state machine that arrived around script #40 and quietly rewrote everything before and after it. The 16 extractors hiding behind one dispatcher. The halt conditions that turn silent failure into loud refusal. The canary harness that keeps every postmortem from coming back.
 
-If you are designing a content pipeline that has to survive real-world inputs — public-domain coursework, scraped corpora, customer-supplied bundles, anything that arrives in shapes you didn't choose — this is the architecture I'd build today.
+If you're designing a pipeline that has to survive real-world inputs — public-domain coursework, scraped corpora, customer bundles, anything that arrives in shapes you didn't choose — this is the architecture I'd build today.
 
 ## §1 Factory floor
 
@@ -49,7 +49,7 @@ flowchart LR
 
 Each phase has a narrow job. Each phase has the right to refuse. The orchestration layer doesn't push work through; it asks each phase, "given what arrived from the previous phase, can you produce a valid output, or should I halt this course?"
 
-Refusal is a feature, not a failure. Half the value of the pipeline is in *what doesn't get published* — courses that look fine to a human reading metadata but that the validators caught with zero surviving words, or thin sources, or contamination, or extractor mismatch. The shape of the system is built around making refusal easy and silent-acceptance hard.
+Refusal is a feature, not a failure. Half the value of this pipeline is in *what doesn't get published* — courses that look fine to a human reading metadata but that the validators caught with zero surviving words, or thin sources, or contamination, or extractor mismatch. The whole shape of the system is built around making refusal easy and silent-acceptance hard.
 
 ## §2 The 11 phases
 
@@ -130,7 +130,7 @@ stateDiagram-v2
 
 Twelve statuses. Lock TTL on `locked`, `extracting`, `composing`, `modernizing`, `enriching`, `seeding` so a crashed worker releases the lock automatically. Retry budget enforced by the orchestrator on each transition into `halted`.
 
-When this table got created, the operator had 772 in-flight courses scattered across log files and ad-hoc tracking spreadsheets. The backfill was its own multi-day project: parse every log file, parse every spreadsheet, reconcile against the actual database state, write 772 rows with the best-known status. A consolidation guard prevented two backfill rows from overwriting each other when the same course appeared in two log streams.
+When this table got created, I had 772 in-flight courses scattered across log files and ad-hoc tracking spreadsheets. The backfill was its own multi-day project: parse every log file, parse every spreadsheet, reconcile against actual database state, write 772 rows with the best-known status. A consolidation guard kept two backfill rows from overwriting each other when the same course appeared in two log streams.
 
 The lesson from the backfill: **state is data, not log lines.** Once the state machine existed, every script that previously printed `[INFO] course 789 starting modernize` could just call `transition(789, "modernizing")` and let the table be the truth. Logs became telemetry. Status became a query. The 60+ scripts didn't need to coordinate — they just needed to write to the same table.
 
@@ -205,15 +205,15 @@ Every phase gets to refuse. The halt-condition table is the contract.
 | enrich | Glossary unique conflict | Halt course | `canary_glossary_unique_per_section` |
 | seed | DB constraint violation | Halt with diagnostic | `canary_seed_constraint_diagnostic` |
 
-The biggest historical bug in this table is the `intent_extract surviving_words=0 → continue` (Bug 8). It was supposed to halt and didn't. Modernize generated coherent garbage from titles. Twelve courses bypass-routed past the consolidator made it through to publish before the halt-condition was wired correctly.
+The biggest historical bug in this table is `intent_extract surviving_words=0 → continue` (Bug 8). It was supposed to halt and didn't. Modernize generated coherent garbage from titles. Twelve courses got bypass-routed past the consolidator and made it all the way to publish before the halt-condition was wired correctly.
 
-The general rule: **every step in your pipeline should be able to answer "should I refuse?" before answering "what is my output?"** If a step cannot refuse, it cannot be safe.
+The general rule: **every step in your pipeline should be able to answer "should I refuse?" before it answers "what is my output?"** If a step cannot refuse, it cannot be safe.
 
 ## §6 The canary harness
 
 Every postmortem plants a test.
 
-That's the rule. We've shipped 39 canaries against this pipeline, one per fixed bug plus a handful of broader integration canaries. They run before any pipeline-touching merge. They run in 8 seconds.
+That's the rule. There are 39 canaries on this pipeline now — one per fixed bug, plus a handful of broader integration canaries. They run before any pipeline-touching merge. They finish in 8 seconds.
 
 ```
 $ python run_canaries.py
@@ -259,7 +259,7 @@ The [19-bug failure-pattern atlas](/blog/nineteen-bugs-failure-pattern-atlas) is
 
 This phase exists because of one bad afternoon.
 
-Every audit step was running 20× slower than baseline. Modernize took longer than usual. Validate took twice as long. The canaries passed but the wall-clock numbers were terrible.
+Every audit step was running 20× slower than baseline. Modernize was taking longer than usual. Validate was taking twice as long. Canaries all green, wall-clock numbers terrible.
 
 Diagnosis: `~/.codex/config.toml` had `model_reasoning_effort = "xhigh"` set globally. Nobody changed it on purpose — it had drifted from a previous experiment and stayed. Every audit step that called Codex was paying for high-reasoning when it didn't need it.
 
@@ -309,10 +309,10 @@ If I were starting this pipeline today, knowing what I know now, the order would
 
 6. **Standalone scripts are pipeline gaps.** Audit `/scripts/` quarterly. Anything doing real value must be wired in or deleted. Standalone scripts that quietly carry the system are debt that compounds.
 
-You don't need 60 scripts to start. You need a state machine, a halt-on-zero default, and one canary. The 60 scripts will arrive on their own as the catalog grows. The architecture decides whether they're a working pipeline or a stack of duct tape.
+You don't need 60 scripts to start. You need a state machine, a halt-on-zero default, and one canary. The 60 scripts will arrive on their own as the catalog grows. The architecture is what decides whether they're a working pipeline or a stack of duct tape.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Pipeline-engineering as a service</h3>
-  <p className="mt-3 text-white/70">If your content pipeline is leaking money, that's what we do. Talk to Go7Studio.</p>
+  <p className="mt-3 text-white/70">If your content pipeline is leaking money on bad routes, fabricated output, or scripts nobody remembers to run — that's the work I do at Go7Studio. Small studio, real receipts, every fix gets a canary.</p>
   <Link href="/contact" className="btn-primary mt-6 inline-flex">Talk to Go7Studio</Link>
 </div>

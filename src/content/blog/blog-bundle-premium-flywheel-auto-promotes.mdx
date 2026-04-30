@@ -19,7 +19,7 @@ schemaType: "Article"
 
 ## The funnel in one diagram
 
-The shape is simple before the moving parts get in. A reader lands on a career story. The story has an AI bundle callout. The callout points at an AI bundle landing page. The bundle's traffic and conversion are watched by a nightly audit. When a bundle clears its threshold, a flip script promotes it from free to premium tier. Future readers get a slightly better-monetized version of the same post.
+A reader lands on a career story. The story has an AI bundle callout. The callout points at a bundle landing page. A nightly audit watches traffic and conversion. When a bundle clears its threshold, a flip script promotes it from free to premium tier. Future readers get a slightly better-monetized version of the same post. None of it requires a person in the loop on a normal day.
 
 ```mermaid
 flowchart LR
@@ -31,7 +31,7 @@ flowchart LR
     F --> B
 ```
 
-There are four scripts in there, all of them in the Qualora repo. None of them require a person in the loop on a normal day. Below is what each one does and why we deliberately wrote them as small, dumb, single-purpose pieces.
+Four scripts, all of them in the Qualora repo. Below is what each one does and why we deliberately wrote them as small, dumb, single-purpose pieces.
 
 ## The audit script
 
@@ -59,9 +59,9 @@ type AuditOutput = {
 };
 ```
 
-The audit's only job is to write that JSON. It does not flip anything. It does not change tiers. It identifies candidates and stops.
+The audit's only job is to write that JSON. It doesn't flip anything. It doesn't change tiers. It identifies candidates and stops.
 
-The reason for the firewall is operational. If something is wrong with the audit logic — wrong thresholds, broken metrics, drifted definitions — I want to read a JSON file and ignore it, not deal with a tier flip that should not have happened. Audits write. Triggers act. Different scripts.
+The firewall is operational. If something's wrong with the audit logic — bad thresholds, broken metrics, drifted definitions — I want to read a JSON file and ignore it, not unwind a tier flip that should never have happened. Audits write. Triggers act. Different scripts.
 
 ## The flip trigger
 
@@ -88,7 +88,7 @@ async function flipToPremium(slug: string) {
 }
 ```
 
-No model call. No content generation. No surprises. The flip is data-layer only. UI surfaces re-render off the new tier flag at next request. The bundle itself does not change — its production passes were already done; its tier label is the only thing that moved.
+No model call. No content generation. No surprises. The flip is data-layer only. UI surfaces re-render off the new tier flag at next request. The bundle itself doesn't change — its production passes were already done; the tier label is the only thing that moved.
 
 ## The seed pipeline and the 6-pass production
 
@@ -151,7 +151,7 @@ We log every pass and the model that ran it. Every dual-use bundle we ship has a
 }
 ```
 
-If the Codex red-team produces findings, the bundle does not seed. It goes back to BUILD with the findings attached. We have caught our own numeric drift this way more than once.
+If the Codex red-team produces findings, the bundle doesn't seed. It goes back to BUILD with the findings attached. We've caught our own numeric drift this way more than once.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">See it live on Qualora</h3>
@@ -172,4 +172,4 @@ Three architectural calls I'd undo if I started over.
 
 The flywheel works. We ship bundles end-to-end without me touching them on most days. Reader clicks AI Bundle Callout, bundle visits log, audit fires nightly, threshold trips, flip script runs the next morning. We see the conversion in GSC and the funnel in our own analytics.
 
-The version of this we'll have a year from now will probably be unrecognizable from this version. That's the point of writing it down.
+A year from now this version will probably be unrecognizable. That's the point of writing it down.

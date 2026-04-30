@@ -18,19 +18,19 @@ schemaType: "Article"
 
 The dashboard said 662 courses, healthy backlog, all green. The pipeline was processing items. Statuses moved. Logs accumulated. From the outside, the system was working.
 
-It was lying.
+It was lying to my face.
 
-A `.imscc` recursion bug was hiding rich source files inside the queue. Items looked in-flight, with statuses transitioning and locks rotating, but the extractor couldn't reach the actual content. Every "in queue" item was potentially unprocessable, and there was no field on the dashboard that would tell us which ones.
+A `.imscc` recursion bug was hiding rich source files inside the queue. Items looked in-flight, with statuses transitioning and locks rotating, but the extractor couldn't reach the actual content. Every "in queue" item was potentially unprocessable, and there was no field on the dashboard that could tell me which ones.
 
-This post is the postmortem on a class of bug I've started to call *silent exclusion* — when your queue contains items that are technically there, technically tracked, technically progressing through statuses, but architecturally unreachable.
+This is the postmortem on a class of bug I've started to call *silent exclusion* — when your queue contains items that are technically there, technically tracked, technically progressing through statuses, but architecturally unreachable.
 
 ## §1 The dashboard that lied
 
 Six hundred and sixty-two rows. All in motion. Status distribution looked normal — most in `extracted` or `modernizing`, a handful in `halted` waiting for retry. No alarms. The orchestrator was happy. The retry budget was fine.
 
-The thing the dashboard didn't show, because we had no field for it: how many of those items were *extractable*. Not "have we tried to extract" — that was a column. Not "is there a source file" — that was also a column. *Extractable*. Has there been a successful extraction with surviving content above threshold?
+The thing the dashboard didn't show, because there was no field for it: how many of those items were *extractable*. Not "have we tried to extract" — that was a column. Not "is there a source file" — that was also a column. *Extractable*. Has there been a successful extraction with surviving content above threshold?
 
-Because that wasn't a column, it wasn't a filter, and it wasn't a histogram. The dashboard reported queue health. It did not report queue *processability*.
+That wasn't a column, so it wasn't a filter, and it wasn't a histogram. The dashboard reported queue health. It did not report queue *processability*.
 
 That gap is the bug class.
 
@@ -56,9 +56,9 @@ flowchart LR
     style E1 fill:#ff5722,color:#fff
 ```
 
-The outer manifest produced a clean output that *looked* like extraction had succeeded. Title was extracted. Section structure was extracted. Module titles were extracted. The actual lesson content lived one level deeper, inside each `module_N.imscc`, and the extractor never got there.
+The outer manifest produced a clean output that *looked* like extraction had succeeded. Title extracted. Section structure extracted. Module titles extracted. The actual lesson content lived one level deeper, inside each `module_N.imscc`, and the extractor never got there.
 
-Downstream, the pipeline saw a course with titles, structure, and zero lesson content. With Bug 8 (`intent_extract surviving_words=0` continued — see [the 19-bug atlas](/blog/nineteen-bugs-failure-pattern-atlas)), the modernize step then generated coherent generic content from the titles. With Bug 8 fixed, those courses now halt at extract — but only after we shipped the halt-on-zero patch. Before that, they shipped fabricated.
+Downstream, the pipeline saw a course with titles, structure, and zero lesson content. With Bug 8 (`intent_extract surviving_words=0` continued — see [the 19-bug atlas](/blog/nineteen-bugs-failure-pattern-atlas)), the modernize step then generated coherent generic content from the titles. With Bug 8 fixed, those courses now halt at extract. Before that patch landed, they shipped fabricated.
 
 The fix: full-depth recursion in `extract_imscc.py`. When the manifest references a `.imscc` resource, recurse in, parse its inner manifest, extract its resources, merge into the outer course's content.
 
@@ -98,9 +98,9 @@ The fix needs a two-step dispatcher: detect Blackboard wrapping (presence of `Bl
 
 ## §4 "In queue" is a wish, not a status
 
-The deeper failure was in our status vocabulary.
+The deeper failure was in the status vocabulary.
 
-Our state machine has 12 statuses: `queued`, `locked`, `extracting`, `extracted`, `preflighting`, `preflighted`, `composing`, `composed`, `modernizing`, `modernized`, `enriching`, `seeding`, `seeded`, `halted`, `triage`. Each describes intent or progress. None describes *processability*.
+The state machine has 12 statuses: `queued`, `locked`, `extracting`, `extracted`, `preflighting`, `preflighted`, `composing`, `composed`, `modernizing`, `modernized`, `enriching`, `seeding`, `seeded`, `halted`, `triage`. Each describes intent or progress. None describes *processability*.
 
 A queue of unprocessable items looks identical to a queue of healthy ones in this vocabulary:
 
@@ -156,10 +156,10 @@ Status names should describe verifiable facts, not operator intentions.
 
 The cure is an audit step at the boundary where intent becomes status. Run the cheap version of the work. Verify the precondition is real. Only then move into the status. Anything that fails the audit goes to triage with a diagnostic — *loudly*, not silently.
 
-Otherwise your dashboards are full of beautifully colored cells that don't mean what their column headers say.
+Otherwise your dashboards are full of beautifully colored cells that don't mean what their column headers say. That's not metrics, that's decoration.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Pipeline-engineering as a service</h3>
-  <p className="mt-3 text-white/70">If your pipeline dashboards report "all green" but you don't know which items are actually processable, your status vocabulary is the bug. That's what we fix.</p>
+  <p className="mt-3 text-white/70">If your pipeline dashboards report "all green" and you can't tell which items are actually processable, your status vocabulary is the bug. That's the kind of work Go7Studio fixes. Small studio, real receipts.</p>
   <Link href="/contact" className="btn-primary mt-6 inline-flex">Talk to Go7Studio</Link>
 </div>

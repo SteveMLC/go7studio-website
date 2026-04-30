@@ -20,7 +20,7 @@ Two scripts I wrote months ago for a one-off image-quality cleanup. Both lived i
 
 Neither was wired in.
 
-When I stopped manually triggering them — because I had moved on to other work, because they had become invisible, because they did exactly the right thing every time and never needed attention — the pipeline silently regressed. Two courses shipped with 206 and 271 images respectively, most of them logos and decorative junk.
+When I stopped triggering them manually — because I'd moved on to other work, because they'd become invisible, because they did exactly the right thing every time and never needed attention — the pipeline silently regressed. Two courses shipped with 206 and 271 images respectively, most of them logos and decorative junk.
 
 That regression is the topic. The pattern is general: **standalone scripts that quietly carry the system are pipeline gaps with extra steps.**
 
@@ -38,19 +38,19 @@ $ ls -la scripts/ | grep -E '(label_course_images|inject_images)'
 
 `inject_images_into_lessons.py` reads the labels, walks the lesson manifest, and injects classified instructional images into lesson bodies at appropriate positions. It already had a `SKIP_CATEGORIES = {"logo", "decorative"}` set — meaning it already filtered out junk. It just had to be run.
 
-Both scripts were written for a one-off image-quality cleanup back in January. They worked. They produced clean output. I'd run them manually after each ingestion wave, see the junk-image counts drop, and move on.
+Both scripts were written for a one-off image-quality cleanup back in January. They worked. They produced clean output. I'd run them manually after each ingestion wave, watch the junk-image counts drop, move on.
 
-Then I stopped running them. Other work. Other waves. The scripts didn't change. The pipeline didn't change. And gradually it became invisible that the pipeline didn't include image classification at all — that all the image-quality work was being done by my human muscle memory.
+Then I stopped running them. Other work. Other waves. The scripts didn't change. The pipeline didn't change. And gradually it became invisible that the pipeline didn't include image classification at all — all the image-quality work was being done by muscle memory.
 
 ## §2 Discovery — Bug 19
 
-HIT 101 published. 206 images on the course. Most of them logos. Some of them decorative shapes lifted from the original PowerPoint backgrounds. A handful of actual diagrams, buried in the noise.
+HIT 101 published. 206 images on the course. Most of them logos. Some decorative shapes lifted from the original PowerPoint backgrounds. A handful of actual diagrams, buried in the noise.
 
 HIT 105 followed: 271 images. Same problem. Logos repeated across every lesson because the original course used the institution's letterhead as a slide template. Decorative arrows and bullet markers extracted as standalone PNGs because the source PPTX put them in the wrong layer.
 
-I went to look at why the image filter wasn't running. There was no image filter. There never had been an image filter *in the pipeline*. The image filter was sitting in `/scripts`, waiting for me to remember to run it.
+I went to look at why the image filter wasn't running. There was no image filter. There never had been an image filter *in the pipeline*. It was sitting in `/scripts`, waiting for me to remember to run it.
 
-That moment — looking at the pipeline DAG and seeing no node for the work that was clearly happening every time we shipped a clean course — is the discovery. The script wasn't a backup. The script was the *pipeline gap*. The whole time I'd been "running it manually," I was patching a hole I hadn't admitted existed.
+That moment — looking at the pipeline DAG and seeing no node for the work that was clearly happening every time we shipped a clean course — was the discovery. The script wasn't a backup. The script was the *pipeline gap*. The whole time I'd been "running it manually," I was patching a hole I hadn't admitted existed.
 
 ## §3 The wire-in
 
@@ -102,7 +102,7 @@ The "instructional false-positive" bucket is what gets human review. Seven image
 
 ## §5 The economics
 
-The cost of running this on every course:
+Cost of running this on every course:
 
 ```python
 # label_course_images.py — economics
@@ -122,11 +122,11 @@ estimate_cost(271)  # = $0.00596
 # Annual: ~700 courses * ~150 images avg = $2.31/year for the entire catalog
 ```
 
-Two-tenths of a cent per typical course. About $2/year to run this for the whole catalog at current volume.
+Two-tenths of a cent per typical course. About $2/year to run this on the whole catalog at current volume.
 
-The cost of *not* running it: 136 junk images shipped to learners on HIT 101, 186 on HIT 105. The user-facing cost is real (cluttered lesson pages, slower load, weird logos repeated everywhere). The CDN cost is real (storing and serving images that nobody is supposed to see). The cost of fixing it after publish is huge (un-publishing, re-running, re-publishing, link rot).
+The cost of *not* running it: 136 junk images shipped to learners on HIT 101, 186 on HIT 105. User-facing cost is real (cluttered pages, slow load, weird logos repeated everywhere). CDN cost is real (storing and serving images nobody is supposed to see). Cost of fixing it after publish is huge (un-publishing, re-running, re-publishing, link rot).
 
-Two-tenths of a cent vs all of that. It is one of the cheapest pipeline steps we run, and it was the most expensive one we weren't running.
+Two-tenths of a cent versus all of that. It's one of the cheapest pipeline steps I run, and it was the most expensive one I wasn't running.
 
 ## §6 The audit pattern
 
@@ -147,16 +147,16 @@ The principle is *pipeline-or-delete*. A `/scripts/` directory is a fine place f
 
 ## §7 The deeper failure mode
 
-The standalone script wasn't a backup. It was the pipeline gap.
+The standalone script wasn't a backup. It *was* the pipeline gap.
 
 That sentence is the lesson. Every standalone script doing real value is a pipeline gap with extra steps — the script exists because the pipeline doesn't, and once the script exists, the absence of the pipeline node becomes invisible.
 
 The discovery moment for Bug 19 was looking at the DAG and seeing what wasn't there. No node for image filtering. No node, despite three months of consistently shipping clean courses. The clean courses were happening *despite* the pipeline, not *because of* it.
 
-When the operator stops being the pipeline node, the pipeline regresses. That's not a flaw in the operator. That's a flaw in the architecture that depended on the operator's invisible labor.
+When the operator stops being the pipeline node, the pipeline regresses. That's not a flaw in the operator. That's a flaw in an architecture that depended on the operator's invisible labor.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Pipeline-engineering as a service</h3>
-  <p className="mt-3 text-white/70">If your `/scripts` directory has tools doing pipeline-shaped work, they're pipeline gaps. We wire them in, plant canaries, and make the work invisible to the operator the right way — by automating it.</p>
+  <p className="mt-3 text-white/70">If your `/scripts` directory has tools doing pipeline-shaped work, those are pipeline gaps. Go7Studio wires them in, plants canaries, and makes the work invisible to the operator the right way — by automating it. Small studio, real receipts.</p>
   <Link href="/contact" className="btn-primary mt-6 inline-flex">Talk to Go7Studio</Link>
 </div>

@@ -19,7 +19,7 @@ schemaType: "Article"
 
 # Three Conversations I've Stopped Having (And the Reframes That Replaced Them)
 
-Three sentences I used to say at least once a week:
+I used to say each of these at least once a week. They all sounded sensible. They were all the wrong move.
 
 | Old conversation | New conversation |
 |---|---|
@@ -33,9 +33,9 @@ Each reframe came from a real failure that capacity couldn't fix. The receipts a
 
 Two SEO agents, Scout and Ivy, were architecturally finished. Scout would scan target communities on a six-hour cron; Ivy would draft platform-native replies. Both had tests, both had cron lines, both were ready to fire on day two of their build.
 
-I disabled them both before they posted anything.
+I disabled both before they posted anything.
 
-The fix wasn't a third agent to coordinate them. The fix was an audit of whether the first two had a real surface to act on. They didn't — Reddit accounts didn't exist, LinkedIn was unconnected, the routing platform wasn't wired. Adding a third agent on top of two agents with no output channel would have multiplied cost and produced zero output.
+The fix wasn't a third agent to coordinate them. The fix was auditing whether the first two had a real surface to act on. They didn't — Reddit accounts didn't exist, LinkedIn was unconnected, the routing platform wasn't wired. Adding a third agent on top of two agents with no output channel would have multiplied cost and produced zero output.
 
 | Symptom | Used-to-do | Now-do | Outcome |
 |---|---|---|---|
@@ -47,16 +47,16 @@ The principle: **more agents multiply coordination cost; tighter JDs reduce it.*
 
 ## Reframe 2 — Better model → Halt condition
 
-Nine fabricated courses shipped to production because a pipeline step returned `surviving_words=0` and the next step continued anyway. Those nine courses were generated from titles and metadata alone — fluent, plausible, completely unrelated to the actual source content. They got past every model-quality check because the input itself was empty.
+Nine fabricated courses shipped to production because a pipeline step returned `surviving_words=0` and the next step continued anyway. The nine courses were generated from titles and metadata alone — fluent, plausible, completely unrelated to the actual source content. They got past every model-quality check because the input itself was empty.
 
-A bigger model wouldn't have helped. The modernize step did exactly what it was asked to do: take the input it received and produce a coherent course. The input was nothing. The output was nothing dressed up as something.
+A bigger model wouldn't have helped. The modernize step did exactly what it was asked to do: take the input it received and produce a coherent course. The input was nothing. The output was nothing, dressed up as something.
 
 > [!CAUTION]
 > When the input is zero, no model is good enough. Halt-on-zero is a contract between every pipeline step. Any step returning zero primary output halts unless an explicit `--allow-empty-output` flag is set on that step's run config.
 
 The fix shipped as inversion of the default. Previously: zero-output continued unless flagged. Now: zero-output halts unless flagged. Same interface, opposite behavior, every pipeline step gets a refusal right.
 
-The full postmortem lives in [My AI Agent Wrote Nine Courses From Nothing](/blog/agent-wrote-nine-courses-from-nothing).
+Full postmortem in [My AI Agent Wrote Nine Courses From Nothing](/blog/agent-wrote-nine-courses-from-nothing).
 
 ## Reframe 3 — Run in parallel → Make the handoff a file
 
@@ -84,7 +84,7 @@ The fix was `pipeline-log.py` — a 200-line Python harness that replaced free-f
 
 The harness ships with 23/23 tests passing. The Winnie-Rex stall has not recurred. The principle: **parallelism without durable handoffs produces ghost work; serial-with-files beats parallel-with-chat.**
 
-Full receipts: [The Day I Realized My AI Agents Were Lying to Each Other](/blog/agents-lying-to-each-other).
+Full receipts in [The Day I Realized My AI Agents Were Lying to Each Other](/blog/agents-lying-to-each-other).
 
 ## The meta-pattern
 
@@ -102,6 +102,6 @@ Three sentences, three reframes, one pattern. The pattern is older than AI. The 
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Get the next AI Lab post</h3>
-  <p className="mt-3 text-white/70">The lab covers agent design, harness engineering, and the routing stack behind a one-person studio. New post every couple of weeks.</p>
-  <Link href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe</Link>
+  <p className="mt-3 text-white/70">One post every couple of weeks from a one-person studio that's been catching itself in these conversations long enough to write the reframes down. Agent design, harness engineering, and the routing stack behind it all.</p>
+  <Link href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe to AI Lab</Link>
 </div>

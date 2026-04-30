@@ -20,15 +20,15 @@ ogImage: "/images/og/whisper-three-pass-quiz-generator-21-questions.jpg"
 schemaType: "Article"
 ---
 
-The first version of our CE quiz generator was one prompt: "read this lesson and write three quiz questions." It produced fluent, well-formatted, completely uniform output. Every question on every lesson was a "what is the definition of X" recall question.
+The first version of our CE quiz generator was one prompt: "read this lesson and write three quiz questions." It produced fluent, well-formatted, completely uniform output. Every question on every lesson was a "what is the definition of X" recall.
 
 That's the single-pass trap. One prompt → one cognitive shape. The model is doing exactly what it was asked to do, which is the problem.
 
-This post is about the architecture we shipped instead — three passes, three prompts, one tagger, one bank — and the per-course economics that make it cheap enough to use for every CE course we build.
+This post is the architecture we shipped instead — three passes, three prompts, one tagger, one bank — and the per-course economics that make it cheap enough to use on every CE course we build.
 
 ## Section 1: The single-pass trap
 
-The default failure mode of LLM quiz generation is shape collapse. You ask for "three questions" without specifying their cognitive shape, and the model — trained on internet text — defaults to the most common shape: definitional recall.
+The default failure mode of LLM quiz generation is shape collapse. You ask for "three questions" without specifying their cognitive shape, and the model — trained on internet text — defaults to the most common shape on the internet: definitional recall.
 
 Symptoms:
 
@@ -116,11 +116,11 @@ A sample row from the output, anchored at `[09:02.180]`:
 }
 ```
 
-The transcript anchor is load-bearing. It lets us audit the question against the lecture and link to the exact timestamp from the explanation page after a student answers.
+The transcript anchor is load-bearing. It lets us audit the question against the lecture and link to the exact timestamp from the explanation page after a student answers — so a student who got it wrong can land at the precise moment the answer was given.
 
 ## Section 4: Pass 2 — Application
 
-This is the prompt that produces the questions students actually find hard — and the one that distinguishes a real assessment from a vocabulary test.
+Pass 2 is the prompt that produces the questions students actually find hard — and the one that distinguishes a real assessment from a vocabulary test.
 
 ```python
 PASS_2_PROMPT = """
@@ -147,7 +147,7 @@ Output JSON conforming to the schema below.
 """
 ```
 
-The "scenario must NOT appear verbatim in the transcript" rule is what forces application. The model can't lift its scenario from the lecture; it has to construct one.
+The "scenario must NOT appear verbatim in the transcript" rule is what forces real application. The model can't lift its scenario from the lecture — it has to construct one.
 
 Sample output:
 
@@ -221,9 +221,9 @@ The cost side, at the model layer:
 > [!TIP]
 > About a dollar at the model layer to turn an hour of lecture into a 21-question CE course with a Bloom-balanced bank, transcript anchors, and a verified disjoint final exam. The platform-engineering work around it is the real cost; the model spend is rounding error.
 
-The reason cost matters: it lets the same architecture be used for every course we build. There's no "premium tier where we run the proper generator." Every course gets the 3-pass treatment because the marginal cost is sub-dollar. The expensive thing is shaping the prompts the first time. After that, the pipeline runs.
+The reason cost matters: it lets the same architecture run on every course we build. There's no "premium tier where we run the proper generator." Every course gets the 3-pass treatment because the marginal cost is sub-dollar. The expensive thing is shaping the prompts the first time. After that, the pipeline runs.
 
-If you're building a CE platform, an L&D platform, or any assessment engine with a regulator looking over your shoulder, this is the architecture we recommend. If you'd rather have us build it, we will.
+If you're building a CE platform, an L&D platform, or any assessment engine with a regulator looking over your shoulder, this is the architecture we'd point you at. If you'd rather have us build it, we will.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Build with Go7Studio</h3>

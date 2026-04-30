@@ -19,15 +19,15 @@ schemaType: "Article"
 
 ## Starting state
 
-244 URLs in the sitemap. 6,173 GSC impressions over 90 days. 8 clicks. 0.13% CTR.
+244 URLs in the sitemap. 6,173 GSC impressions over 90 days. 8 clicks. 0.13% CTR. The kind of numbers that make you check whether the analytics tag is firing.
 
 <Image src="/images/blog/gsc-90day-pre-sitemap.png" alt="GSC dashboard showing 90-day window with 6,173 impressions and 8 clicks" />
 
 The 244 URLs were almost entirely course indexes — `/courses`, `/courses/<id>`, the section index per course. The career pages were missing because of the hardcoded-taxonomy bug (different post). The glossary URLs were missing because nobody had ever added them to the sitemap generator.
 
-That last one was the opportunity. We had **15,000+ glossary terms already published** and rendering at canonical URLs. They had real definitions, sourced from real instructor materials and SkillsCommons content. They were just not in the sitemap, so Google could find them only by crawling internal links — which it does, but slowly, and incompletely.
+That last one was the opportunity. We had **15,000+ glossary terms already published** and rendering at canonical URLs. They had real definitions, reshaped from real instructor materials and SkillsCommons content. They were just not in the sitemap, so Google could find them only by crawling internal links — which it does, but slowly and incompletely.
 
-The question was whether to add them all at once. The aggressive SEO answer is "yes, ship every URL." The more cautious answer is "no, you'll get a thin-content penalty." The right answer turned out to be a third one.
+The question was whether to add them all at once. The aggressive SEO answer is "yes, ship every URL." The cautious answer is "no, you'll get a thin-content penalty." The right answer turned out to be a third one.
 
 ## Expansion source — glossary quality already done
 
@@ -37,7 +37,7 @@ We had already done the quality work on the glossary itself. Every term has:
 - a `parent_course_id` linking back to the source content
 - O\*NET-style career associations (top-3 careers most relevant to the term)
 
-A glossary entry on Qualora isn't a thin definition. It is a 100–300-word explanation reshaped from real human sources with cross-links to careers and courses. By the time we considered adding them to the sitemap, the underlying content was already published. The sitemap addition was an indexing question, not a content question.
+A glossary entry on Qualora isn't a thin definition. It's a 100–300-word explanation reshaped from real human sources with cross-links to careers and courses. By the time we considered adding them to the sitemap, the underlying content was already published. The sitemap addition was an indexing question, not a content question.
 
 ## The quality filter
 
@@ -62,7 +62,7 @@ flowchart TD
 
 ## Priority budgeting
 
-Sitemaps support a `<priority>` value per URL. Google treats it as a hint about your own ranking of importance, not a guarantee of rank. The advice that doesn't get repeated enough is that **Google trusts your sitemap less if you mark everything as priority 1.0**. If every URL is critical, none of them are.
+Sitemaps support a `<priority>` value per URL. Google treats it as a hint about your own ranking of importance, not a guarantee of rank. The advice that doesn't get repeated enough: **Google trusts your sitemap less if you mark everything as priority 1.0**. If every URL is critical, none of them are.
 
 We set explicit caps.
 
@@ -126,7 +126,7 @@ Second, the 64× sitemap expansion did **not** trigger a thin-content penalty. W
 
 ## Quality gates beat volume gates
 
-The aggressive SEO playbook says ship every URL. The defensive playbook says be conservative with what you index. We tested neither and ran a third option: **quality gates at ingestion, not at the sitemap boundary**.
+The aggressive SEO playbook says ship every URL. The defensive playbook says be conservative with what you index. We ran a third option: **quality gates at ingestion, not at the sitemap boundary**.
 
 The difference is operational.
 
@@ -137,6 +137,6 @@ We do quality work in the production pipeline (the 6-pass and 7-pass processes f
 
 That's how a sitemap goes from 244 to 15,602 without spam. The 15,358 glossary URLs we added were already passing quality bars; the bar was applied at content-production time, not at sitemap-emission time.
 
-Two follow-ups still on the list. First, structured-data validation across the 15K added URLs — we ran spot checks but not full coverage. Second, the priority-budget tuning: if the 0.3 cap on glossary turns out to be too low after a few months of indexing data, we'll bump it to 0.4. The right number is whatever GSC actually rewards for our query mix, which we will only know after the indexed volume stabilizes.
+Two follow-ups still on the list. First, structured-data validation across the 15K added URLs — we ran spot checks but not full coverage. Second, priority-budget tuning: if the 0.3 cap on glossary turns out to be too low after a few months of indexing data, we'll bump it to 0.4. The right number is whatever GSC actually rewards for our query mix, which we'll only know after the indexed volume stabilizes.
 
 For now, the sitemap is doing its job. Google sees what we publish. Clicks doubled inside a week. The compound win comes from continuing to publish quality, not from gaming volume.

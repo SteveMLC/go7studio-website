@@ -20,9 +20,9 @@ schemaType: "Article"
 
 # How I Keep My Memory: A State-File Architecture for an AI-Augmented Solo Operator
 
-The first time I lost three weeks of context to a session restart, I went looking for a longer context window. That was the wrong fix. The right fix was the realization that **context windows are not memory** — they're working memory at best, scratch paper at worst — and anything load-bearing has to live outside the conversation.
+The first time I lost three weeks of context to a session restart, I went looking for a longer context window. Wrong fix.
 
-What replaced the "longer context" wish is a three-layer memory architecture: state files, dated memory, topic memory. Every layer answers a different question. Every layer is plain markdown or JSON in a directory I can `grep` and `git log`.
+The right fix was admitting that **context windows aren't memory** — they're scratch paper at best — and anything load-bearing has to live outside the conversation. What replaced the "longer context" wish is a three-layer memory architecture: state files, dated memory, topic memory. Every layer answers a different question. Every layer is plain markdown or JSON in a directory I can `grep` and `git log`.
 
 ```mermaid
 flowchart TD
@@ -53,7 +53,7 @@ flowchart TD
 
 One JSON per project. Lives in `/state`. The source of truth for the *current* status of any active workstream.
 
-I have 18+ state files. Each one answers: what is this project, what phase is it in, what's the latest reportable number, what's blocking it, what's next?
+I have 18+ state files. Each one answers the same five questions: what is this project, what phase is it in, what's the latest reportable number, what's blocking it, what's next?
 
 ```json
 {
@@ -93,9 +93,9 @@ $ ls memory/ | grep -E '^[0-9]{4}-' | tail -10
 2026-04-29.md
 ```
 
-Today's directory has 101 daily files starting from 2026-02-01. Each file captures the day's decisions, ships, kills, and alerts. They are the receipts an AI agent reads before it acts on something it has never seen before.
+Today's directory has 101 daily files going back to 2026-02-01. Each one captures the day's decisions, ships, kills, and alerts. They're the receipts an AI agent reads before it acts on something it has never seen before.
 
-The discipline: **append-only**. If I was wrong yesterday, I write a new entry today that contradicts yesterday — I don't edit yesterday's file. The chain of edits is the real history.
+The discipline: **append-only**. If I was wrong yesterday, I write a new entry today contradicting yesterday — I don't edit yesterday's file. The chain of edits is the real history.
 
 ## Layer 3 — Topic memory
 
@@ -115,7 +115,7 @@ qualora-appledouble-fix.md
 qualora-wave11-fixes.md
 ```
 
-30+ files indexed. Each file is the durable, distilled answer to a recurring question — not a journal, not a status, but a working note that carries lessons between sessions.
+30+ files indexed. Each one is the distilled answer to a recurring question — not a journal, not a status report, but a working note that carries lessons between sessions.
 
 ```mermaid
 mindmap
@@ -139,7 +139,7 @@ mindmap
       Scout/Ivy disabled
 ```
 
-The topic-memory layer is what lets a brand-new session boot up with the equivalent of months of operational context, instead of starting from "hi, what is this project?"
+The topic-memory layer is what lets a brand-new session boot with months of operational context already loaded, instead of starting from "hi, what is this project?"
 
 ## The auto-memory index — MEMORY.md
 
@@ -152,21 +152,21 @@ The file that ties all three layers together. Auto-loaded on session boot. A sim
 - [Qualora GPT-5.4 Reasoning Config (2026-04-16)](qualora-gpt54-reasoning-config.md) — reasoning_effort per call (low/medium/high); xhigh global config was making audits 20× slower than needed.
 ```
 
-The index is not the memory. The index is the *table of contents* over the memory. The actual content lives in the linked files. The index keeps the boot context small while making the full archive one click away.
+The index isn't the memory. It's the *table of contents* over the memory. Actual content lives in the linked files. The index keeps boot context small while putting the full archive one click away.
 
 ## The discipline — "if you didn't write it down, it didn't happen"
 
-The architecture only works if I write entries when triggers fire. Five triggers: handoff, ship, decision, killed process, alert. If none of those happened, the day doesn't earn an entry.
+The architecture only works if I write entries when triggers fire. Five triggers: handoff, ship, decision, killed process, alert. If none of those happened today, today doesn't earn an entry. (Empty days are data too.)
 
 > [!IMPORTANT]
 > If you didn't write it down, it didn't happen. Anything load-bearing lives outside the conversation. Context windows are scratch paper; state files, dated memory, and topic memory are the actual record.
 
-The architecture composes with the file-based pipeline harness — both move load-bearing state out of chat and into disk. When agent A and agent B disagree about what happened, the answer isn't in either of their conversation transcripts. The answer is in the memory files. That's the seam.
+The architecture composes with the file-based pipeline harness — both move load-bearing state out of chat and into disk. When agent A and agent B disagree about what happened, the answer isn't in either of their transcripts. It's in the memory files. That's the seam.
 
-The compound is structural. Today's session boots with full context in seconds. Tomorrow's session does too. The week-three context loss that started this whole architecture has not recurred.
+The compound is structural. Today's session boots with full context in seconds. Tomorrow's does too. The week-three context loss that started this architecture hasn't recurred since.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Get the next AI Lab post</h3>
-  <p className="mt-3 text-white/70">The lab covers memory architecture, agent failure modes, and the routing stack behind a one-person studio. New post every couple of weeks.</p>
-  <Link href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe</Link>
+  <p className="mt-3 text-white/70">One post every couple of weeks from a one-person studio that's been writing the receipts long enough to read them back. Memory architecture, agent failure modes, and the routing stack behind it all.</p>
+  <Link href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe to AI Lab</Link>
 </div>

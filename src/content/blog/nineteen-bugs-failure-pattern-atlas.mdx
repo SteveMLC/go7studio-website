@@ -17,9 +17,11 @@ ogImage: "/images/og/nineteen-bugs-failure-pattern-atlas.jpg"
 schemaType: "Article"
 ---
 
-This is the atlas of every bug we've shipped a fix for in the last three months across our content-ingestion pipeline. Nineteen of them, drawn from real postmortems with real commits. They are not interesting one at a time. They are interesting because they cluster into five recurring families, and once you can name the family, you can spot the next instance before it ships.
+Nineteen bugs. Three months. One pipeline. Every fix has a real commit and a real postmortem behind it.
 
-A postmortem without a canary is just a story. Each of these bugs has a canary test that runs before any pipeline-touching merge — the test is the rule that says "this specific failure mode cannot recur silently." Right now there are 39 of them and they all pass.
+One at a time, they're not interesting. Together they're a debugging vocabulary — they cluster into five recurring failure families, and once you can name the family, you can spot the next instance before it ships.
+
+A postmortem without a canary is just a story. Each of these bugs has a canary test that runs before any pipeline-touching merge — the test is the rule that says "this specific failure cannot recur silently." There are 39 of them now. They all pass.
 
 Here's the atlas, the five families, and the recognition checklist.
 
@@ -47,7 +49,7 @@ Here's the atlas, the five families, and the recognition checklist.
 | 18 | `extract_pptx` not populating content field | Output-shape contract | PPTX-derived lessons empty | `extract_pptx.py` | `canary_extractor_output_shape` |
 | 19 | `WMF` images breaking media upload | Format gap | `upload_media` choking on WMF | WMF filter | `canary_upload_media_format_filter` |
 
-Different surfaces. Five underlying patterns. Walk through each.
+Different surfaces. Five underlying patterns. Walk each.
 
 ## §2 Pattern 1 — Bypass routes are guards you don't have
 
@@ -72,9 +74,9 @@ flowchart LR
     style C fill:#4caf50,color:#fff
 ```
 
-Every dashed-line "bypass" arrow is a guard you do not have. The shortcut is the bug.
+Every dashed-line "bypass" arrow is a guard you don't have. The shortcut is the bug.
 
-The fix in every case was the same shape: move the guard *out of* the optional step and *into* a step that always runs, no matter the route. Cleanup is optional. Contamination check is not. Consolidation before modernize is not optional either, regardless of how badly the operator wants to unblock the queue.
+The fix in every case was the same shape: move the guard *out of* the optional step and *into* a step that always runs, no matter the route. Cleanup is optional. Contamination check is not. Consolidation before modernize isn't optional either, no matter how badly the operator wants to unblock the queue.
 
 > [!CAUTION]
 > Audit your pipeline for "skip" flags, "force" flags, and "as-is" routes. For each, list every substep that flag bypasses. Any safety check on that list belongs on the *required* path, not the bypassable one.
@@ -87,7 +89,7 @@ Bugs 10 and 11 are a different family. Both were finished, working, valuable scr
 
 Both were run manually for months. Both did 70% of the image-quality work. Neither ran in the pipeline.
 
-Discovery moment: HIT 101 published with 206 images, most of them logos and decorative. HIT 105 published with 271 images, same problem. Pipeline never filtered. The standalone scripts had been doing the filtering when run manually, and we'd just stopped running them manually.
+Discovery moment: HIT 101 published with 206 images, most of them logos and decorative. HIT 105 published with 271 images, same problem. Pipeline never filtered. The standalone scripts had been doing the filtering when I ran them manually — and I'd just stopped running them.
 
 ```mermaid
 flowchart LR
@@ -108,13 +110,13 @@ The deeper failure mode: a standalone script is *not a backup* for a pipeline ga
 
 ## §4 Pattern 3 — Halt-on-zero or hallucinate
 
-Bug 8 is the most expensive bug in this atlas. It is also the most systemic.
+Bug 8 is the most expensive bug in this atlas. It's also the most systemic.
 
 `intent_extract` runs early in the pipeline. It takes the raw extracted content and produces a structured "intent" — what is this lesson about, what are the learning objectives, what is the source material. Downstream steps consume this.
 
 When `intent_extract` was given source material it could not parse (or material that had been silently emptied by an earlier extractor bug, e.g. the Storyline misrouting in Bug 3), it returned `surviving_words=0` and continued. The pipeline kept running. Modernize generated fluent, plausible lesson content from titles and standard learning objectives — content with no relationship to the actual source material.
 
-Twelve courses bypass-routed (via Bug 7) plus an unknown count from earlier waves had this happen. The output was *coherent*. Native English. Pedagogically reasonable. Completely fabricated.
+Twelve courses bypass-routed via Bug 7, plus an unknown count from earlier waves, hit this. The output was *coherent*. Native English. Pedagogically reasonable. Completely fabricated.
 
 ```mermaid
 flowchart LR
@@ -134,11 +136,11 @@ The principle is general: **halt is a design choice, not a panic.** Every step i
 
 ## §5 Pattern 4 — File-system shadows that look like data
 
-Bug 1 is small in scope and large in lesson. AppleDouble files are macOS's `._foo.ext` shadow files — the resource fork data that gets written when you copy a file to a network share that doesn't support HFS+ extended attributes. They look like real files. Their names match real-file globs.
+Bug 1 is small in scope and large in lesson. AppleDouble files are macOS's `._foo.ext` shadow files — the resource-fork data that gets written when you copy a file to a network share that doesn't support HFS+ extended attributes. They look like real files. Their names match real-file globs.
 
-When operators dragged `.imscc` archives onto our NAS from macOS Finder, the network share got both `course.imscc` (real) and `._course.imscc` (shadow). The pipeline's source-file dispatcher iterated `*.imscc` and picked the first match — which depending on filesystem ordering was sometimes the shadow.
+When operators dragged `.imscc` archives onto our NAS from macOS Finder, the network share got both `course.imscc` (real) and `._course.imscc` (shadow). The pipeline's source-file dispatcher iterated `*.imscc` and picked the first match — which, depending on filesystem ordering, was sometimes the shadow.
 
-`extract_imscc` would then try to parse the shadow file as an IMSCC archive and fail on what was actually encoded HFS+ resource fork data. We were getting silent extraction failures with no indication that the source file even existed correctly elsewhere.
+`extract_imscc` would then try to parse the shadow file as an IMSCC archive and fail on what was actually encoded HFS+ resource-fork data. Silent extraction failures with no indication that the real source file even existed elsewhere.
 
 Fix at `pipeline.py:147`:
 
@@ -165,7 +167,7 @@ total 8048
 -rw-r--r--@  1 ops  staff  3987234  BLD-168.imscc
 ```
 
-The pattern beyond this specific bug: **anything your file-system shows you that isn't actually data will eventually pretend to be data.** macOS shadows. Windows `Thumbs.db`. Editor backup files. Lock files. Hidden directories with archive contents. The dispatcher should know about all of them, and the rule for adding a new source format should always include "and add the shadow filter to the dispatcher's enumerator."
+The pattern beyond this specific bug: **anything your file system shows you that isn't actually data will eventually pretend to be data.** macOS shadows. Windows `Thumbs.db`. Editor backup files. Lock files. Hidden directories with archive contents. The dispatcher should know about all of them, and the rule for adding a new source format should always include "and add the shadow filter to the dispatcher's enumerator."
 
 ## §6 Pattern 5 — Extension collisions between extractors
 
@@ -234,7 +236,7 @@ $ python run_canaries.py
 39/39 passed in 8.4s
 ```
 
-The rule isn't "fix the bug." The rule is "make the bug impossible to recur." Those are different things. A fix without a canary depends on the next operator remembering. A fix *with* a canary depends on the next operator running `run_canaries.py`, which they already do because it gates merges.
+The rule isn't "fix the bug." The rule is "make the bug impossible to recur silently." Those are different things. A fix without a canary depends on the next operator remembering. A fix *with* a canary depends on the next operator running `run_canaries.py`, which they already do because it gates merges.
 
 Wave-by-wave timeline of when each pattern family started showing up and getting fixed:
 
@@ -265,7 +267,7 @@ The pattern of the patterns: discovery comes in waves. We don't find one bug at 
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Pipeline-engineering as a service</h3>
-  <p className="mt-3 text-white/70">If your content pipeline is leaking money — fabricating where it should halt, bypassing where it should guard, or running standalone scripts that should be steps — that's what we do at Go7Studio. Every fix gets a canary.</p>
+  <p className="mt-3 text-white/70">If your content pipeline is leaking money — fabricating where it should halt, bypassing where it should guard, or running standalone scripts that should be pipeline steps — that's the work I do at Go7Studio. Every fix gets a canary. Small studio, real receipts.</p>
   <Link href="/contact" className="btn-primary mt-6 inline-flex">Talk to Go7Studio</Link>
 </div>
 
@@ -279,6 +281,6 @@ When the next postmortem lands, the question is: which of the five families does
 - **Pattern 4 — File-system shadows.** Did the dispatcher pick a file that wasn't actually data? Add the shadow filter to the enumerator.
 - **Pattern 5 — Extension collisions.** Did one extractor receive a file meant for another, and produce empty content rather than erroring? The detection logic is the bug, not the extractor.
 
-If a new postmortem doesn't slot into any of these five, that's interesting too — you have a sixth pattern, and the atlas just grew. Add it. Plant a canary. Move on.
+If a new postmortem doesn't slot into any of these five, that's interesting too — you have a sixth pattern and the atlas just grew. Add it. Plant a canary. Move on.
 
-The discipline of writing the atlas down is what makes the next bug findable. Postmortems by themselves are stories. Postmortems organized by pattern family are a debugging vocabulary.
+The discipline of writing the atlas down is what makes the next bug findable. Postmortems on their own are stories. Postmortems organized by pattern family are a debugging vocabulary.

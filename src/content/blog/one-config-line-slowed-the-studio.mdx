@@ -17,9 +17,9 @@ ogImage: "/images/og/one-config-line-slowed-the-studio.jpg"
 schemaType: "Article"
 ---
 
-Wave 11 was crawling. No errors. No alerts. The dashboards were green. The pipeline was just slow.
+Wave 11 was crawling. No errors, no alerts, dashboards all green. Just slow.
 
-The bottleneck was a single line in a TOML file I had opened weeks earlier and forgotten.
+I lost two days bisecting hypotheses before I thought to open `~/.codex/config.toml`. The bottleneck was a single line I'd typed weeks earlier and forgotten about.
 
 ## Half-speed wave
 
@@ -34,7 +34,7 @@ The slowness lived inside the LLM calls themselves. Specifically, inside the aud
 
 ## Bisecting nothing
 
-I lost two days bisecting hypotheses that were all wrong.
+For two days I bisected hypotheses that were all wrong.
 
 | Hypothesis | What I tested | Result |
 |---|---|---|
@@ -44,9 +44,9 @@ I lost two days bisecting hypotheses that were all wrong.
 | Rate-limiting in disguise | Checked rate-limit headers, queue depth | Headers clean. No throttling. |
 | Codex CLI version regression | Pinned codex CLI to the previous minor | Same latency. Clean. |
 
-Every hypothesis came back clean. That should have been the signal that I was looking in the wrong layer. Instead, I kept bisecting, because bisection feels productive.
+Every hypothesis came back clean. That should have been my signal that I was looking in the wrong layer. Instead I kept bisecting, because bisection feels productive even when it's wrong.
 
-The thing I was not testing was global config. I had not opened `~/.codex/config.toml` in weeks. I had no reason to. Nothing in my recent diff history had touched it.
+The thing I wasn't testing was global config. Nothing in my recent diff history had touched `~/.codex/config.toml`, so I had no reason to open it. That assumption was the bug.
 
 ## One line in `~/.codex/config.toml`
 
@@ -64,11 +64,11 @@ default_model = "gpt-5.4"
 # reasoning_effort is now set per-call, not globally
 ```
 
-I had set `model_reasoning_effort = "xhigh"` weeks earlier for a one-off audit. The audit needed maximum reasoning depth on a small batch. I set it globally instead of per-call because it was faster to type. I never reverted it.
+I'd set `model_reasoning_effort = "xhigh"` weeks earlier for a one-off audit on a small batch that genuinely needed maximum reasoning depth. I set it globally instead of per-call because it was faster to type. I never reverted it.
 
-For weeks, every codex helper in my pipeline had been picking up `xhigh` from the global config. Content generation. Classification. Summarization. Audits. All of them, running at the highest reasoning level even though most of them had no business running there.
+For weeks, every codex helper in my pipeline had been picking up `xhigh` from that global config. Content generation. Classification. Summarization. Audits. All of them grinding away at the highest reasoning level when most of them had no business being there.
 
-The single line was the bottleneck for an entire studio's worth of throughput.
+One line. An entire studio's throughput.
 
 ## The benchmark
 
@@ -76,11 +76,11 @@ After the find, I ran a proper benchmark across reasoning levels (`low` / `mediu
 
 **Content gen latency is roughly flat across reasoning levels.** The model spends most of its time generating tokens. Reasoning depth is a small fraction of that time. `low` and `xhigh` finish a content-gen call within seconds of each other.
 
-**Audit latency is dominated by reasoning level.** The audit prompt is short, the response is structured, and almost all of the latency is reasoning. The same audit call that takes ~10 seconds at `low` can take several minutes at `xhigh`. The 20× ratio I had been seeing on the slow audit calls was `xhigh` audit vs `low` content gen, both running through the same global config.
+**Audit latency is dominated by reasoning level.** The audit prompt is short, the response is structured, almost all the latency is reasoning. The same audit call that takes ~10 seconds at `low` can take several minutes at `xhigh`. The 20× ratio I'd been seeing was `xhigh` audit vs `low` content gen, both running through the same global config.
 
-The shape of the rule that fell out: pick `low` for content gen, pick `medium` for routine audits, pick `high` only for audits where the model has to reason across many sources or catch subtle inconsistencies. **Never set `xhigh` globally.** It should be a per-call escape hatch for one-off pieces of work, not the default for an entire pipeline.
+The rule that fell out: pick `low` for content gen, pick `medium` for routine audits, pick `high` only for audits that have to reason across many sources or catch subtle inconsistencies. **Never set `xhigh` globally.** It's a per-call escape hatch for one-off work, not a default.
 
-The takeaway: reasoning level is a per-call decision. Setting it globally is a footgun. The default should be per-call, with a sensible fallback.
+Reasoning level is a per-call decision. Setting it globally is a footgun.
 
 ## Per-call routing wired through
 
@@ -162,14 +162,14 @@ def check_fingerprint(current: dict, baseline: dict) -> None:
         )
 ```
 
-The baseline is a JSON file checked into the pipeline harness repo. When somebody changes `~/.codex/config.toml`, the fingerprint changes, the next pipeline run halts loudly, and the operator has to either revert the config change or explicitly accept the new baseline. There is no silent inheritance.
+The baseline is a JSON file checked into the pipeline harness repo. When somebody changes `~/.codex/config.toml`, the fingerprint changes, the next pipeline run halts loudly, and the operator has to either revert the config or explicitly accept the new baseline. No silent inheritance.
 
-This is now part of pipeline hardening Stage 1, alongside the retry budget, the numeric-preservation audit, and the canary harness. The cost of `env_fingerprint` is a few milliseconds at the start of each run. The benefit is that the next time somebody (probably me) sets a global config flag for a one-off and forgets to revert it, the next pipeline run says so out loud.
+This is now part of pipeline hardening Stage 1, alongside the retry budget, the numeric-preservation audit, and the canary harness. Cost of `env_fingerprint`: a few milliseconds at the start of each run. Benefit: the next time somebody (probably me) sets a global config flag for a one-off and forgets to revert it, the pipeline says so out loud.
 
-Slow is not broken. Dashboards optimized for success rate miss latency regressions. If your studio ever feels slow without an obvious reason, check the global config files first.
+Slow is not broken. Dashboards tuned for success rate miss latency regressions for a week before anybody notices. If your studio feels slow for no obvious reason, the global config files are where I'd look first.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Get the next AI Lab post</h3>
-  <p className="mt-3 text-white/70">One post a month on real production AI. The next one is the cost-and-quality routing matrix — five model families, six call types, real production cost numbers, and the fallback chains that keep it bounded. No fluff.</p>
+  <p className="mt-3 text-white/70">One post a month from a production system that's currently breaking and getting fixed. Next up: the cost-and-quality routing matrix — five model families, six call types, real production cost numbers, and the fallback chains that keep the budget bounded.</p>
   <a href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe to AI Lab</a>
 </div>

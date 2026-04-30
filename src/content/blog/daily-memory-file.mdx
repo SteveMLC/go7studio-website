@@ -19,16 +19,16 @@ schemaType: "Article"
 
 # Why I Keep a Daily Memory File (and Read It Back to the AI Every Morning)
 
-Every fresh AI session starts at zero. System prompts can hold a few thousand tokens of identity and convention; they can't hold three months of decisions, ships, and reversals. So when a fresh session starts, the AI re-derives state from scratch — and gets it wrong, because the state was never fully recoverable from the codebase alone.
+Every fresh AI session starts at zero. System prompts can hold a few thousand tokens of identity and convention — they can't hold three months of decisions, ships, and reversals. So when a fresh session boots, the AI re-derives state from scratch and gets it wrong, because the state was never fully recoverable from the codebase alone.
 
-The fix is not a longer context window. The fix is a **daily memory file** — written for the next session of the AI, not for me — that brings a fresh agent up to current state in 30 seconds.
+The fix isn't a longer context window. The fix is a **daily memory file** — written for the next session of the AI, not for me — that brings a fresh agent up to current state in 30 seconds.
 
 > [!IMPORTANT]
 > The amnesia problem is not solved by bigger context. It is solved by writing receipts. The audience of the daily memory file is not you, six months from now. It is the AI session you boot ten minutes after this one.
 
 ## The format — one paragraph per event, timestamped
 
-Every entry: timestamp, event type, one paragraph. No journal-style reflection. No "today I felt." Just what happened and what changed.
+Every entry: timestamp, event type, one paragraph. No journal-style reflection. No "today I felt." Just what happened and what changed. The audience is the agent, not the diarist.
 
 ```markdown
 # 2026-04-29 — Daily Memory
@@ -82,7 +82,7 @@ flowchart LR
 | Killed process | A running thing was stopped | Disabled Scout cron line |
 | Alert | A problem was caught | AdMob fill rate drop |
 
-If the day was just normal grind with no triggers, that's a real signal — the file stays empty. Empty days are data too.
+If the day was just normal grind with no triggers, that's a real signal — the file stays empty. Empty days are data.
 
 ## Why markdown, not a database
 
@@ -93,7 +93,7 @@ If the day was just normal grind with no triggers, that's a real signal — the 
 | Notion | No | Limited | Limited | No |
 | Obsidian DB | Limited | Yes | Yes | Limited (vault-shaped) |
 
-Markdown wins because it survives me forgetting about the system. A database needs a schema, an export tool, a backup story, and a whole tool stack that can read the schema. A directory of timestamped markdown files survives tool churn, OS migrations, and my own decision to switch editors. `git log` is the audit trail.
+Markdown wins because it survives me forgetting about the system. A database needs a schema, an export tool, a backup story, and a whole stack that can read the schema. A directory of timestamped markdown files survives tool churn, OS migrations, and my own decision to switch editors. `git log` is the audit trail.
 
 ## The compound — 101 files, ~90 days of receipts
 
@@ -116,7 +116,7 @@ $ ls memory/ | grep -E '^[0-9]{4}-' | tail -5
 2026-04-29.md
 ```
 
-When I want to know "what did we change about the modernize step in early March?" the answer is a `grep` away. Twenty seconds, full context. No re-derivation, no guessing, no asking the AI to reason from first principles about a decision the AI itself was part of three weeks ago.
+When I want to know "what did we change about the modernize step in early March?", the answer is a `grep` away. Twenty seconds, full context. No re-derivation, no guessing, no asking the AI to reason from first principles about a decision the AI itself was part of three weeks ago.
 
 ## The orient skill that bootstraps a fresh session in 30 seconds
 
@@ -144,7 +144,7 @@ $ /orient
 - Storyline 2+ HTML5 extractor (3 medical-series courses blocked)
 ```
 
-Fresh AI session goes from zero to current state in one command. The session can then write its own dated memory file by end of day, and the next session boots with the context the previous session generated.
+Fresh AI session goes from zero to current state in one command. The session writes its own dated memory file by end of day, and the next session boots with the context this one generated.
 
 ## The compounding loop
 
@@ -174,10 +174,10 @@ The skeleton is just markdown. Copy, change date, fill in entries when triggers 
 [...]
 ```
 
-That's the entire template. The discipline of the format does the compounding work. The audience of the file is the AI session ten minutes from now, the day after, and three months from today.
+That's the entire template. The discipline of the format does the compounding work. The audience is the AI session ten minutes from now, tomorrow, and three months from today.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Get the next AI Lab post</h3>
-  <p className="mt-3 text-white/70">The lab covers memory architecture, agent design, and the routing stack behind a one-person studio. New post every couple of weeks.</p>
-  <Link href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe</Link>
+  <p className="mt-3 text-white/70">One post every couple of weeks from a one-person studio that's been writing the receipts long enough to read them back. Memory architecture, agent design, and the routing stack behind it all.</p>
+  <Link href="/ai-lab" className="btn-primary mt-6 inline-flex">Subscribe to AI Lab</Link>
 </div>

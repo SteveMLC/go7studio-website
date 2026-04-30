@@ -20,9 +20,7 @@ schemaType: "Article"
 
 # The Game I Won't Ship: Why Pet Paradise Is on Hold
 
-Pet Paradise is the most complete unshipped game in the studio. 814 files, 7.3MB of integrations, ~80-90% done on the systems side. Pet-breeding mutation system functional. Visual hook validated through playtests. Everything ready except one bottleneck.
-
-The category benchmark — Pet Sim X, the obvious comparable on Roblox — reportedly earns around $1M per month. Capturing 1% of that is more than everything else in the studio combined.
+Pet Paradise is the most complete unshipped game in the studio. 814 files, 7.3MB of integrations, ~80-90% done on the systems side. Pet-breeding mutation system: functional. Visual hook: validated in playtests. Everything ready except one bottleneck — and that bottleneck is sitting between me and a category where the obvious comparable (Pet Sim X on Roblox) reportedly earns around $1M per month. Capturing 1% of that is more than everything else in the studio combined.
 
 So why is it frozen?
 
@@ -36,9 +34,9 @@ So why is it frozen?
 | Rampart | Pre-launch | $0 | Modest wave-defense revenue |
 | SlimeSlip | In development (60-70%) | $0 | Casual platformer, paced for learning |
 
-Even with conservative assumptions, Pet Paradise dominates the portfolio's theoretical upside by an order of magnitude. The honest reading is: if any single game in the studio justifies focused attention on its own, this is the one.
+Even with conservative assumptions, Pet Paradise dominates the portfolio's theoretical upside by an order of magnitude. Honest read: if any single game in the studio earns focused attention on its own, this is the one.
 
-That makes the freeze a real decision, not a default. The freeze is not "I'll get to it eventually." The freeze is "the unit economics of finishing it now do not work, and here are the four conditions that would change that."
+That makes the freeze a real decision, not a default. "I'll get to it eventually" is not the freeze. "The unit economics of finishing it now do not work, and here are the four conditions that would change that" — that's the freeze.
 
 ## What's already built
 
@@ -50,7 +48,7 @@ That makes the freeze a real decision, not a default. The freeze is not "I'll ge
 | Monetization scaffolding | In place, needs final balance pass |
 | Animation pipeline for new pet types | **Bottleneck** |
 
-Eighty to ninety percent on the systems side. The remaining ten to twenty percent is not evenly distributed across systems — it's concentrated in one place, and that one place is the entire reason for the freeze.
+Eighty to ninety percent on the systems side. The remaining ten to twenty isn't spread evenly — it's piled into one place, and that one place is the entire reason for the freeze.
 
 ## The bottleneck — a 4-tool animation chain
 
@@ -72,7 +70,7 @@ sequenceDiagram
     Note over B,RS: Per-pet cost: ~1 day of focused work
 ```
 
-Each step is solvable individually. The chain is what's slow. Until the chain is industrialized — until I can drop a new pet model into Bplug and have it land in Roblox Studio with working joints in under an hour — every new pet costs a day. The hand-fix step at R6 joints is the worst link, and it doesn't yield to automation in 2-hour daily blocks. It needs a 2-week uninterrupted block to industrialize.
+Each step is solvable on its own. The chain is what's slow. Until I can drop a new pet model into Bplug and have it land in Roblox Studio with working joints in under an hour, every new pet costs me a day. The R6 hand-fix is the worst link, and it doesn't yield to automation in 2-hour daily blocks. It needs a 2-week uninterrupted block to industrialize, and that's a block I haven't had.
 
 ## The opportunity-cost equation
 
@@ -86,7 +84,7 @@ Pet Paradise wants a 2-week uninterrupted block to industrialize the animation p
 | Pet Paradise (thaw + ship) | $0 | 2-week block + 4-6w | Compounds only after launch |
 | Portfolio total | $5-7 | bounded | Stable |
 
-The honest math is that shipping Empire's next phase first compounds harder over the next 90 days than the equivalent time spent thawing Pet Paradise. The Pet Paradise revenue is gated on a multi-month runway I don't have to spend yet — and may never need to spend, if the resume conditions don't fire.
+The honest math: shipping Empire's next phase first compounds harder over the next 90 days than the same time spent thawing Pet Paradise. Pet Paradise revenue is gated on a multi-month runway I don't have to spend yet — and may never need to spend, if the resume conditions don't fire.
 
 ## Resume criteria — the 4-condition gate
 
@@ -104,7 +102,7 @@ The fourth condition is the most important and the easiest to skip. If I show up
 
 ## The "freeze, don't kill" rule
 
-Most advice for solo developers is "ship anything." That advice is wrong for category-benchmark games. Shipping Pet Paradise at 90% in a category where the top games are at 99% is asymmetric loss — the worse-than-competitor experience defines the brand for the people who try it, and they don't come back when the better version eventually ships.
+Most solo-dev advice says "ship anything." That advice is wrong for category-benchmark games. Shipping Pet Paradise at 90% in a category where the top games sit at 99% is asymmetric loss — the worse experience defines the brand for everyone who tries it, and they don't come back when the better version eventually arrives.
 
 > [!TIP]
 > Deleted projects can't be unfrozen. Frozen projects compound — I can use Pet Paradise's R6 work to learn the animation chain on something else. Every paused project gets a written resume gate. Without the gate, frozen drifts into abandoned.
@@ -132,10 +130,10 @@ Top-right quadrant is where Pet Paradise lives — high completion, high categor
 
 Empire Tycoon sits in the bottom-right — high completion, lower category competition — which is exactly the quadrant where shipping and iterating is the correct strategy. Different quadrants, different rules. Pet Paradise's quadrant says: freeze, gate, wait for the four conditions, then thaw with intent.
 
-The portfolio metric isn't "things shipped this quarter." It's "things ready to thaw when the gate trips, and shipping when the math works." Pet Paradise will thaw when the math works. Until then, the freeze is the right call.
+The portfolio metric isn't "things shipped this quarter." It's "things ready to thaw when the gate trips, shipping when the math works." Pet Paradise will thaw when the math works. Until then, the freeze is the right call — and writing the gate down is what keeps me honest about it.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">See what 37 strangers paid for</h3>
-  <p className="mt-3 text-white/70">Empire Tycoon is the game that did ship — the daily revenue that gates whether Pet Paradise thaws this year. Free to play, monetized with rewarded ads and IAPs.</p>
+  <p className="mt-3 text-white/70">Empire Tycoon is the game that did ship — and its daily revenue is the lever that decides whether Pet Paradise thaws this year. Free to play, monetized with rewarded ads and IAPs.</p>
   <Link href="https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon" className="btn-primary mt-6 inline-flex">Get Empire Tycoon</Link>
 </div>

@@ -19,11 +19,11 @@ schemaType: "Article"
 
 ## The signal
 
-I pulled GSC. It said 8 indexed careers. I pulled the admin dashboard. It said 31 published.
+GSC said 8 indexed careers. The admin dashboard said 31 published. Twenty-three careers were live in production and Google didn't know any of them existed.
 
 <Image src="/images/blog/gsc-vs-admin-careers.png" alt="GSC indexed careers count of 8 next to admin dashboard published count of 31" />
 
-When two numbers should agree and don't, the question is which one is lying. The database was right. The 8 came from somewhere else. The hunt for "where" took longer than the fix.
+When two numbers that should agree don't, the question is which one is lying. The database was right. The 8 came from somewhere else. The hunt for "where" took longer than the fix.
 
 ## Where the hardcoded array lived
 
@@ -66,9 +66,9 @@ const SITEMAP_CAREERS = [
 const KNOWN_CAREERS = ['medical-coding', 'emt', /* ...same 8 */];
 ```
 
-Four copies of the same array. None of them imported from a shared module. If you added a career to one, it had to be added to the other three. Nobody had added a career to any of them in months because the production seeder publishes career pages directly off database state — and that flow had been working fine.
+Four copies of the same array. None of them imported from a shared module. If you added a career to one, it had to be added to the other three. Nobody had touched any of them in months because the production seeder publishes career pages directly off database state — and that flow had been working fine.
 
-So new careers shipped. They rendered fine for a user who landed on `/careers/<slug>`. They just never made it into the homepage's "Featured Careers" grid, the sitemap, the static-route metadata, or the glossary funnel. From Google's perspective, the database had 31, but the only ones it could discover from internal links and the sitemap were the original 8.
+So new careers shipped. They rendered fine for any user who landed on `/careers/<slug>`. They just never made it into the homepage's "Featured Careers" grid, the sitemap, the static-route metadata, or the glossary funnel. From Google's perspective, the database had 31; the only ones discoverable from internal links and the sitemap were the original 8.
 
 ## The inferCategory() fallback that masked the bug
 
@@ -84,7 +84,7 @@ function inferCategory(slug: string): CareerCategory {
 
 Because the page rendered with a generic category, nobody on the team had a way to notice. The career was live. It looked fine. Internal links from the homepage didn't include it. The sitemap didn't include it. The schema markup pulled from the generic fallback, so structured data was wrong too.
 
-This is the worst kind of bug: nothing 500s, nothing logs, the page is up. It just isn't discoverable.
+That's the worst kind of bug: nothing 500s, nothing logs, the page is up. It just isn't discoverable.
 
 ## The /blog/:slug ghost route
 
@@ -152,7 +152,7 @@ The `≥4 published` threshold is deliberate. A career page that shows up on the
 
 ## Generalizable lesson
 
-If your taxonomy lives in code, your taxonomy is stale. Every taxonomy I've ever hardcoded has eventually drifted from reality. The pattern is consistent — somebody adds a thing to the database, the thing is real, the thing renders, but the array of "things we know about" never gets updated, so internal navigation, sitemaps, and SEO surfaces all silently miss it.
+If your taxonomy lives in code, your taxonomy is stale. Every hardcoded taxonomy I've shipped has eventually drifted from reality. The pattern is consistent: somebody adds a thing to the database, the thing is real, the thing renders, but the array of "things we know about" never gets updated, so internal navigation, sitemaps, and SEO surfaces all silently miss it.
 
 The fix is always the same shape. Move the source of truth into a query. Materialize at build time so production isn't paying query cost on every page render. Re-run nightly so changes propagate.
 
@@ -166,4 +166,4 @@ The fix is always the same shape. Move the source of truth into a query. Materia
 
 The migration was a one-PR rip-and-replace. The hardcoded arrays came out, the derived JSON went in, the four consumers each switched their import from `FEATURED_CAREERS` to the materialized list. Took an afternoon. The 23 careers that had been hiding from Google for months were in the sitemap by the next nightly build.
 
-If you're shipping anything where new entities (products, locations, courses, careers, ingredients, models) land in a database and your homepage / sitemap / SEO layer has a list, audit it today. Search your codebase for any array literal that has more than three slugs in it. If you find one, that's almost certainly a future stale-taxonomy bug. Move it to a query before it costs you index coverage.
+If you're shipping anything where new entities — products, locations, courses, careers, ingredients, models — land in a database and your homepage / sitemap / SEO layer has a list, audit it today. Search your codebase for any array literal with more than three slugs in it. If you find one, that's almost certainly a future stale-taxonomy bug. Move it to a query before it costs you index coverage.

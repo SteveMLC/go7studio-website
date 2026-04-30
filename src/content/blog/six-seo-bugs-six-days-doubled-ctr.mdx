@@ -19,7 +19,7 @@ schemaType: "Article"
 
 ## The day I finally opened Google Search Console
 
-We had been shipping features into Qualora for the better part of a year. New course pages, glossary terms, career landing pages, schema-rich modules. The product was real. The traffic was not.
+For the better part of a year I'd been shipping features into Qualora — new course pages, glossary terms, career landing pages, schema-rich modules. The product was real. The traffic was not.
 
 The first thing GSC told me when I finally pulled the 90-day report was simple and ugly.
 
@@ -29,13 +29,13 @@ The first thing GSC told me when I finally pulled the 90-day report was simple a
 - **8 clicks**
 - **0.13% CTR**
 
-Benchmark CTR for our keyword set is somewhere between 0.5% and 1.0%. We were 3 to 8 times below that. Either we were getting impressions for queries we had no business showing up on, or we were showing up and not earning the click. Both turned out to be true. And the root cause for most of it was bugs we shipped, not strategy we got wrong.
+Benchmark CTR for our keyword set sits between 0.5% and 1.0%. We were 3 to 8 times below that. Either we were getting impressions for queries we had no business showing up on, or we were showing up and not earning the click. Both turned out to be true. And the root cause for most of it was bugs we shipped, not strategy we got wrong.
 
-Six days later, after a tight bug-by-bug audit and fix cycle, the numbers had moved. This is the post-mortem.
+Six days later, after a tight audit-and-fix cycle, the numbers had moved. This is the post-mortem.
 
 ## The six bugs in one table
 
-Before any narrative, here is the contract for the rest of the post. Six bugs. Where they lived. How bad they were.
+Before any narrative, here's the contract for the rest of the post. Six bugs. Where they lived. How bad they were.
 
 | # | Bug | Location | Severity | Symptom |
 |---|---|---|---|---|
@@ -46,7 +46,7 @@ Before any narrative, here is the contract for the rest of the post. Six bugs. W
 | 5 | STATIC_ROUTE_META gaps | `server/seo.ts` | Medium | 7 static routes had no meta at all |
 | 6 | Sitemap junk URLs | sitemap generator | Low | 200 OK on real URLs but quality bar low |
 
-The biggest finding was bug 1. It is also the one I would have sworn was impossible if you had described it to me cold.
+The biggest finding was bug 1. It's also the one I would have sworn was impossible if you'd described it to me cold.
 
 ## Bug 1 — the App.tsx race that wiped every per-page head
 
@@ -146,15 +146,15 @@ Two notes on those numbers. First, the +138% on clicks is real and ongoing — i
   <Link href="https://qualora.io/quiz/sampler" className="btn-primary mt-6 inline-flex">Try a free lesson</Link>
 </div>
 
-## What I would do differently
+## What I'd do differently
 
-Audit before you build. We shipped a year of features without ever opening GSC. The single biggest lesson here is that the App.tsx race had been silently wiping our heads for months, and we never knew because we never looked.
+Audit before you build. We shipped a year of features without ever opening GSC. The biggest lesson: the App.tsx race had been silently wiping our heads for months, and we never knew because we never looked.
 
-The next bug we are hunting is the duplicate-canonical issue — 256 URLs flagged "Google chose a different canonical." That one turned into a 2,500-row glossary dedup with a partial unique index. Different post.
+The next bug on the list is the duplicate-canonical issue — 256 URLs flagged "Google chose a different canonical." That one turned into a 2,500-row glossary dedup with a partial unique index. Different post.
 
 > [!TIP]
 > Open GSC on the day you launch. Not the day someone tells you SEO is broken.
 
-If you build the kind of app where every page has a story to tell — careers, glossaries, courses, recipes, products, locations — your default assumption should be that something in your render tree is silently wiping the head. Verify it, even if you are sure it is fine.
+If you build the kind of app where every page has a story to tell — careers, glossaries, courses, recipes, products, locations — your default assumption should be that something in your render tree is silently wiping the head. Verify it, even if you're sure it's fine.
 
-Especially if you are sure it is fine.
+Especially if you're sure it's fine.

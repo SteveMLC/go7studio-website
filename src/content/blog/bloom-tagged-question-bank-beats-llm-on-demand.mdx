@@ -20,15 +20,13 @@ ogImage: "/images/og/bloom-tagged-question-bank-beats-llm-on-demand.jpg"
 schemaType: "Article"
 ---
 
-The first version of our CE platform asked the LLM to write a quiz at the moment a student opened a lesson.
+The first version of our CE platform asked the LLM to write a quiz the moment a student opened a lesson. It looked beautiful in a demo. We almost shipped it.
 
-It worked. It looked great in a demo. We almost shipped it.
-
-Then I sat down and asked the regulator's question: if a student fails a quiz, retries it, and passes the second time, what did they actually see? A different prompt's response. A different shape. Possibly a different difficulty. We had no record of which questions were asked, no audit trail of which distractors appeared, and no way to guarantee that two students of the same skill level took comparable assessments.
+Then I sat down and asked the regulator's question: if a student fails a quiz, retries it, and passes the second time, what did they actually see? A different prompt's response. A different shape. Possibly a different difficulty. No record. No audit trail. No way to claim that two students of the same skill level took comparable assessments.
 
 That's not a quiz engine. That's a vibe.
 
-This post is about what we built instead — a Bloom-tagged question bank with distribution-aware selection — and why it's the right shape for any compliance-grade learning platform we ship through Go7Studio. The platform we're describing is the [NEALAC Learning Hub](https://drannnealac.com), built with Dr. Ann Leonard-Zabel as the public-facing CE provider. The architecture decisions here generalize to every edtech platform we've built since.
+This post is about what we built instead — a Bloom-tagged question bank with distribution-aware selection — and why it's the right shape for any compliance-grade learning platform we ship through Go7Studio. The example is the [NEALAC Learning Hub](https://drannnealac.com), built with Dr. Ann Leonard-Zabel as the public-facing CE provider. The architecture decisions generalize to every edtech build we've shipped since.
 
 ## Section 1: The trap — letting the LLM write quizzes at runtime
 
@@ -46,7 +44,7 @@ What you actually get when you ship that:
 > [!NOTE]
 > Runtime LLM generation is fine for *content* — drafting a glossary entry, suggesting a flashcard, summarizing a lesson. It is not fine for *assessment*, where the platform must be able to show every student saw a comparable, auditable, deterministic instrument.
 
-The framing that finally clicked for me: a quiz is not "content the LLM produces on demand." A quiz is a *measuring instrument*, and an instrument needs calibration, distribution control, and a reproducible read.
+The framing that finally clicked: a quiz is not content the LLM writes on demand. A quiz is a *measuring instrument*, and an instrument needs calibration, distribution control, and a reproducible read.
 
 ## Section 2: The bank model
 
@@ -124,11 +122,11 @@ A real row from the NEALAC TBI bank, slightly abridged:
 }
 ```
 
-Notice the rationale on each answer, including the wrong ones. This is what lets us run distractor-quality audits without re-engaging a model. A good distractor is plausibly wrong; a bad one is obviously wrong. We score every distractor at write time so the bank itself can be filtered.
+Notice the rationale on each answer, including the wrong ones. That's what lets us run distractor-quality audits without re-engaging a model. A good distractor is plausibly wrong; a bad one is obviously wrong. We score every distractor at write time so the bank itself can be filtered.
 
 ## Section 3: Distribution-aware selection
 
-Here's where most quiz engines fail even when they have a bank: they pick three random rows.
+Here's where most quiz engines that have a bank still fail: they pick three random rows.
 
 A section quiz on the NEALAC TBI course is exactly three questions. We pick:
 
@@ -136,7 +134,7 @@ A section quiz on the NEALAC TBI course is exactly three questions. We pick:
 - 1 question from `bloom_level = 'apply'`
 - 1 question from `bloom_level IN ('analyze', 'evaluate')`
 
-Why this composition? Because a passing CE quiz that tests only recall doesn't actually demonstrate competency. It demonstrates lookup. Distribution control is how we say "the student understands the material at three cognitive levels," not just "the student memorized terminology."
+Why this composition? A passing CE quiz that tests only recall doesn't demonstrate competency — it demonstrates lookup. Distribution control is how we say "the student understands the material at three cognitive levels," not "the student memorized terminology."
 
 The bank coverage on the TBI course as it currently sits:
 
@@ -294,11 +292,11 @@ Same student → same quiz on retry. Different students → different sampling w
 
 ## What this gets us
 
-A platform that the regulator can audit. A platform where two students of the same skill level take comparable assessments. A platform that doesn't go down when the model API does. A platform whose quiz quality is owned by the team that built it, not by whatever the model decides to write at the moment of impression.
+A platform the regulator can audit. A platform where two students of the same skill level take comparable assessments. A platform that doesn't go down when the model API does. A platform whose quiz quality is owned by the team that built it, not by whatever the model decides to write at the moment of impression.
 
-The reason all 10 lines of our NEALAC verification suite passed on the first run is partly that we built the bank model from day one. Distribution checks, no-overlap checks, anchor checks, eligible-flag checks — all of them were *expected to pass* because the architecture made them tractable.
+All 10 lines of our NEALAC verification suite passed on the first run, partly because we built the bank model from day one. Distribution checks, no-overlap checks, anchor checks, eligible-flag checks — all of them were *expected to pass* because the architecture made them tractable.
 
-If you want to see what this looks like in a live, regulator-facing CE platform, [drannnealac.com](https://drannnealac.com) is hosting the result. The platform is small enough to read in an afternoon and rigorous enough to survive an audit. That's what we're optimizing for.
+If you want to see what this looks like in a live, regulator-facing CE platform, [drannnealac.com](https://drannnealac.com) is hosting the result. The platform is small enough to read in an afternoon and rigorous enough to survive an audit. That's the shape we optimize for.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
   <h3 className="text-xl font-semibold text-white">Build with Go7Studio</h3>
