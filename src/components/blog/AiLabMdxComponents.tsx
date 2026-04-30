@@ -10,6 +10,7 @@ import {
   ShieldAlert,
   Sparkles,
 } from "lucide-react";
+import { MermaidDiagram } from "./MermaidDiagram";
 
 type TakeawayItem = { title: string; body: string };
 type ChecklistItem = string | { label: string; note?: string };
@@ -325,10 +326,25 @@ function InlineCode(props: React.HTMLAttributes<HTMLElement>) {
   return <code {...props} className={`rounded-md border border-white/10 bg-white/[0.06] px-1.5 py-0.5 font-mono text-[0.92em] text-brand-teal ${className}`.trim()} />;
 }
 
+function extractTextFromChildren(node: React.ReactNode): string {
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractTextFromChildren).join("");
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+    return extractTextFromChildren(node.props.children);
+  }
+  return "";
+}
+
 function PremiumPre(props: React.HTMLAttributes<HTMLPreElement>) {
-  const child = React.Children.toArray(props.children)[0] as React.ReactElement<{ className?: string }> | undefined;
+  const child = React.Children.toArray(props.children)[0] as React.ReactElement<{ className?: string; children?: React.ReactNode }> | undefined;
   const className = child?.props?.className || "";
   const language = className.replace("language-", "") || "code";
+
+  if (language === "mermaid") {
+    const chart = extractTextFromChildren(child?.props?.children).trim();
+    return <MermaidDiagram chart={chart} />;
+  }
 
   return (
     <div className="my-8 overflow-hidden rounded-[24px] border border-white/10 bg-[#060912] shadow-[0_18px_40px_rgba(0,0,0,0.35)]">
