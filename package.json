@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@octokit/rest": "^22.0.1",
     "firebase-admin": "^13.7.0",
     "framer-motion": "^12.30.0",
     "gray-matter": "^4.0.3",

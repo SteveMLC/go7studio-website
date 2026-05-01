@@ -2,83 +2,126 @@
 title: "The Day Empire Tycoon Made Its First Dollar"
 slug: "empire-tycoon-first-dollar"
 date: "2026-04-29"
-modified: "2026-04-30"
-excerpt: "A $4.99 premium purchase on Feb 5, 2026. What it told me about pricing, timing, and the 90-day arc that followed."
+modified: "2026-05-01"
+excerpt: "Ten months of building. Two kids on the couch. Months of crickets. Then on February 5, a stranger paid $4.99. This is what that one sale actually meant."
 pillar: "Studio"
 tags:
   - empire-tycoon
   - mobile-games
-  - monetization
-  - iap
   - solo-dev
+  - founder-story
+  - monetization
 status: "published"
 seoTitle: "The Day Empire Tycoon Made Its First Dollar"
-seoDescription: "On Feb 5, 2026, a stranger paid $4.99 for Empire Tycoon. Here's what that first IAP told me about pricing, timing, and the 90-day arc that followed."
+seoDescription: "Ten months of nights and weekends, building an idle game with my kids on the couch. Then a stranger paid $4.99. Here's the whole arc — story, data, lessons."
 ogImage: "/images/og/empire-tycoon-first-dollar.jpg"
 schemaType: "Article"
 ---
 
-# The Day Empire Tycoon Made Its First Dollar
+April 2025. My kids and I were playing _AdVenture Capitalist_ on the couch, taking turns smashing the income button. One of them looked up and said, "We should make one of these."
 
-On Day 5 of a 30-day revenue challenge, somebody I've never met paid Empire Tycoon $4.99.
+I don't know exactly what made me take it seriously — maybe just that they kept asking — but a week later there was a Flutter project on the iPad, three businesses, a manual upgrade button, and the world's ugliest tap-to-earn loop. That was the start of Empire Tycoon. Not a product. Something to build with my sons.
 
-First dollar. Then dollars two through five, all at once. One transaction, one buyer, one line in the scoreboard that ended a long stretch of running ads against an audience of essentially me.
+## The build, on the couch
 
-Here's that line, copied from `scoreboard.json`:
+We worked on it on weekends. They'd play whatever I'd shipped that morning, then come back with notes. The notes were almost always about *feel*. "It's not satisfying when you upgrade." "The numbers are too small." "Why does the manager just disappear when you tap him?" They didn't know the language for game design but they knew when something was off, and they had infinite patience for me iterating in front of them.
+
+By the summer the gameloop was real. Eleven businesses, a working prestige system, hustle taps that did something, a property layer that felt good to expand. The investment system came from one of them asking why you couldn't park money somewhere instead of only spending it. I'd been hesitating on that for weeks. His question made the answer obvious. I prototyped it that afternoon.
+
+We launched on Google Play in late 2025. Quietly. No marketing. The boys were the first installers. I took a screenshot of the first 1.0 release and texted it to my brother.
+
+## Then nothing happened, for months
+
+The Play Store has a way of telling you that nobody cares. Daily installs in the single digits. Most of those were probably my own test devices and the boys' Chromebooks. AdMob earnings hovered between zero and twenty-nine cents per day. The eCPM dashboard was technically reporting numbers, but they were the kind of numbers that round to *nothing happened today*.
+
+Every week I'd ship a small fix or a new business or polish a transition, push the build, watch the stats, and see exactly the same thing. Occasionally a stranger would file a comment — usually someone reporting a crash on a phone I'd never tested on — and it would feel like contact from another planet. Then back to silence.
+
+I'd started this for the kids and I was still doing it for the kids and that was supposed to be enough. Some days it was. Other days I'd open the analytics dashboard at 11pm and feel a kind of bone-tiredness that's hard to describe. You build something, you keep building it, and the world doesn't notice.
+
+## February 2026 — the $600 challenge
+
+By February 1 of this year — ten months in — the game was live and good and quiet. I gave myself a thirty-day window to recoup $600 in real revenue, mostly to force myself to stop hiding behind "still polishing" and start shipping some marketing. Most days I missed the daily target by a factor of ten. Some days fifty.
+
+Then on Day 5, this line appeared in the scoreboard:
 
 ```text
-2026-02-05  premium_purchase_enhanced  $4.99  Manual report from Steve
+2026-02-05  premium_sale  $4.99  Manual report from Steve
 ```
 
-Five dollars and a manual report. That is the entire artifact.
+That's the whole artifact. Five dollars from a stranger, recorded by hand because I hadn't yet wired up the BigQuery sync. The SKU was `premium_purchase` — the **legacy $4.99 "remove ads + 1 platinum point"** tier. The simplest, cheapest non-cosmetic IAP in the game.
 
-## What the price told me
+## What that one sale actually meant
 
-The buyer picked the entry tier. Bigger bundles were sitting right there in the IAP carousel — `starter_bundle` at $22.60, `pp_pack_large` at $25.55 — and they walked past both for the cheapest non-rewarded purchase in the game.
+A real human, somewhere in the world, had downloaded the game, played enough of it to want more, opened the IAP carousel, picked an option, and paid for premium content. None of those events were inevitable. The download wasn't inevitable. The play session wasn't inevitable. The decision to even open the IAP screen wasn't inevitable. And the decision to spend money on a game shipped by a one-person studio they'd never heard of, that was the least inevitable of all.
+
+I sat with that for a minute. Ten months of building. Hundreds of small decisions about feel and progression and the right size of a number on a button. Weekend playtests with my kids. Quiet weeks where I assumed nobody was out there. And somebody had finally said, with their wallet, "this is worth four ninety-nine to me."
+
+That meant something. It still does.
+
+## The data, after the goosebumps wore off
+
+The buyer didn't pick the most expensive thing. They picked the legacy ad-removal tier. That's information.
+
+Empire Tycoon's actual IAP shelf, with real display prices straight from `BillingService`:
+
+| SKU | Price | What it does |
+| --- | --- | --- |
+| `pp_pack_small` | **$0.99** | 100 platinum points |
+| `income_boost_24h` | **$1.99** | 2× income for 24 hours |
+| `pp_pack_medium` | **$2.49** | 500 platinum points |
+| `starter_bundle` | **$2.99** | 200 PP + 2× income for 24h |
+| `premium_purchase` (legacy) | **$4.99** | Remove ads + 1 platinum point |
+| `pp_pack_large` | **$4.99** | 1500 platinum points |
+| `premium_purchase_enhanced` (top tier) | **$6.99** | Remove ads + bigger platinum grant |
+
+The most expensive thing in the store is the **enhanced premium tier at $6.99**, not the legacy $4.99. The cheapest is `pp_pack_small` at ninety-nine cents. The first buyer skipped past the dollar packs and the income boost and paid almost five times as much for the legacy ad-removal tier.
+
+Why?
+
+Because removing ads from an idle game is the IAP that earns its keep over the long tail of the session. Income boosts wear off. Platinum packs get spent. Ad removal compounds every minute you keep playing. The buyer wasn't optimizing for *cheapest*. They were optimizing for *most value per dollar over time*. That is a much more sophisticated read on the IAP carousel than I'd given a first-session player credit for.
+
+By Day 90, of 37 paying buyers, the distribution looked like this:
+
+| Tier | SKU | Buyers | Gross revenue |
+| --- | --- | --- | --- |
+| Top | `premium_purchase_enhanced` ($6.99) | 15 | $107.03 |
+| Mid | `pp_pack_large` ($4.99) | 5 | $25.55 |
+| Mid | `premium_purchase` ($4.99 legacy) | 4 | $24.17 |
+| Mid | `starter_bundle` ($2.99) | 7 | $22.60 |
+| Low | `income_boost_24h` ($1.99) | 4 | $8.36 |
+| Low | `pp_pack_medium` ($2.49) | 1 | $2.94 |
+| Low | `pp_pack_small` ($0.99) | 1 | $1.99 |
+| **Total** | — | **37** | **$192.63** |
+
+Premium tiers (enhanced + legacy) carried 19 of the 37 buyers and $131.20 of the $192.63 gross. The enhanced version eventually out-converted the legacy version fifteen to four — because per platinum point delivered, the enhanced version was actually a better deal. The buyers were doing math.
+
+The first buyer wasn't an outlier. They were the first proof of a pattern that took ninety days to fully read.
 
 > [!NOTE]
-> First conversions tell you what the funnel offers, not what the buyer wants. They picked $4.99 because the higher tiers had no story attached to them yet. By Day 90, the entry tier carried the line: 15 of 37 total IAP buyers.
-
-The bundle hadn't earned trust because nothing in the game had earned the bundle yet. New player, new account, fifth day live — they wanted the smallest possible commitment that proved the IAP worked. Which is exactly what an entry tier is for.
-
-## What the timing told me
-
-Day 5. Not Day 30. Not "after a week of free play converts them into an engaged user." A stranger downloaded an unsigned-feel idle game from a no-name studio and paid for premium content inside the first session window.
-
-```mermaid
-timeline
-    title Empire Tycoon — first 5 days
-    Day 1 : Public listing live
-          : 0 IAP
-    Day 2 : First handful of users
-          : 0 IAP
-    Day 3 : AdMob trickle starts
-          : 0 IAP
-    Day 4 : Daily-login reward designed
-          : 0 IAP
-    Day 5 : First IAP — $4.99 premium_purchase_enhanced
-```
-
-I'd been designing the conversion funnel around a "let them play for a week first" assumption that turned out to be wrong. First-session intent is real. If your game has a clear hook in the first 20 minutes and a credible reason to spend, some percentage of users will spend that day. Most who don't spend then never come back to spend at all.
-
-## The contrast with the AdMob trickle
-
-The same week, ad revenue was running cents per day. The peak day didn't arrive until Feb 13 (eCPM $30.00) — eight days later. On Day 5 specifically, AdMob earnings were noise. The single IAP purchase was worth roughly thirty days of ad revenue at the rate ads were running at that moment.
-
-That reframed the rest of the 90-day arc. The dashboards I had been building optimized for ad eCPM and impression count. After Day 5, the dashboards I actually checked first thing in the morning were the IAP funnel and the last-IAP-purchase timestamp.
+> Gross figures here come from BigQuery's `event_value_in_usd`, which includes regional pricing variation, so the totals run a few percent above clean per-unit math. The unit prices in the SKU table are the US display prices.
 
 ## The one thing I changed the next day
 
-The IAP prompt had been firing on the prestige screen — once a player completed their first prestige reset. The first buyer never prestiged. They saw the entry-tier offer because I'd also planted it on the post-build summary screen as a secondary placement, almost as an afterthought. That afterthought is where the conversion happened.
+The IAP prompt had been firing on the prestige screen — once a player completed their first reset. The first buyer never prestiged. They saw an entry-tier offer because I'd also planted it on the post-build summary screen, almost as an afterthought. That afterthought was where the conversion actually happened.
 
-So on Day 6 I moved the post-build placement earlier in the loop, made it the primary, and pushed the prestige-screen prompt to secondary. Buyer activation jumped on the change. By Day 90 the same SKU had carried 15 buyers.
+So on Day 6 I moved the post-build placement earlier in the loop, made it the primary, and pushed the prestige-screen prompt to secondary. Buyer activation jumped on the change. By Day 90 the same shelf had carried thirty-seven of them.
+
+## What I think about now
+
+I don't think much about the first dollar in dollar terms anymore. $4.99 is a rounding error against a year of nights and weekends.
+
+What I think about is what the first dollar *broke open*: the assumption that nobody was out there.
+
+There were people out there. They were busy, they were skeptical, the Play Store algorithm wasn't surfacing the game, the icon wasn't quite right yet, and some percentage of them were going to install Empire Tycoon, play through the first hour, and quietly decide it was worth $4.99 to keep going without ads. That percentage is small. It's not zero.
+
+If you've shipped something and watched it land in silence, the only honest thing I can tell you is: the silence is not the answer. The silence is the *absence* of the answer. The answer comes from the one stranger who plays through and pays.
+
+You only need one to know.
+
+Empire Tycoon is still my side project. The boys still ship me notes. There are now thirty-seven strangers in the data who paid me a total of $192.63 to keep building it. Some weeks that feels like nothing. Most weeks, ten months in, it feels like a lot.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
-  <h3 className="text-xl font-semibold text-white">See what 37 strangers paid for</h3>
-  <p className="mt-3 text-white/70">Empire Tycoon is the idle-game side of the studio — the one where that first $4.99 turned into a 90-day revenue line. Free, monetized with rewarded ads and IAPs, runs on Android.</p>
-  <Link href="https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon" className="btn-primary mt-6 inline-flex">Get Empire Tycoon</Link>
+  <h3 className="text-xl font-semibold text-white">Play the game thirty-seven strangers paid for</h3>
+  <p className="mt-3 text-white/70">Empire Tycoon is the idle-game side of Go7Studio &mdash; eleven businesses, prestige loops, real estate, hustle taps. The version those buyers paid for. Free, ad-supported, runs on Android.</p>
+  <Link href="https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon" className="btn-primary mt-6 inline-flex">Get Empire Tycoon on Google Play</Link>
 </div>
-
-The first dollar was a manual report from a scoreboard that had been showing zeros for a week. The lesson wasn't "I made money." It was that the pricing, placement, and timing assumptions I'd baked into the funnel were all wrong, and one buyer told me so.
-
-The 90-day total ended at $339.56. Day 5 was the day I stopped guessing and started reading the data.
