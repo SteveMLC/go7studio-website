@@ -13,7 +13,7 @@
 
 # Day 1 (Steve's Tier 1)
 # empire-tycoon-ninety-days-thirty-seven-buyers
-empire-tycoon-first-dollar
+# (Day 2 — empire-tycoon-first-dollar — published 2026-04-30 by cron)
 # Day 3 (Steve's Tier 1)
 # the-day-i-stopped-building-and-started-selling
 # Day 4 (Steve's Tier 1)

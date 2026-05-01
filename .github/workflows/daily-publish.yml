@@ -41,10 +41,12 @@ jobs:
           slug=$(cat "$PUBLISHED_SLUG_FILE")
           git config user.name 'Go7Studio Publisher'
           git config user.email 'walt@go7studio.com'
-          git add src/content/blog/*.mdx
+          # Stage BOTH the post (status flipped) AND the queue (slug removed).
+          # Missing the queue means the same slug gets re-attempted next day.
+          git add src/content/blog/*.mdx scripts/publish-queue.txt
           git commit -m "publish(blog): ${slug} goes live
 
-          Daily automated promotion from status:ready → status:published.
+          Daily automated promotion from status:draft → status:published.
           Triggered by .github/workflows/daily-publish.yml.
 
           Co-Authored-By: Daily Publisher <walt@go7studio.com>"
