@@ -79,9 +79,9 @@ Why?
 
 Because removing ads from an idle game is the IAP that earns its keep over the long tail of the session. Income boosts wear off. Platinum packs get spent. Ad removal compounds every minute you keep playing. The buyer wasn't tire-kicking. They had been playing long enough to know they wanted to keep playing, and they picked the unlock that paid back forever. That's a much more committed read on the IAP carousel than I'd given a first-session player credit for.
 
-By Day 90 there were thirty-seven of them. The premium ad-removal tier carried the bulk of the gross — about half the buyers, well over half the dollars. The dollar packs and income boosts trailed, mostly bought by players who'd already been playing long enough to know they wanted more platinum points, faster. Total to date: $192.63 from thirty-seven strangers, distributed almost exactly the way the first sale had hinted.
+By Day 90 the buyer count was up into the dozens. The premium ad-removal tier carried the bulk of the gross — about half the buyers, well over half the dollars. The dollar packs and income boosts trailed, mostly bought by players who'd already been playing long enough to know they wanted more platinum points, faster. The pattern held: most of the people who paid, paid for the same thing the first stranger had picked.
 
-The first buyer wasn't an outlier. They were the first proof of a pattern that took ninety days to fully read.
+The first buyer wasn't an outlier. They were the first proof of a pattern that's still playing out.
 
 > [!NOTE]
 > Gross figures come from BigQuery's `event_value_in_usd`, which includes regional pricing variation, so the per-buyer totals don't always match clean per-unit math. The unit prices in the SKU table are the US display prices.
@@ -90,7 +90,7 @@ The first buyer wasn't an outlier. They were the first proof of a pattern that t
 
 The IAP prompt had been firing on the prestige screen — once a player completed their first reset. The first buyer never prestiged. They saw the carousel because I'd also planted the prompt on the post-build summary screen, almost as an afterthought. That afterthought was where the conversion actually happened.
 
-So on Day 6 I moved the post-build placement earlier in the loop, made it the primary, and pushed the prestige-screen prompt to secondary. Buyer activation jumped on the change. By Day 90 the same shelf had carried thirty-seven of them.
+So on Day 6 I moved the post-build placement earlier in the loop, made it the primary, and pushed the prestige-screen prompt to secondary. Buyer activation jumped on the change. The same shelf has been carrying buyers ever since.
 
 ## What I think about now
 
@@ -104,10 +104,10 @@ If you've shipped something and watched it land in silence, the only honest thin
 
 You only need one to know.
 
-Empire Tycoon is still my side project. The boys still ship me notes. There are now thirty-seven strangers in the data who paid me a total of $192.63 to keep building it. Some weeks that feels like nothing. Most weeks, ten months in, it feels like a lot.
+Empire Tycoon is still my side project. The boys still ship me notes. The strangers in the data keep arriving. Some weeks that feels like nothing. Most weeks, ten months in, it feels like a lot.
 
 <div className="my-12 rounded-2xl border border-brand-teal/30 bg-brand-teal/5 p-8">
-  <h3 className="text-xl font-semibold text-white">Play the game thirty-seven strangers paid for</h3>
-  <p className="mt-3 text-white/70">Empire Tycoon is the idle-game side of Go7Studio &mdash; eleven businesses, prestige loops, real estate, hustle taps. The version those buyers paid for. Free, ad-supported, runs on Android.</p>
+  <h3 className="text-xl font-semibold text-white">Play Empire Tycoon</h3>
+  <p className="mt-3 text-white/70">The idle-game side of Go7Studio &mdash; eleven businesses, prestige loops, real estate, hustle taps. Free, ad-supported, runs on Android.</p>
   <Link href="https://play.google.com/store/apps/details?id=com.go7studio.empire_tycoon" className="btn-primary mt-6 inline-flex">Get Empire Tycoon on Google Play</Link>
 </div>
