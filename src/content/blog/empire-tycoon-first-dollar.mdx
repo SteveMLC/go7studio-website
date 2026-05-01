@@ -48,7 +48,7 @@ Then on Day 5, this line appeared in the scoreboard:
 2026-02-05  premium_sale  $4.99  Manual report from Steve
 ```
 
-That's the whole artifact. Five dollars from a stranger, recorded by hand because I hadn't yet wired up the BigQuery sync. The SKU was `premium_purchase` — the **legacy $4.99 "remove ads + 1 platinum point"** tier. The simplest, cheapest non-cosmetic IAP in the game.
+That's the whole artifact. Five dollars from a stranger, recorded by hand because I hadn't yet wired up the BigQuery sync. The SKU was `premium_purchase` — **$4.99, remove ads plus 1,500 platinum points**. The most expensive thing on the shelf.
 
 ## What that one sale actually meant
 
@@ -60,9 +60,9 @@ That meant something. It still does.
 
 ## The data, after the goosebumps wore off
 
-The buyer didn't pick the most expensive thing. They picked the legacy ad-removal tier. That's information.
+The buyer reached for the top of the shelf. That's information.
 
-Empire Tycoon's actual IAP shelf, with real display prices straight from `BillingService`:
+Empire Tycoon's IAP catalog, straight from `BillingService`:
 
 | SKU | Price | What it does |
 | --- | --- | --- |
@@ -70,39 +70,25 @@ Empire Tycoon's actual IAP shelf, with real display prices straight from `Billin
 | `income_boost_24h` | **$1.99** | 2× income for 24 hours |
 | `pp_pack_medium` | **$2.49** | 500 platinum points |
 | `starter_bundle` | **$2.99** | 200 PP + 2× income for 24h |
-| `premium_purchase` (legacy) | **$4.99** | Remove ads + 1 platinum point |
-| `pp_pack_large` | **$4.99** | 1500 platinum points |
-| `premium_purchase_enhanced` (top tier) | **$6.99** | Remove ads + bigger platinum grant |
+| `pp_pack_large` | **$4.99** | 1,500 platinum points |
+| `premium_purchase` | **$4.99** | Remove ads + 1,500 platinum points |
 
-The most expensive thing in the store is the **enhanced premium tier at $6.99**, not the legacy $4.99. The cheapest is `pp_pack_small` at ninety-nine cents. The first buyer skipped past the dollar packs and the income boost and paid almost five times as much for the legacy ad-removal tier.
+Two SKUs tie for the top at $4.99. One of them — `premium_purchase` — strictly dominates: the same 1,500 platinum points as `pp_pack_large`, plus permanent ad-removal, at no extra cost. So at the top of the shelf there's a cheaper-or-equal item that just gives you more. The first buyer skipped past the ninety-nine-cent pack and the dollar boost and the starter bundle and went straight to the dominant offer.
 
 Why?
 
-Because removing ads from an idle game is the IAP that earns its keep over the long tail of the session. Income boosts wear off. Platinum packs get spent. Ad removal compounds every minute you keep playing. The buyer wasn't optimizing for *cheapest*. They were optimizing for *most value per dollar over time*. That is a much more sophisticated read on the IAP carousel than I'd given a first-session player credit for.
+Because removing ads from an idle game is the IAP that earns its keep over the long tail of the session. Income boosts wear off. Platinum packs get spent. Ad removal compounds every minute you keep playing. The buyer wasn't tire-kicking. They had been playing long enough to know they wanted to keep playing, and they picked the unlock that paid back forever. That's a much more committed read on the IAP carousel than I'd given a first-session player credit for.
 
-By Day 90, of 37 paying buyers, the distribution looked like this:
-
-| Tier | SKU | Buyers | Gross revenue |
-| --- | --- | --- | --- |
-| Top | `premium_purchase_enhanced` ($6.99) | 15 | $107.03 |
-| Mid | `pp_pack_large` ($4.99) | 5 | $25.55 |
-| Mid | `premium_purchase` ($4.99 legacy) | 4 | $24.17 |
-| Mid | `starter_bundle` ($2.99) | 7 | $22.60 |
-| Low | `income_boost_24h` ($1.99) | 4 | $8.36 |
-| Low | `pp_pack_medium` ($2.49) | 1 | $2.94 |
-| Low | `pp_pack_small` ($0.99) | 1 | $1.99 |
-| **Total** | — | **37** | **$192.63** |
-
-Premium tiers (enhanced + legacy) carried 19 of the 37 buyers and $131.20 of the $192.63 gross. The enhanced version eventually out-converted the legacy version fifteen to four — because per platinum point delivered, the enhanced version was actually a better deal. The buyers were doing math.
+By Day 90 there were thirty-seven of them. The premium ad-removal tier carried the bulk of the gross — about half the buyers, well over half the dollars. The dollar packs and income boosts trailed, mostly bought by players who'd already been playing long enough to know they wanted more platinum points, faster. Total to date: $192.63 from thirty-seven strangers, distributed almost exactly the way the first sale had hinted.
 
 The first buyer wasn't an outlier. They were the first proof of a pattern that took ninety days to fully read.
 
 > [!NOTE]
-> Gross figures here come from BigQuery's `event_value_in_usd`, which includes regional pricing variation, so the totals run a few percent above clean per-unit math. The unit prices in the SKU table are the US display prices.
+> Gross figures come from BigQuery's `event_value_in_usd`, which includes regional pricing variation, so the per-buyer totals don't always match clean per-unit math. The unit prices in the SKU table are the US display prices.
 
 ## The one thing I changed the next day
 
-The IAP prompt had been firing on the prestige screen — once a player completed their first reset. The first buyer never prestiged. They saw an entry-tier offer because I'd also planted it on the post-build summary screen, almost as an afterthought. That afterthought was where the conversion actually happened.
+The IAP prompt had been firing on the prestige screen — once a player completed their first reset. The first buyer never prestiged. They saw the carousel because I'd also planted the prompt on the post-build summary screen, almost as an afterthought. That afterthought was where the conversion actually happened.
 
 So on Day 6 I moved the post-build placement earlier in the loop, made it the primary, and pushed the prestige-screen prompt to secondary. Buyer activation jumped on the change. By Day 90 the same shelf had carried thirty-seven of them.
 
