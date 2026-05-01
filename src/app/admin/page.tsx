@@ -1,11 +1,45 @@
+import fs from "fs";
+import path from "path";
 import Link from "next/link";
-import { getAllBlogPosts } from "@/lib/content";
-import { ArrowRight, FileText, Newspaper, Sparkles, Wrench } from "lucide-react";
+import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/content";
+import { ArrowRight, CalendarClock, FileText, Newspaper, Sparkles, Wrench } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+const QUEUE_FILE = path.join(process.cwd(), "scripts", "publish-queue.txt");
+
+function nextEligibleSlug(): string | null {
+  let text = "";
+  try {
+    text = fs.readFileSync(QUEUE_FILE, "utf-8");
+  } catch {
+    return null;
+  }
+  for (const raw of text.split("\n")) {
+    const trimmed = raw.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const post = getBlogPostBySlug(trimmed);
+    if (post && post.status === "draft") return trimmed;
+  }
+  return null;
+}
+
+function nextCronWindow(): string {
+  const now = new Date();
+  const next = new Date(now);
+  next.setUTCHours(14, 0, 0, 0);
+  if (next <= now) next.setUTCDate(next.getUTCDate() + 1);
+  const diff = next.getTime() - now.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  return `${hours}h ${minutes}m`;
+}
+
 export default function AdminHome() {
   const posts = getAllBlogPosts();
+  const nextSlug = nextEligibleSlug();
+  const nextPost = nextSlug ? getBlogPostBySlug(nextSlug) : null;
+  const cronCountdown = nextCronWindow();
   const counts = {
     total: posts.length,
     published: posts.filter((p) => p.status === "published").length,
@@ -68,7 +102,41 @@ export default function AdminHome() {
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/[0.05] p-6">
+        <div className="flex items-start gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-400/15 text-emerald-200">
+            <CalendarClock className="h-5 w-5" />
+          </div>
+          <div className="flex-1">
+            <p className="text-xs uppercase tracking-[0.18em] text-emerald-200">Next scheduled publish</p>
+            {nextPost ? (
+              <>
+                <h2 className="mt-1 text-xl font-semibold text-white">{nextPost.title}</h2>
+                <p className="mt-1 font-mono text-xs text-emerald-200/80">{nextPost.slug}</p>
+                <p className="mt-3 text-sm text-white/65">
+                  Auto-publishes in roughly <span className="font-semibold text-white">{cronCountdown}</span> (cron at 14:00 UTC daily). Or hit Publish now from the blog admin to flip immediately.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="mt-1 text-xl font-semibold text-white">Queue is empty or all entries skipped</h2>
+                <p className="mt-3 text-sm text-white/65">
+                  No eligible drafts in the queue. Add slugs to <code className="font-mono text-brand-teal">scripts/publish-queue.txt</code> or unpark Tier-1 placeholders.
+                </p>
+              </>
+            )}
+            <Link
+              href="/admin/queue"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-200 hover:text-white"
+            >
+              View full schedule
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3">
         <Link
           href="/admin/blog"
           className="group rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-brand-teal/40 hover:bg-white/[0.05]"
@@ -76,9 +144,23 @@ export default function AdminHome() {
           <p className="text-xs uppercase tracking-[0.18em] text-brand-teal">Blog</p>
           <h2 className="mt-2 text-xl font-semibold text-white">Manage posts</h2>
           <p className="mt-2 text-sm text-white/60">
-            See every post, flip status (draft → published or vice versa), or open the editor on GitHub.
+            All 47 posts. Flip status (draft → published or vice versa), or open the editor on github.dev.
           </p>
           <div className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-teal/90 group-hover:text-white">
+            Open <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/queue"
+          className="group rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-emerald-400/40 hover:bg-white/[0.05]"
+        >
+          <p className="text-xs uppercase tracking-[0.18em] text-emerald-200">Schedule</p>
+          <h2 className="mt-2 text-xl font-semibold text-white">Publish queue</h2>
+          <p className="mt-2 text-sm text-white/60">
+            See the order each post will publish in. Reorder, comment out, or annotate Day-N slots.
+          </p>
+          <div className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-200 group-hover:text-white">
             Open <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </div>
         </Link>
@@ -92,11 +174,10 @@ export default function AdminHome() {
           <p className="text-xs uppercase tracking-[0.18em] text-white/45">GitHub</p>
           <h2 className="mt-2 text-xl font-semibold text-white">Open repo on GitHub</h2>
           <p className="mt-2 text-sm text-white/60">
-            For when you want to edit the raw MDX, work in <code className="font-mono text-brand-teal">github.dev</code>, or browse other parts of the codebase.
+            Raw MDX editing, <code className="font-mono text-brand-teal">github.dev</code>, or other repo files.
           </p>
           <div className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-white/70 group-hover:text-white">
-            github.com/SteveMLC/go7studio-website
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            Open repo <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </div>
         </a>
       </div>

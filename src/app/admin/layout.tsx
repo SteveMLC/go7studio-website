@@ -22,6 +22,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link href="/admin/blog" className="hover:text-white">
                 Blog
               </Link>
+              <Link href="/admin/queue" className="hover:text-white">
+                Queue
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-3 text-xs text-white/45">
