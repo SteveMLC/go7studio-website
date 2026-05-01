@@ -53,8 +53,13 @@ pet-paradise-on-hold
 # Day 38 (Steve's Tier 1)
 # things-i-shipped-that-made-zero-and-why-i-kept-them
 picking-mobile-game-names
-# Day 40 (Steve's Tier 1)
-# a-12-institution-endgame-for-an-idle-game
+# Day 40 — PERMANENTLY PARKED, DO NOT PUBLISH
+# Original slot was post #10 "A 12-Institution Endgame for an Idle Game".
+# That endgame design is not implemented in Empire Tycoon yet, so we
+# cannot publish a piece talking about it as live. Leave commented out
+# permanently. Do not draft, do not generate images for it, do not flip
+# to "ready". If/when the endgame ships in-game, revisit then.
+# (No replacement slot — the cron skips past Day 40 to the next post.)
 cost-and-quality-routing-five-model-families
 one-config-line-slowed-the-studio
 daily-memory-file
