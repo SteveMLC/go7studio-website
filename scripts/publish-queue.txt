@@ -20,7 +20,6 @@
 # i-audited-my-own-studio-site-this-morning
 # Day 5 (Steve's Tier 1)
 # why-moonlightcapital-is-now-go7studio
-views-vs-buyers
 # Day 7 (Steve's Tier 1)
 # i-caught-my-lead-ai-agent-writing-the-same-mutation-twenty-one-times
 scout-ivy-disabled-before-posting
