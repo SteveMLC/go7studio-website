@@ -22,7 +22,6 @@
 # why-moonlightcapital-is-now-go7studio
 # Day 7 (Steve's Tier 1)
 # i-caught-my-lead-ai-agent-writing-the-same-mutation-twenty-one-times
-petra-reddit-signup
 work-orders-that-survive-agent-handoff
 # Day 15 (Steve's Tier 1)
 # how-a-two-person-studio-shipped-a-compliance-grade-ce-platform
