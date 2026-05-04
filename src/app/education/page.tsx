@@ -37,10 +37,10 @@ export default function EducationPage() {
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <a
-            href="#"
+            href="mailto:hello@go7studio.com?subject=Metronome%20app%20access"
             className="btn-primary inline-flex items-center gap-2 text-base"
           >
-            Download Metronome
+            Request Classroom Access
           </a>
         </div>
       </header>

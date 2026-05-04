@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
-import { ArrowLeft, Wind, Leaf, Mountain, Sparkles, Download, ExternalLink } from "lucide-react";
+import { ArrowLeft, Wind, Leaf, Mountain, Sparkles, ExternalLink } from "lucide-react";
 import Script from "next/script";
 import { getVideoGameSchema, createSchemaGraph } from "@/lib/schema";
 
@@ -255,13 +255,13 @@ export default function SortbloomPage() {
                   className="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start"
                 >
                   <a
-                    href="https://play.google.com/store/apps/details?id=com.go7studio.stakd"
+                    href="https://sortbloom.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#7A9E7E] to-[#6B8E6B] px-6 py-3 text-sm font-medium text-white shadow-md shadow-[#7A9E7E]/20 transition-all duration-300 hover:shadow-lg hover:shadow-[#7A9E7E]/30 hover:-translate-y-0.5"
                   >
-                    <Download className="h-4 w-4" />
-                    Get it on Google Play
+                    <ExternalLink className="h-4 w-4" />
+                    Visit Sortbloom.com
                   </a>
 
                   <a
@@ -368,17 +368,17 @@ export default function SortbloomPage() {
                   Ready to Find Your Zen?
                 </h2>
                 <p className="mb-8 text-[#6B6B6B] max-w-md mx-auto">
-                  Download Sortbloom today and begin your journey.
+                  Visit Sortbloom and begin your journey.
                 </p>
                 
                 <a
-                  href="https://play.google.com/store/apps/details?id=com.go7studio.stakd"
+                  href="https://sortbloom.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#7A9E7E] to-[#6B8E6B] px-8 py-4 text-base font-medium text-white shadow-lg shadow-[#7A9E7E]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#7A9E7E]/30 hover:-translate-y-0.5"
                 >
-                  <Download className="h-5 w-5" />
-                  Download Free on Google Play
+                  <ExternalLink className="h-5 w-5" />
+                  Open Sortbloom.com
                 </a>
               </div>
             </motion.div>
