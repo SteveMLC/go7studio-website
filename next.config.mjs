@@ -1,5 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    outputFileTracingIncludes: {
+      "/admin": ["src/content/blog/**/*.mdx", "scripts/publish-queue.txt"],
+      "/admin/blog": ["src/content/blog/**/*.mdx"],
+      "/admin/queue": ["src/content/blog/**/*.mdx", "scripts/publish-queue.txt"],
+      "/blog/[slug]/opengraph-image": ["src/content/blog/**/*.mdx"],
+      "/ai-lab/[slug]/opengraph-image": ["src/content/blog/**/*.mdx"],
+    },
+  },
   images: {
     remotePatterns: [
       {
