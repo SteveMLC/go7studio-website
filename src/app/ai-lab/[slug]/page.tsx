@@ -62,8 +62,8 @@ export default function AiLabPostPage({ params }: { params: { slug: string } }) 
         <span className="mx-2">/</span>
         <span className="text-white/80">{post.title}</span>
       </nav>
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <div>
+      <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="min-w-0">
           <BlogPost post={post} />
           <ShareButtons title={post.title} url={url} />
           <AuthorCard />

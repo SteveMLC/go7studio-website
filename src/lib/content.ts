@@ -161,18 +161,30 @@ function extractHeadings(content: string) {
     .filter((h): h is { id: string; text: string; level: number } => Boolean(h));
 }
 
+function stripDuplicateTitleHeading(content: string, title: string): string {
+  const match = content.match(/^\s*#\s+(.+?)(?:\r?\n|$)/);
+  if (!match) return content;
+
+  const heading = match[1].trim().replace(/\s+/g, " ");
+  const expected = title.trim().replace(/\s+/g, " ");
+  if (heading !== expected) return content;
+
+  return content.slice(match[0].length).replace(/^\s*\r?\n/, "");
+}
+
 function parseBlogFile(filePath: string): BlogPost {
   const file = fs.readFileSync(filePath, "utf8");
   const { data, content } = matter(file);
-  const reading = readingTime(content);
   const frontmatter = data as BlogFrontmatter;
+  const displayContent = stripDuplicateTitleHeading(content, frontmatter.title);
+  const reading = readingTime(displayContent);
 
   return {
     ...frontmatter,
     status: frontmatter.status ?? "draft",
     readingTime: frontmatter.readingTime ?? reading.text,
-    content,
-    headings: extractHeadings(content),
+    content: displayContent,
+    headings: extractHeadings(displayContent),
   };
 }
 

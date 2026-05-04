@@ -7,10 +7,10 @@ import "remark-github-blockquote-alert/alert.css";
 
 export function BlogPost({ post }: { post: BlogPostType }) {
   return (
-    <article className="glass-card overflow-hidden p-8 sm:p-10">
-      <h1 className="text-3xl font-bold sm:text-4xl">{post.title}</h1>
-      <p className="mt-3 text-white/70">{post.excerpt}</p>
-      <div className="mt-8 max-w-none ai-lab-mdx">
+    <article className="glass-card min-w-0 max-w-full overflow-hidden p-6 sm:p-10">
+      <h1 className="break-words text-3xl font-bold sm:text-4xl">{post.title}</h1>
+      <p className="mt-3 break-words text-white/70">{post.excerpt}</p>
+      <div className="ai-lab-mdx mt-8 max-w-full min-w-0 overflow-hidden">
         <MDXRemote
           source={post.content}
           components={aiLabMdxComponents}

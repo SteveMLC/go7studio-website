@@ -81,8 +81,8 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       {post.schemaType === "HowTo" ? <HowToSchema title={post.title} steps={post.headings.map((h) => h.text)} /> : null}
       {post.schemaType === "FAQ" ? <FAQSchema items={post.headings.map((h) => ({ question: h.text, answer: post.excerpt }))} /> : null}
       <BlogBreadcrumbs title={post.title} />
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <div>
+      <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="min-w-0">
           <BlogPost post={post} />
           <ShareButtons title={post.title} url={`${SITE}/blog/${post.slug}`} />
           <AuthorCard />
