@@ -54,6 +54,17 @@ Keep Studio content focused on:
 - real asset-backed visuals,
 - what actually shipped.
 
+## Empire Tycoon Asset Rule
+
+The following Empire Tycoon source art is stale and unusable:
+
+- maroon title-card artwork with the old ornate `Empire Tycoon` wordmark,
+- flat blue square globe/crown/city icon artwork.
+
+Do not use either image as source material, reference material, collage input, generated-image guidance, OG art, thumbnail art, or article art.
+
+Empire Tycoon visuals on Go7Studio must use verified current project assets only. The accepted current app icon source is `play_store_icon_512.png` from `git@github.com:SteveMLC/empire_tycoon.git`; gameplay/article compositions should prefer real screenshots and shipped in-game assets from that repo.
+
 ## Next Visual/Content Batch
 
 1. Rebuild `/blog` and `/ai-lab` cards with visual thumbnails and stronger editorial hierarchy.

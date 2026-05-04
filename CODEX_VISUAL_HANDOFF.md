@@ -148,6 +148,12 @@ Use generated images sparingly. Most posts should *not* need them. When they do:
 - A simple Mermaid timeline or a callout for the "what changed" moment
 - No generated heroes unless the post genuinely lacks any visual artifact
 
+Empire Tycoon-specific guardrail:
+- The maroon title-card artwork with the ornate `Empire Tycoon` wordmark is stale and unusable.
+- The flat blue square globe/crown/city icon artwork is stale and unusable.
+- Do not use either as source material, reference material, collage input, generated-image guidance, OG art, thumbnail art, or article art.
+- Current Empire visuals must come from the Empire Tycoon GitHub repo. The accepted app icon source is `play_store_icon_512.png`; richer article art should prefer real gameplay screenshots and shipped in-game assets.
+
 **Technical pipeline / debugging posts** (Qualora bug stories, extractor writeups):
 - A pipeline-stage diagram (Mermaid `flowchart` works well)
 - A "before / after" code panel showing the fix
