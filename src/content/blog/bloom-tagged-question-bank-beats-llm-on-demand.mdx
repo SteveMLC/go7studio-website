@@ -2,7 +2,7 @@
 title: "How a Bloom-Tagged Question Bank Beats LLM-On-Demand Quiz Generation"
 slug: "bloom-tagged-question-bank-beats-llm-on-demand"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "A tagged pool, distribution-aware selection, and the moment we stopped letting the LLM write quizzes at runtime. The architecture behind a CE platform that passed audit on the first try."
 pillar: "Case Study"
 tags:
@@ -27,6 +27,10 @@ Then I sat down and asked the regulator's question: if a student fails a quiz, r
 That's not a quiz engine. That's a vibe.
 
 This post is about what we built instead — a Bloom-tagged question bank with distribution-aware selection — and why it's the right shape for any compliance-grade learning platform we ship through Go7Studio. The example is the [NEALAC Learning Hub](https://drannnealac.com), built with Dr. Ann Leonard-Zabel as the public-facing CE provider. The architecture decisions generalize to every edtech build we've shipped since.
+
+<HeroCallout eyebrow="Assessment architecture" title="Runtime quiz generation looked impressive until it had to answer an audit." body="A compliance-grade quiz needs reproducible selection, source anchors, and a record of what each student saw. A Bloom-tagged bank gives the platform those properties before any learner opens a lesson." />
+
+<DecisionMatrix title="Quiz architecture trade-offs" columns='["Architecture","What it optimizes for","Where it fails"]' rows='[{"label":"LLM on demand","values":["Fresh-looking quizzes with no authoring backlog.","Non-deterministic difficulty, slow lesson loads, and no durable record of the exact instrument shown."]},{"label":"Static bank","values":["Fast rendering and simple audit records.","Random selection can still collapse into recall-only quizzes if the bank has no cognitive distribution rules."]},{"label":"Bloom-tagged bank","values":["Deterministic sampling across recall, application, and higher-order categories.","Requires generation-time tagging, coverage checks, and rejection paths before launch."]}]' />
 
 ## Section 1: The trap — letting the LLM write quizzes at runtime
 

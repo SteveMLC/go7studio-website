@@ -2,7 +2,7 @@
 title: "Compliance via Architecture (Not Surveillance)"
 slug: "compliance-via-architecture-not-surveillance"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "No-skip enforcement, 1x speed lock, HMAC-sealed certificates with QR verification. How we passed a CE audit on the first try without putting a single webcam on a single student."
 pillar: "Studio"
 tags:
@@ -26,6 +26,10 @@ We took a different bet on the [NEALAC Learning Hub](https://drannnealac.com) bu
 
 This post is the architecture, the trade-offs, and the line we draw.
 
+<HeroCallout eyebrow="Privacy-first compliance" title="For this CE tier, database state beats webcam evidence." body="Seat time, quiz eligibility, certificate issuance, and QR verification all became explicit platform states. The audit story came from code paths the system already needed, not from watching students." />
+
+<DecisionMatrix title="What proves compliance" columns='["Compliance question","Surveillance answer","Architecture answer"]' rows='[{"label":"Did the student spend seat time?","values":["Review proctor logs or webcam evidence after the fact.","Persist a maxWatched watermark from the player and refuse forward skips."]},{"label":"Did the student demonstrate competency?","values":["Watch for suspicious behavior while the test runs.","Gate completion on deterministic quizzes and a verified final-exam bank."]},{"label":"Can a certificate be verified later?","values":["Rely on vendor records or a manually checked PDF.","Re-derive an HMAC token from certificate claims at QR scan time."]},{"label":"What fails when the system breaks?","values":["Subjective flags, appeals, privacy review, and vendor dependency.","A visible enforcement bug that can be tested, fixed, and re-run."]}]' />
+
 ## Section 1: What CE compliance actually asks for
 
 > [!NOTE]
@@ -39,6 +43,17 @@ This post is the architecture, the trade-offs, and the line we draw.
 Both questions can be answered without a camera. The first is "did the player log continuous viewing time on this video," which the player knows. The second is "did the assessment outcome flip the eligibility flag to true," which the database knows. The audit just asks us to surface those two states with confidence.
 
 A regulator showing up six months after issuance and asking "show me what happened" doesn't need to watch a recording. They need to read a row in the database. That row needs to be unforgeable, complete, and tied to a verifiable certificate. Architecture handles that. Cameras don't.
+
+```mermaid
+flowchart LR
+    WATCH["Player records continuous viewing<br/>maxWatched watermark"]
+    QUIZ["Quiz pass updates eligibility<br/>deterministic assessment state"]
+    CERT["Certificate issued<br/>signed with HMAC token"]
+    VERIFY["QR scan re-derives token<br/>green check or rejection"]
+    WATCH --> QUIZ
+    QUIZ --> CERT
+    CERT --> VERIFY
+```
 
 ## Section 2: The surveillance route — costs and failure modes
 

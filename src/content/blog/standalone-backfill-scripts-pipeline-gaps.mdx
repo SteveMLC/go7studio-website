@@ -2,7 +2,7 @@
 title: "Standalone Backfill Scripts Are Pipeline Gaps in Disguise"
 slug: "standalone-backfill-scripts-pipeline-gaps"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "Two image-quality scripts I wrote as one-offs were doing 70% of the value. They weren't wired into the pipeline. Here's the pattern, the wire-in, and the audit rule that prevents the next one."
 pillar: "Studio"
 tags:
@@ -23,6 +23,10 @@ Neither was wired in.
 When I stopped triggering them manually — because I'd moved on to other work, because they'd become invisible, because they did exactly the right thing every time and never needed attention — the pipeline silently regressed. Two courses shipped with 206 and 271 images respectively, most of them logos and decorative junk.
 
 That regression is the topic. The pattern is general: **standalone scripts that quietly carry the system are pipeline gaps with extra steps.**
+
+<HeroCallout eyebrow="Operations debt" title="A remembered script is not a pipeline step." body="The image cleanup worked only while the operator remembered it. Wiring the scripts into the DAG turned invisible manual labor into a repeatable quality gate." />
+
+<KeyTakeaways title="The audit rule now" items='[{"title":"Manual runs are signal","body":"Any script run by hand in the last 90 days is probably doing pipeline-shaped work."},{"title":"Pipeline-or-delete","body":"If a script carries production value, wire it in; if it does not, remove it before it becomes folklore."},{"title":"Quarantine before upload","body":"Image filtering belongs before CDN upload so junk media never becomes a live asset."},{"title":"Canary before recurrence","body":"A standalone gap only closes when the wired step has a test for the original failure."}]' />
 
 ## §1 Two scripts I forgot about
 

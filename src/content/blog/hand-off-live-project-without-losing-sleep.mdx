@@ -2,7 +2,7 @@
 title: "How I Hand Off a Live Project to a Client Without Losing Sleep"
 slug: "hand-off-live-project-without-losing-sleep"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "A nine-item handoff checklist from a real CE platform launch. Password rotation, end-to-end student tests, attribution conversations, and the reproducibility test that turns service revenue into product revenue."
 pillar: "Studio"
 tags:
@@ -23,6 +23,10 @@ The version of "shipped" I've come to trust isn't the day the platform goes live
 Launch day is a release. The day after is a handoff. Different jobs — and the second one is where projects fail in slow motion. Credentials still in someone's `.env`. A single admin account that holds the only working session. A video file on a Railway filesystem that's about to bill the client like an AWS surprise.
 
 This is the nine-item checklist I run at handoff. The example is the [NEALAC Learning Hub](https://drannnealac.com) launch with Dr. Ann Leonard-Zabel — a CE platform that went live and then needed to *stay* live, with a client who is a clinician, not a sysadmin.
+
+<HeroCallout eyebrow="Launch handoff" title="A live handoff is an engineering checklist, not a goodbye email." body="The project is not stable because the demo worked. It is stable when credentials, student flow, backups, hosting triggers, and client ownership have all been made explicit." />
+
+<ChecklistBlock title="The risk-carrying handoff checks" items='[{"label":"Rotate every credential that touched development","note":"History cleanup is not enough if an exposed secret still works anywhere."},{"label":"Run the full student path with a non-admin account","note":"Admin sessions hide the exact role bugs that show up after launch."},{"label":"Write down the hosting trigger before traffic arrives","note":"A cheap launch path is fine when the migration threshold is already documented."},{"label":"Prove the second course can ship without custom code","note":"Repeatability is the test that separates a studio project from a productized offer."}]' />
 
 ## Section 1: State at handoff
 

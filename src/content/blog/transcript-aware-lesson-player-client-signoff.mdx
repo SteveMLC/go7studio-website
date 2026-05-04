@@ -2,7 +2,7 @@
 title: "The Transcript-Aware Lesson Player That Made My Client Sign Off In One Demo"
 slug: "transcript-aware-lesson-player-client-signoff"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "Auto-scroll, click-to-seek, sticky-on-scroll. Three UX choices that turned a video player into a study tool — and made my client say yes mid-demo."
 pillar: "Studio"
 tags:
@@ -24,6 +24,10 @@ There's a moment in every client demo where you find out whether you've shipped.
 For our [NEALAC Learning Hub](https://drannnealac.com) build with Dr. Ann Leonard-Zabel, that moment came at minute four. She paused the video, clicked a sentence in the transcript pane, and the video jumped to that timestamp. She watched the seek happen, looked back at me, and said yes.
 
 Three UX choices closed that demo. None of them are novel. All of them are missing from the default video player every other CE platform ships. Here's the engineering breakdown.
+
+<HeroCallout eyebrow="Client-signoff UX" title="The closer was not the video player. It was learner control." body="Click-to-seek, auto-scroll, and a sticky transcript turned the lesson from passive playback into a study surface the client could evaluate in one demo." />
+
+<KeyTakeaways title="Why the player changed the demo" items='[{"title":"Transcript became navigation","body":"Learners moved by sentence instead of dragging a scrubber through a long lecture."},{"title":"Compliance stayed local","body":"The same seek listener handled useful backtracking and clamped jumps past unwatched content."},{"title":"Correct time beat clever UI","body":"Fixing the chapter clock from wall time to video time made the player feel trustworthy."},{"title":"One component owned seek","body":"UX and enforcement shared the player layer, so future edits had one contract to preserve."}]' />
 
 ## Section 1: Default video UX is for entertainment, not learning
 

@@ -2,7 +2,7 @@
 title: "We Tracked Sixteen Extractors Across Eight Course Formats. Here's What Each One Costs."
 slug: "sixteen-extractors-eight-formats-cost-matrix"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "Moodle, Articulate, Blackboard, IMSCC, PDF-OCR, Storyline, MBZ, Presenter — eight formats, sixteen extractors, real per-course numbers, and the dispatcher order that turns routing into safety."
 pillar: "Studio"
 tags:
@@ -20,6 +20,10 @@ schemaType: "Article"
 When you ingest real public-domain courses — not curated benchmark datasets — they don't arrive in one format. They arrive in eight.
 
 I've ended up with sixteen extractors across those eight formats, plus an OCR fallback for the cases where there isn't actually any text in the file. This is the cost matrix: what each format looks like in the wild, which extractor handles it, real per-course numbers, and the gotchas I learned the hard way. The Storyline 2+ gap is real and currently unfixed.
+
+<HeroCallout eyebrow="Extractor economics" title="Routing is the safety system before extraction starts." body="The cheapest extractor is worthless if the dispatcher sends a source bundle down the wrong path. The matrix only works because detection order, fallback thresholds, and known gaps are explicit." />
+
+<DecisionMatrix title="Routing decisions that carry the cost" columns='["Decision","Why it matters","Failure it prevents"]' rows='[{"label":"Storyline before IMSCC","values":["Both can arrive as zip-shaped bundles, but Storyline needs a more specific detector.","A Storyline course silently returning empty content through the IMSCC path."]},{"label":"Text-layer PDF before OCR","values":["Most PDFs do not need vision OCR, so the cheap parser gets first pass.","Paying 4x per word when a normal text layer already exists."]},{"label":"OCR fallback below threshold","values":["Image-only PDFs are routed to vision only when word count proves the text layer is thin.","Publishing zero-word courses from scanned source material."]},{"label":"Storyline 2+ as a named gap","values":["Correct detection plus incomplete extraction is visible as triage, not a mystery failure.","Confusing unsupported runtime data with a working extractor."]}]' />
 
 ## §1 The format zoo
 

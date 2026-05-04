@@ -2,7 +2,7 @@
 title: "I Trained a Custom Game-Art Style for $2.28 and Now I Pay $0 Per Image"
 slug: "custom-game-art-lora-228"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "A LoRA on Replicate, 3,000 steps, one trigger word, a permanent style I can call from any prompt. Full recipe — including the counterintuitive finding that Schnell beat Dev for me."
 pillar: "Studio"
 tags:
@@ -19,11 +19,15 @@ ogImage: "/images/og/custom-game-art-lora-228.jpg"
 schemaType: "Article"
 ---
 
-# I Trained a Custom Game-Art Style for $2.28 and Now I Pay $0 Per Image
-
 Two out of every five renders came back off-brand. I'd burned a week trying to wrestle a consistent Empire Tycoon look out of base Flux — long prompts, ControlNet, the works. Then I spent $2.28 training a LoRA on Replicate and the brand problem evaporated. Inference since then: zero dollars, because it runs locally on the M4 Pro at about 12 seconds per image.
 
 Here's the full recipe — dataset, training config, prompt template, the counterintuitive Schnell-beats-Dev finding, and how I cloned the same approach for a second game's pixel art.
+
+<HeroCallout eyebrow="Style infrastructure" title="The LoRA turns repeated art direction into a reusable studio asset." body="The point is not cheaper novelty images. The point is preserving a visual brand across storefront art, blog headers, and future game assets without re-fighting the same prompt every week." />
+
+![Collage of Empire Tycoon and Rampart source art used to show the reusable style systems behind the LoRA workflow](/images/blog/custom-game-art-lora-228/source-art-collage.jpg)
+
+<DecisionMatrix title="Where the LoRA pays back" columns='["Use case","Why it works","When to skip"]' rows='[{"label":"Game asset families","values":["The same style appears across characters, items, store art, and seasonal surfaces.","One-off logos or hero art where uniqueness matters more than consistency."]},{"label":"Storefront batches","values":["Dozens of screenshots, promo tiles, and headers need a shared visual language.","A single campaign image that can be art-directed by hand faster than building a dataset."]},{"label":"Second-game clone","values":["The same recipe transferred from Empire Tycoon illustration to Rampart pixel art with a new dataset.","A project with no existing art direction or too few approved examples."]}]' />
 
 ## Why a LoRA, not better prompting
 

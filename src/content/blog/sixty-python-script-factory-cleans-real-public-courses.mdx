@@ -2,7 +2,7 @@
 title: "Inside the Sixty-Python-Script Factory That Cleans Real Public Courses"
 slug: "sixty-python-script-factory-cleans-real-public-courses"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "A tour of Qualora's 11-phase ingestion pipeline — phases as contracts, halt conditions, the state machine moving 700+ courses, and the canary harness that keeps every postmortem from recurring."
 pillar: "Studio"
 tags:
@@ -24,6 +24,10 @@ That last number is the one doing all the work. It only holds up because the pip
 This is the tour. The 11 phases. The 12-status state machine that arrived around script #40 and quietly rewrote everything before and after it. The 16 extractors hiding behind one dispatcher. The halt conditions that turn silent failure into loud refusal. The canary harness that keeps every postmortem from coming back.
 
 If you're designing a pipeline that has to survive real-world inputs — public-domain coursework, scraped corpora, customer bundles, anything that arrives in shapes you didn't choose — this is the architecture I'd build today.
+
+<HeroCallout eyebrow="Pipeline architecture" title="The factory works because every phase can refuse." body="Sixty scripts only stay operable when state lives in a table, phases own narrow contracts, and every postmortem plants a canary that keeps the failure from coming back." />
+
+<KeyTakeaways title="The contracts that keep one operator sane" items='[{"title":"State is a row","body":"The pipeline answers status questions from pipeline_items instead of scattered logs and memory."},{"title":"Refusal is a feature","body":"Every phase decides whether it can safely continue before it produces output."},{"title":"Dispatch is safety logic","body":"Format routing runs most-specific first so a familiar extension cannot hide the wrong extractor."},{"title":"Every bug plants a canary","body":"Postmortems only close after the original failure has a small reproducible test."}]' />
 
 ## §1 Factory floor
 

@@ -2,7 +2,7 @@
 title: "Whisper Plus a 3-Pass Quiz Generator: How One Hour of Lecture Becomes a 21-Question Course"
 slug: "whisper-three-pass-quiz-generator-21-questions"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "Factual, Application, Slide-specific — three passes, one transcript, one tagger. The architecture and the prompts behind a 7-lesson CE course built for ~$0.70 in model spend."
 pillar: "Studio"
 tags:
@@ -25,6 +25,10 @@ The first version of our CE quiz generator was one prompt: "read this lesson and
 That's the single-pass trap. One prompt → one cognitive shape. The model is doing exactly what it was asked to do, which is the problem.
 
 This post is the architecture we shipped instead — three passes, three prompts, one tagger, one bank — and the per-course economics that make it cheap enough to use on every CE course we build.
+
+<HeroCallout eyebrow="Assessment pipeline" title="One prompt produced one cognitive shape. Three passes produced a course." body="The generator works because each pass has a narrow job, then a separate tagger rejects drafts whose Bloom level does not match the pass that produced them." />
+
+<DecisionMatrix title="Why the generator runs in passes" columns='["Pass","What it writes","What it prevents"]' rows='[{"label":"Factual","values":["Recall and understanding questions tied to transcript timestamps.","A quiz with no source anchor or audit path."]},{"label":"Application","values":["Scenario stems that require using the concept, not repeating the wording.","The common collapse into three versions of the same definition question."]},{"label":"Slide-specific","values":["Questions anchored to diagrams, tables, and slide text when the transcript only gestures at them.","Losing visual material because the speaker did not read every slide aloud."]},{"label":"Bloom tagger","values":["A second read that classifies the rendered draft before it enters the bank.","Trusting the generation prompt alone when the output does not match its requested shape."]}]' />
 
 ## Section 1: The single-pass trap
 
