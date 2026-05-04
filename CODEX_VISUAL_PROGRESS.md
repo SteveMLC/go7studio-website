@@ -1,0 +1,7 @@
+# Codex Visual Progress
+
+## 2026-05-04
+
+Phase A plan completed in `CODEX_VISUAL_PLAN.md` for all posts returned by the handoff inventory command. First execution batch touched 10 priority posts: `agent-job-description`, `agents-lying-to-each-other`, `ai-wrote-nine-courses-from-nothing`, `fired-my-orchestrator-from-real-work`, `scout-ivy-disabled-before-posting`, `petra-reddit-signup`, `work-orders-that-survive-agent-handoff`, `empire-tycoon-first-dollar`, `views-vs-buyers`, and `shipped-4-games-with-ai-in-30-days`, plus the short `hello-world` post. Added HeroCallout/KeyTakeaways blocks, real Empire Tycoon collages, and the Go7Studio banner. Shared MDX image styling was added to the blog component layer. The inventory grep is down to 27 remaining posts. Admin panel inspection also landed: `/api/admin/*` is now covered by the Basic Auth middleware, malformed Basic Auth parsing is hardened, and the status-flip API rewrites only frontmatter while bumping/adding `modified`.
+
+Verification: `npm run build` passes. Playwright rendered `/blog/empire-tycoon-first-dollar` and `/ai-lab/agent-job-description`; the new image loads, the new cards render, and no Mermaid fallback remains on the checked AI Lab page. A favicon route conflict found during the browser pass was fixed by removing the duplicate app-router favicon and keeping the public favicon referenced by metadata. Local admin API check without `ADMIN_PASSWORD` returns fail-closed `503`.

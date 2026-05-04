@@ -2,7 +2,7 @@
 title: "I Built Two SEO Agents and Disabled Them Before They Posted Anything"
 slug: "scout-ivy-disabled-before-posting"
 date: "2026-04-29"
-modified: "2026-05-02"
+modified: "2026-05-04"
 excerpt: "Scout and Ivy were architecturally finished. They never went live. Here's why I'm okay with that."
 pillar: "AI Lab"
 tags:
@@ -22,6 +22,14 @@ schemaType: "Article"
 Scout and Ivy were architecturally finished. Tests passed. Cron lines were ready. Both were about to push content to brand accounts on a recurring schedule.
 
 I disabled both on day two of their build, before they posted a single word. This post is why — and the four-question pre-flight test that would have caught it earlier than day two.
+
+<HeroCallout
+  eyebrow="Agent pre-flight"
+  title="Correct code without a real destination is still an agent that should stay offline."
+  body="The tests passed, but the publishing surface did not exist yet. Disabling the agents kept the studio from paying for convincing dry-run output with nowhere safe to land."
+/>
+
+<KeyTakeaways title="The pre-flight rule" items='[{"title":"Surface","body":"The account, page, or channel must exist before cron starts."},{"title":"Routing","body":"Approved output needs a wired destination, not a growing queue."},{"title":"Failure visibility","body":"Logs or status files have to surface breaks within a day."},{"title":"Brand readiness","body":"Passing architecture checks does not mean the voice should go live."}]' />
 
 ## Two finished agents on the shelf
 

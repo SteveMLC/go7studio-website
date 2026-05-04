@@ -51,7 +51,8 @@ const toneStyles: Record<
   },
 };
 
-function parseJsonProp<T>(value: T | string): T {
+function parseJsonProp<T>(value: T | string | undefined | null): T {
+  if (value == null) return [] as T;
   if (typeof value !== "string") return value;
   try {
     return JSON.parse(value) as T;
@@ -116,7 +117,7 @@ export function KeyTakeaways({
   items,
 }: {
   title?: string;
-  items: TakeawayItem[] | string;
+  items?: TakeawayItem[] | string;
 }) {
   const parsedItems = parseJsonProp<TakeawayItem[]>(items);
   return (
@@ -336,6 +337,37 @@ function extractTextFromChildren(node: React.ReactNode): string {
   return "";
 }
 
+function slugifyHeading(node: React.ReactNode): string {
+  return extractTextFromChildren(node)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+function H2(props: React.HTMLAttributes<HTMLHeadingElement>) {
+  const { className, id, ...rest } = props;
+  return (
+    <h2
+      {...rest}
+      id={id ?? slugifyHeading(props.children)}
+      className={`mt-10 scroll-mt-24 font-display text-3xl font-semibold text-white ${className ?? ""}`.trim()}
+    />
+  );
+}
+
+function H3(props: React.HTMLAttributes<HTMLHeadingElement>) {
+  const { className, id, ...rest } = props;
+  return (
+    <h3
+      {...rest}
+      id={id ?? slugifyHeading(props.children)}
+      className={`mt-8 scroll-mt-24 font-display text-2xl font-semibold text-white ${className ?? ""}`.trim()}
+    />
+  );
+}
+
 function PremiumPre(props: React.HTMLAttributes<HTMLPreElement>) {
   const child = React.Children.toArray(props.children)[0] as React.ReactElement<{ className?: string; children?: React.ReactNode }> | undefined;
   const className = child?.props?.className || "";
@@ -378,6 +410,18 @@ function StyledTd(props: React.TdHTMLAttributes<HTMLTableCellElement>) {
   return <td {...props} className={`px-4 py-3 align-top leading-7 text-white/70 ${props.className ?? ""}`.trim()} />;
 }
 
+function StyledImg(props: React.ImgHTMLAttributes<HTMLImageElement>) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      {...props}
+      alt={props.alt ?? ""}
+      className={`my-8 w-full rounded-[24px] border border-white/10 bg-[#060912] shadow-[0_18px_40px_rgba(0,0,0,0.35)] ${props.className ?? ""}`.trim()}
+      loading={props.loading ?? "lazy"}
+    />
+  );
+}
+
 export const aiLabMdxComponents = {
   HeroCallout,
   KeyTakeaways,
@@ -388,8 +432,8 @@ export const aiLabMdxComponents = {
   CalloutBox,
   ToolComparisonGrid,
   Link,
-  h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => <h2 className="mt-10 font-display text-3xl font-semibold text-white" {...props} />,
-  h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => <h3 className="mt-8 font-display text-2xl font-semibold text-white" {...props} />,
+  h2: H2,
+  h3: H3,
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => <p className="mt-4 text-base leading-8 text-white/80" {...props} />,
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => <ul className="mt-4 list-disc space-y-2 pl-6 text-white/80" {...props} />,
   ol: (props: React.HTMLAttributes<HTMLOListElement>) => <ol className="mt-4 list-decimal space-y-2 pl-6 text-white/80" {...props} />,
@@ -404,4 +448,5 @@ export const aiLabMdxComponents = {
   tr: (props: React.HTMLAttributes<HTMLTableRowElement>) => <tr {...props} className="border-t border-white/10 align-top" />,
   th: StyledTh,
   td: StyledTd,
+  img: StyledImg,
 };

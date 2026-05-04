@@ -2,7 +2,7 @@
 title: "I Wrote My AI Agent a Job Description. It Changed Everything."
 slug: "agent-job-description"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "Three pages of \"what Walt is responsible for, what he's NOT, when to escalate.\" Cuts agent confusion in half."
 pillar: "AI Lab"
 tags:
@@ -25,6 +25,14 @@ One afternoon I stopped writing my orchestrator's system prompt as a "system pro
 > If you can't write a JD for the role, you can't write a system prompt for the agent. The framing forces a level of clarity that "list of capabilities" never does.
 
 This post is the template I use now, the failure mode that drove me to it, and the five questions every JD has to answer.
+
+<HeroCallout
+  eyebrow="Agent role design"
+  title="A job description turns a helpful model into an accountable specialist."
+  body="The JD frame forces the missing operational questions into view: what the agent owns, what it may touch, when it hands off, and what behavior means it should be taken offline."
+/>
+
+<KeyTakeaways title="What the JD has to settle" items='[{"title":"Responsibility","body":"The agent needs named outputs, not a generic instruction to coordinate or help."},{"title":"Scope","body":"Allowed and forbidden surfaces have to be written down before the model guesses."},{"title":"Handoff","body":"Specialist boundaries only work when the artifact and receipt are explicit."},{"title":"Escalation","body":"A good JD gives the agent legal ways to stop instead of improvising."}]' />
 
 ## The before — Walt did everyone's job
 
@@ -130,21 +138,20 @@ After the JD landed for Walt, the silent-execution behavior stopped inside one s
 
 ```mermaid
 sequenceDiagram
-    participant S as Steve
-    participant W as Walt
-    participant C as Chip
-    Note over S,C: Before JD — Walt does the work
-    S->>W: "Need that pipeline fix today."
-    W->>W: opens repo, writes diff, commits
-    W-->>S: "Done."
-    Note over S,C: Outcome: Chip's QC gates skipped, drift accumulates
-
-    Note over S,C: After JD — Walt routes the work
-    S->>W: "Need that pipeline fix today."
-    W->>C: writes inbox/chip/work-order-fix-X.md
-    C->>W: writes inbox/walt/result-fix-X.md (PR + canary)
-    W-->>S: "Routed to Chip; PR open, canary green."
-    Note over S,C: Outcome: every agent's QC gate fires
+    participant Steve
+    participant Walt
+    participant Repo
+    participant Chip
+    Steve->>Walt: Need the pipeline fix today
+    Walt->>Repo: Writes diff directly
+    Walt-->>Steve: Done
+    Note over Walt,Repo: Before JD, Chip is skipped
+    Steve->>Walt: Need the pipeline fix today
+    Walt->>Chip: Sends scoped work order
+    Chip->>Repo: Opens PR with canary
+    Chip-->>Walt: Reports result
+    Walt-->>Steve: Routed and reviewed
+    Note over Walt,Chip: After JD, handoff is explicit
 ```
 
 Same outcome for the user. Every QC gate fires along the way. The only structural change was the JD.

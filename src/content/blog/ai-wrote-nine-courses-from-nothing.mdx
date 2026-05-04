@@ -2,7 +2,7 @@
 title: "My AI Agent Wrote Nine Courses From Nothing. I Published All of Them."
 slug: "ai-wrote-nine-courses-from-nothing"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "A bypass route, a --force-route=modernize flag, a surviving_words=0 log line nobody read. The bug that turned my LMS into a fabrication factory."
 pillar: "AI Lab"
 tags:
@@ -25,6 +25,14 @@ The courses were not bad. That's the part that scared me. They were coherent, we
 > 9 of 662 published courses had zero source-material anchor. They were generated from titles and metadata alone, and they shipped.
 
 This is the postmortem.
+
+<HeroCallout
+  eyebrow="Postmortem"
+  title="When source content is zero, the only safe output is a halt."
+  body="A stronger model would have generated more fluent unsupported material. The fix was not better generation; it was inverting the pipeline default from continue-on-zero to halt-on-zero."
+/>
+
+<KeyTakeaways title="Where the pipeline failed" items='[{"title":"The guard existed","body":"`consolidate_first` was supposed to prove real source reached the model before rewrite."},{"title":"The bypass won","body":"`--force-route=modernize` skipped the guard and became normal tooling."},{"title":"The signal was quiet","body":"`surviving_words=0` logged as info, so the run looked successful."},{"title":"The fix is a contract","body":"Zero primary output now halts unless a specific call site opts into empty output."}]' />
 
 ## Twelve courses I'm not naming
 

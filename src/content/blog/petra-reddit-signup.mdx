@@ -2,7 +2,7 @@
 title: "I Built a Social Posting Agent Before I Had Social Accounts. Here's the Awkward Repair."
 slug: "petra-reddit-signup"
 date: "2026-04-29"
-modified: "2026-05-03"
+modified: "2026-05-04"
 excerpt: "Petra was a finished agent looking for a Reddit account. Three weeks later I created the account. The lesson wasn't \"build less\" — it was \"sequence the build.\""
 pillar: "AI Lab"
 tags:
@@ -22,6 +22,14 @@ schemaType: "Article"
 Petra was the publish tier of a three-agent SEO pipeline. Architecture finished early. Then she sat in dry-run mode for roughly three weeks because the Reddit account she'd post to didn't exist yet.
 
 The repair, when it finally happened, was awkward: an automated signup attempt that hit a CAPTCHA wall, a manual completion of the human-verification step, and a careful warmup phase that's still going. The lesson wasn't "build less" — Petra is good code that does her job. The lesson was about sequencing (credentials before code, accounts before agents) and how a gate-state architecture turned what could have been a clean failure into a productive idle.
+
+<HeroCallout
+  eyebrow="Gate-state architecture"
+  title="Accounts before agents, credentials before code."
+  body="Petra stayed safe because every outbound action routed through gates. Missing credentials became a readable idle state instead of a broken deployment."
+/>
+
+<KeyTakeaways title="Why the idle was productive" items='[{"title":"Default deny","body":"With gates false, the scheduled agent logged and exited instead of forcing work."},{"title":"Progressive enablement","body":"Each credential transition unlocked exactly one more allowed behavior."},{"title":"Human boundary","body":"Signup verification stayed manual because the platform is designed that way."},{"title":"Warmup cap","body":"Rate limits stayed conservative while the new account earned trust."}]' />
 
 ## Three weeks of dry-run
 

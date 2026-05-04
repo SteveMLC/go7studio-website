@@ -2,7 +2,7 @@
 title: "The Day I Realized My AI Agents Were Lying to Each Other (And Built a CLI to Stop It)"
 slug: "agents-lying-to-each-other"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "Three months of free-form agent chat produced ghost messages, false negatives, and lost context. Then I replaced it with a 200-line Python harness."
 pillar: "AI Lab"
 tags:
@@ -20,6 +20,14 @@ schemaType: "Article"
 Rex finished the audit. Winnie reviewed it. The audit didn't exist.
 
 That's the sentence I wrote in a memory file on April 11, the morning I stopped trusting my agents to talk to each other.
+
+<HeroCallout
+  eyebrow="Harness lesson"
+  title="Chat made the work sound real. Files made the work prove itself."
+  body="The bug was not that agents produced bad prose. The bug was trusting conversation as state when the system needed delivery receipts, replay, and audit."
+/>
+
+<KeyTakeaways title="What the file harness fixed" items='[{"title":"Delivery proof","body":"A work order is delivered only when the file exists in the receiving inbox."},{"title":"Replay","body":"Every handoff can be read again without reconstructing intent from chat history."},{"title":"Status","body":"The current state lives in generated files instead of in three diverging transcripts."},{"title":"Refusal","body":"Halts and blockers become committed artifacts instead of polite silence."}]' />
 
 ## A coherent conversation about nothing
 

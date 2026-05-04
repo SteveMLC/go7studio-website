@@ -2,7 +2,7 @@
 title: "A Field Manual for Work Orders That Actually Survive Agent Handoff"
 slug: "work-orders-that-survive-agent-handoff"
 date: "2026-04-29"
-modified: "2026-04-29"
+modified: "2026-05-04"
 excerpt: "Objective / Acceptance / Files / Branching — the four lines I now require at the top of every agent task. Each one prevents a specific failure mode I've already paid for."
 pillar: "AI Lab"
 tags:
@@ -22,6 +22,14 @@ Three quarters of my agent failures used to come from one source: a work order v
 The agent did something plausible. The plausible thing wasn't what I wanted. A file got modified, a test got added, a commit landed. Then I'd read the diff and realize the agent had answered a different question than the one I asked.
 
 That's the worst kind of agent failure. It doesn't look like a failure. It looks like a feature.
+
+<HeroCallout
+  eyebrow="Work-order contract"
+  title="A goal is not a work order until the agent can verify it without asking you what you meant."
+  body="The four-line preamble turns plausible work into checkable work: objective, acceptance, files, and branching. Every line exists because the missing version already failed."
+/>
+
+<KeyTakeaways title="The four lines" items='[{"title":"Objective","body":"One present-tense outcome keeps the task from splitting into multiple plausible jobs."},{"title":"Acceptance","body":"Checkable bullets define what done means before the agent starts."},{"title":"Files","body":"Explicit paths prevent helpful adjacent edits from widening the review surface."},{"title":"Branching","body":"Legal refusal paths stop the agent from fabricating progress when the task does not apply."}]' />
 
 ## Three quarters of my agent failures
 
