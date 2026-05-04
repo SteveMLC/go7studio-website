@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { submitToFormspree } from "@/lib/formspree";
 
 interface WaitlistEntry {
   email: string;
@@ -85,6 +86,15 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
       userAgent: request.headers.get("user-agent") || undefined,
     };
+
+    await submitToFormspree({
+      _subject: `New ${game} waitlist signup`,
+      formType: "game-waitlist",
+      email: newEntry.email,
+      game,
+      submittedAt: newEntry.timestamp,
+      source: "go7studio.com/api/waitlist",
+    });
 
     waitlist.push(newEntry);
     writeWaitlist(waitlist);

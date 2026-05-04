@@ -31,7 +31,7 @@ export function NewsletterSignup() {
         setStatus("success");
         setMessage(data.alreadyExists 
           ? "You're already subscribed!" 
-          : "Thanks for subscribing! Check your email for confirmation."
+          : "Thanks for subscribing. We'll send studio updates when they're ready."
         );
         setEmail("");
       } else {

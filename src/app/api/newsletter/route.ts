@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { submitToFormspree } from "@/lib/formspree";
 
 interface NewsletterEntry {
   email: string;
@@ -102,11 +103,16 @@ export async function POST(request: NextRequest) {
       userAgent: request.headers.get("user-agent") || undefined,
     };
 
+    await submitToFormspree({
+      _subject: "New Go7Studio newsletter signup",
+      formType: "newsletter",
+      email: newEntry.email,
+      source,
+      subscribedAt: newEntry.subscribedAt,
+    });
+
     newsletter.push(newEntry);
     writeNewsletter(newsletter);
-
-    // TODO: Send welcome email via Resend/SendGrid
-    // await sendWelcomeEmail(email);
 
     return NextResponse.json(
       { message: "Successfully subscribed!", alreadyExists: false },
