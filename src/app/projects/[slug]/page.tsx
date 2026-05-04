@@ -60,7 +60,7 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: PageProps): Metadata {
   const project = getProjectBySlug(params.slug);
-  if (!project) return {};
+  if (!project || project.status !== "published") return {};
 
   const baseUrl = "https://go7studio.com";
   const fullUrl = `${baseUrl}/projects/${project.slug}`;
@@ -99,9 +99,10 @@ export default function ProjectDetailPage({ params }: PageProps) {
   const project = getProjectBySlug(params.slug);
   if (!project || project.status !== "published") notFound();
 
-  const relatedCaseStudy = project.relatedCaseStudySlug
+  const candidateCaseStudy = project.relatedCaseStudySlug
     ? getCaseStudyBySlug(project.relatedCaseStudySlug)
     : undefined;
+  const relatedCaseStudy = candidateCaseStudy?.status === "published" ? candidateCaseStudy : undefined;
   const relatedPosts = getRelatedBlogPostsBySlugs(project.relatedPostSlugs ?? []);
   const ctaPrimary = project.links?.find((link) => link.kind === "primary" || link.kind === "live") ?? project.links?.[0];
   const ctaSecondary = project.links?.find((link) => link.kind === "secondary" || link.kind === "case-study")
