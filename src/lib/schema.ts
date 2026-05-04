@@ -78,11 +78,6 @@ export function getWebsiteSchema(): SchemaNode {
     url: SITE_URL,
     name: "Go7Studio",
     publisher: { "@id": SCHEMA_IDS.ORG },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${SITE_URL}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
   };
 }
 

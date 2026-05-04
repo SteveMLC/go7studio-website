@@ -19,7 +19,7 @@ function nextEligibleSlug(): string | null {
     const trimmed = raw.trim();
     if (!trimmed || trimmed.startsWith("#")) continue;
     const post = getBlogPostBySlug(trimmed);
-    if (post && post.status === "draft") return trimmed;
+    if (post && post.status === "draft" && post.publishable === true) return trimmed;
   }
   return null;
 }
@@ -121,7 +121,7 @@ export default function AdminHome() {
               <>
                 <h2 className="mt-1 text-xl font-semibold text-white">Queue is empty or all entries skipped</h2>
                 <p className="mt-3 text-sm text-white/65">
-                  No eligible drafts in the queue. Add slugs to <code className="font-mono text-brand-teal">scripts/publish-queue.txt</code> or unpark Tier-1 placeholders.
+                  No queued drafts are marked <code className="font-mono text-brand-teal">publishable: true</code>. Mark a reviewed draft publishable or use Blog admin for a manual flip.
                 </p>
               </>
             )}
@@ -144,7 +144,7 @@ export default function AdminHome() {
           <p className="text-xs uppercase tracking-[0.18em] text-brand-teal">Blog</p>
           <h2 className="mt-2 text-xl font-semibold text-white">Manage posts</h2>
           <p className="mt-2 text-sm text-white/60">
-            All 47 posts. Flip status (draft → published or vice versa), or open the editor on github.dev.
+            All {counts.total} posts. Flip status (draft → published or vice versa), or open the editor on github.dev.
           </p>
           <div className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-teal/90 group-hover:text-white">
             Open <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

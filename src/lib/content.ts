@@ -27,6 +27,7 @@ export type BlogFrontmatter = {
   seoDescription?: string;
   readingTime?: string;
   featured?: boolean;
+  publishable?: boolean;
 };
 
 export type BlogPost = BlogFrontmatter & {

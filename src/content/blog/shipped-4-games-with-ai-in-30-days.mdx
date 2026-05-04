@@ -3,7 +3,7 @@ title: "We Shipped 4 Games with AI in 30 Days — Here's How"
 slug: "shipped-4-games-with-ai-in-30-days"
 date: "2026-03-03"
 modified: "2026-05-04"
-excerpt: "A small studio used three AI agents to build, ship, and monetize four games across Flutter, Unity, and Roblox in a single month. Real numbers, real code, real lessons."
+excerpt: "A small studio used AI-assisted production lanes to build, ship, and monetize four games across Flutter, Unity, and Roblox in a single month. Real numbers, real code, real lessons."
 pillar: "thought-leadership"
 tags:
   - ai-development
@@ -23,7 +23,7 @@ targetKeywords:
   - indie game development AI
   - ship games faster
 seoTitle: "We Shipped 4 Games with AI in 30 Days — Here's How"
-seoDescription: "How a small indie studio used AI agents to build and ship 4 games across Flutter, Unity, and Roblox in 30 days. Real numbers, architecture, and lessons learned."
+seoDescription: "How a small indie studio used AI-assisted production workflows to build and ship 4 games across Flutter, Unity, and Roblox in 30 days. Real numbers, architecture, and lessons learned."
 readingTime: "12 min read"
 featured: true
 relatedGames:
@@ -40,17 +40,17 @@ relatedServices:
 
 Most game studios spend months on a single title. We shipped four — across three different engines — in 30 days. Not prototypes. Published, monetized games with real users generating real revenue.
 
-The secret wasn't crunch. It was **three AI development agents** working alongside a solo developer, each handling different aspects of the pipeline: code, content, and coordination.
+The secret wasn't crunch. It was **three AI-assisted production lanes** working alongside a solo developer: engineering, product strategy, and review.
 
 Here's exactly how we did it, what went wrong, and whether we'd do it again.
 
 <HeroCallout
   eyebrow="Sprint architecture"
   title="The multiplier was not AI replacing the developer. It was role separation around the repeatable work."
-  body="The agents handled scaffolding, integrations, documentation, analytics, and batch tasks. The human kept the parts that still need taste: game feel, platform judgment, final art direction, and whether the shipped loop was worth playing."
+  body="The workflow handled scaffolding, integrations, documentation, analytics, and batch tasks. The human kept the parts that still need taste: game feel, platform judgment, final art direction, and whether the shipped loop was worth playing."
 />
 
-<KeyTakeaways title="What survived the sprint" items='[{"title":"Clear agent roles","body":"Strategy, engineering, and review stayed separate enough that parallel work remained usable."},{"title":"Fast feedback loops","body":"Flutter moved fastest because builds, state, and UI feedback were easy for agents to reason about."},{"title":"Human taste stayed central","body":"Economy balance, feel, and final product judgment did not become automated."},{"title":"Reusable systems compounded","body":"Ad integration, analytics, asset workflows, and deployment scripts carried into the next games."}]' />
+<KeyTakeaways title="What survived the sprint" items='[{"title":"Clear production lanes","body":"Strategy, engineering, and review stayed separate enough that parallel work remained usable."},{"title":"Fast feedback loops","body":"Flutter moved fastest because builds, state, and UI feedback made iteration cheap."},{"title":"Human taste stayed central","body":"Economy balance, feel, and final product judgment did not become automated."},{"title":"Reusable systems compounded","body":"Ad integration, analytics, asset workflows, and deployment scripts carried into the next games."}]' />
 
 ## The Challenge: $600 in 30 Days
 
@@ -69,13 +69,13 @@ Every game shared a core philosophy: **ship fast, iterate based on data, let AI 
 | **Rampart** | Unity | Android | ~7 days |
 | **SlimeSlip** | Roblox Studio | Roblox | ~4 days |
 
-The AI agents weren't just autocomplete. Each had a distinct role:
+The AI-assisted workflow was not just autocomplete. Each lane had a distinct role:
 
-- **Walt** — Strategy, content creation, marketing, analytics, coordination across all projects
-- **Chip** — Code architecture, infrastructure, CI/CD, performance optimization, debugging
-- **Winnie** — SEO, content review, market research, user experience auditing
+- **Strategy lane** — Content creation, marketing, analytics, and coordination across all projects
+- **Engineering lane** — Code architecture, infrastructure, CI/CD, performance optimization, and debugging
+- **Research lane** — SEO review, market research, user experience auditing, and content QA
 
-They operated as autonomous agents through [OpenClaw](https://openclaw.ai), running 24/7 with access to codebases, deployment pipelines, and analytics dashboards.
+The system worked because the responsibilities were separated cleanly across codebases, deployment pipelines, analytics dashboards, and review steps.
 
 ## Game 1: Stakd — The Puzzle Warmup (3 Days)
 
@@ -136,10 +136,10 @@ This is where the AI-human collaboration really clicked.
 
 **Rampart** (working title: Idle Attack) is a wave defense game built in Unity. Players deploy troops — militiamen, goblins, trolls, golems — to defend against increasingly difficult enemy waves.
 
-This was the AI stress test: **could AI agents work effectively in Unity/C#?**
+This was the AI-assisted production stress test: **could the workflow move effectively in Unity/C#?**
 
 **What worked:**
-- Chip handled the entire build pipeline (IL2CPP compilation, Android keystore signing, AAB generation)
+- The engineering lane handled the entire build pipeline (IL2CPP compilation, Android keystore signing, AAB generation)
 - AI-generated prefab configurations for 40+ unique troop types
 - Automated sprite sheet processing and background removal
 - Battle stat tracking and UI panel generation
@@ -173,26 +173,26 @@ Here's what a typical day looked like during the sprint:
 ### Morning (Human + AI Planning)
 1. Review overnight analytics (AI-pulled from AdMob, GA4, Play Console)
 2. Prioritize bugs vs features vs content
-3. Assign tasks to agents
+3. Split work across production lanes
 
 ### Daytime (Parallel Execution)
-- **Chip** pushes code changes, runs builds, deploys
-- **Walt** creates marketing content, analyzes user behavior, writes copy
-- **Winnie** audits UX, researches competitors, reviews content for SEO
+- **Engineering** pushes code changes, runs builds, and deploys
+- **Strategy** creates marketing content, analyzes user behavior, and writes copy
+- **Research/QA** audits UX, researches competitors, and reviews content for SEO
 - **Human** plays the games, makes design decisions, approves external communications
 
 ### Evening / Overnight
-- AI agents run batch tasks: asset generation, analytics collection, content scheduling
+- AI-assisted tooling runs batch tasks: asset generation, analytics collection, QA checklist generation
 - Automated backups to NAS
 - Morning handoff report ready by 6 AM
 
-**The multiplier effect:** A solo developer with three AI agents isn't a 4x multiplier — it's more like 2-3x on raw output. But the *type* of work changes dramatically. The human stops writing boilerplate and starts making higher-level decisions. That's where the real leverage is.
+**The multiplier effect:** A solo developer with a disciplined AI-assisted workflow is not a magic 4x multiplier. It is closer to 2-3x on raw output. But the *type* of work changes dramatically. The human stops writing boilerplate and starts making higher-level decisions. That's where the real leverage is.
 
 ## What AI Does Well in Game Dev
 
 1. **Boilerplate and scaffolding** — Setting up project structure, adding integrations (ads, analytics, auth), writing CRUD operations
 2. **Iteration at speed** — Need to test 5 different economy curves? AI generates all 5 while you review the first
-3. **Cross-domain work** — The same agents write Dart, C#, Lua, JavaScript, Python, and shell scripts
+3. **Cross-domain work** — The same workflow spans Dart, C#, Lua, JavaScript, Python, and shell scripts
 4. **Documentation** — Every decision, every architecture choice, every bug fix gets documented automatically
 5. **24/7 availability** — Overnight batch processing, monitoring, asset generation while you sleep
 
@@ -225,7 +225,7 @@ Is $250 in 30 days going to retire anyone? No. But consider:
 **Yes — but differently.**
 
 **What we'd keep:**
-- Multi-agent workflow with clear role separation
+- Multi-lane workflow with clear role separation
 - Ship-first mentality (perfect is the enemy of live)
 - Flutter as primary engine for mobile (speed advantage is real)
 - Automated pipelines for everything repeatable
@@ -238,7 +238,7 @@ Is $250 in 30 days going to retire anyone? No. But consider:
 
 ## What's Next
 
-We're continuing to develop all four games, with Empire Tycoon as the primary focus. The AI agents are now handling:
+We're continuing to develop all four games, with Empire Tycoon as the primary focus. The production workflow now supports:
 
 - **Automated art generation** via Stable Diffusion with custom-trained LoRA models
 - **SEO and content marketing** (this blog post is part of that strategy)

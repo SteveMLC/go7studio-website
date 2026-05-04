@@ -17,7 +17,7 @@ export function FeaturedAiLab() {
           <p className="text-sm uppercase tracking-[0.22em] text-brand-teal">AI Lab</p>
           <h2 className="mt-2 text-3xl font-bold text-white">Latest field reports</h2>
           <p className="mt-2 max-w-2xl text-base text-white/60">
-            Builder notes from running AI agents in production. Real incidents, real fixes, real receipts &mdash; not benchmark theater.
+            Builder notes from real AI-assisted engineering work: model routing, review loops, coding workflows, and shipped product lessons.
           </p>
         </div>
 
@@ -46,7 +46,7 @@ export function FeaturedAiLab() {
             </h3>
             <p className="mt-3 flex-1 text-sm leading-6 text-white/60">{post.excerpt}</p>
             <div className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-brand-teal/90 group-hover:text-white">
-              Read field report
+              Read technical note
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </div>
           </Link>

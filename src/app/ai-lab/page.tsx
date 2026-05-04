@@ -3,10 +3,10 @@ import Link from "next/link";
 import { getPublishedBlogPosts } from "@/lib/content";
 import {
   ArrowRight,
-  Bot,
   FileStack,
   GitBranch,
   ShieldCheck,
+  Workflow,
   Wrench,
 } from "lucide-react";
 
@@ -86,14 +86,14 @@ const labAreas = [
   {
     title: "Field notes",
     description:
-      "What broke, what held up, and what changed after shipping with AI agents inside actual app, game, and automation work.",
+      "What worked, what changed, and what held up after using AI-assisted engineering inside actual app, game, and platform work.",
     icon: FileStack,
   },
   {
     title: "Workflows",
     description:
-      "Reusable playbooks for routing, review loops, subagents, coding sessions, and multi-step operator work.",
-    icon: Bot,
+      "Reusable playbooks for routing, review loops, coding sessions, and multi-step technical work.",
+    icon: Workflow,
   },
   {
     title: "Governance",
@@ -106,13 +106,13 @@ const labAreas = [
 export const metadata: Metadata = {
   title: "AI Lab | Go7Studio",
   description:
-    "AI Lab is Go7Studio’s builder-first content hub for real-world AI guides, coding-agent comparisons, field notes, workflow playbooks, and governance lessons.",
+    "AI Lab is Go7Studio’s builder-first content hub for real-world AI guides, coding-tool comparisons, workflow playbooks, and engineering governance lessons.",
   alternates: { canonical: "/ai-lab" },
   keywords: [
     "AI Lab",
     "Go7Studio AI Lab",
     "AI workflow guides",
-    "coding agent comparisons",
+    "AI coding tool comparisons",
     "harness engineering",
     "builder AI workflows",
     "Claude Code guide",
@@ -126,12 +126,21 @@ export const metadata: Metadata = {
     url: "https://go7studio.com/ai-lab",
     siteName: "Go7Studio",
     type: "website",
+    images: [
+      {
+        url: "/images/og-default.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Go7Studio AI Lab",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "AI Lab by Go7Studio",
     description:
       "Builder-first AI guides, comparisons, field notes, workflows, and governance lessons from real studio work.",
+    images: ["/images/og-default.jpg"],
   },
 };
 
@@ -147,7 +156,7 @@ export default function AiLabPage() {
         </h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-white/70 sm:text-xl">
           Go7Studio AI Lab is where we publish the systems, tradeoffs, and field notes behind real AI-enabled work,
-          from coding-agent workflows and model routing to review loops, harness design, and operator playbooks.
+          from AI coding workflows and model routing to review loops, harness design, and production playbooks.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <a href="#cornerstones" className="btn-primary inline-flex items-center justify-center gap-2 text-sm sm:text-base">
@@ -232,7 +241,7 @@ export default function AiLabPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-teal">More AI Lab</p>
             <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">New writing as it lands.</h2>
             <p className="mt-3 text-white/70">
-              Field notes, postmortems, and patterns from running AI agents in production. Each one is a real incident or working playbook from inside the studio.
+              Technical notes, implementation patterns, and production lessons from real studio work. Each one is written to help builders ship cleaner systems.
             </p>
           </div>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">

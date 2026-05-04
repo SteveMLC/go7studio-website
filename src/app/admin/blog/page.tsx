@@ -112,7 +112,7 @@ export default function BlogAdminPage() {
           <li><span className="font-mono text-brand-teal">draft</span> &mdash; hidden from public routes, omitted from hubs, sitemap, and feed, and ignored by the daily cron.</li>
           <li><span className="font-mono text-brand-teal">published</span> &mdash; live at <code className="font-mono text-brand-teal">/blog/&lt;slug&gt;</code> or <code className="font-mono text-brand-teal">/ai-lab/&lt;slug&gt;</code>, listed on hub pages and homepage.</li>
           <li>
-            The daily publisher cron (<code className="font-mono">14:00 UTC</code>) reads <code className="font-mono">scripts/publish-queue.txt</code> and flips the next eligible draft. To force a flip immediately, hit the status pill on this page.
+            The daily publisher cron (<code className="font-mono">14:00 UTC</code>) reads <code className="font-mono">scripts/publish-queue.txt</code> and flips the next eligible draft only after it is marked <code className="font-mono">publishable: true</code>. To force a flip immediately, hit the status pill on this page.
           </li>
         </ul>
       </div>

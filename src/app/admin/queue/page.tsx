@@ -49,12 +49,12 @@ export default function QueueAdminPage() {
   const lines = loadQueue();
   const slugLines = lines.filter((l) => l.type === "slug");
 
-  // Find the first eligible slug — file exists with status:"draft"
+  // Find the first eligible slug — file exists with status:"draft" and publishable:true
   let nextEligibleSlug: string | null = null;
   for (const line of slugLines) {
     if (!line.slug) continue;
     const post = getBlogPostBySlug(line.slug);
-    if (post && post.status === "draft") {
+    if (post && post.status === "draft" && post.publishable === true) {
       nextEligibleSlug = line.slug;
       break;
     }
@@ -69,7 +69,7 @@ export default function QueueAdminPage() {
         <p className="text-xs uppercase tracking-[0.18em] text-brand-teal">Publish queue</p>
         <h1 className="mt-1 text-3xl font-bold text-white">Schedule</h1>
         <p className="mt-2 max-w-2xl text-white/60">
-          The daily publisher cron reads <code className="font-mono text-brand-teal">scripts/publish-queue.txt</code> and flips the first eligible draft to published. Tier-1 placeholders (Steve&apos;s voice-defining posts) are commented out until the .mdx file exists.
+          The daily publisher cron reads <code className="font-mono text-brand-teal">scripts/publish-queue.txt</code> and flips the first reviewed draft marked <code className="font-mono text-brand-teal">publishable: true</code>. Tier-1 placeholders (Steve&apos;s voice-defining posts) are commented out until the .mdx file exists.
         </p>
       </div>
 
@@ -88,8 +88,8 @@ export default function QueueAdminPage() {
           </p>
           <p className="mt-1 text-xs text-emerald-200/80">
             {nextEligibleSlug
-              ? "Will publish on the next cron tick (or click Publish now in the blog admin)."
-              : "All eligible slugs are exhausted. Add new ones to the queue."}
+              ? "Will publish on the next cron tick. Manual flips still happen in the blog admin."
+              : "Nothing will auto-publish until a queued draft is reviewed and marked publishable:true."}
           </p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
@@ -143,6 +143,7 @@ export default function QueueAdminPage() {
               const fileExists = !!post;
               const isNext = line.slug === nextEligibleSlug;
               const status = post?.status ?? "missing";
+              const isPublishable = post?.publishable === true;
 
               return (
                 <tr
@@ -176,8 +177,8 @@ export default function QueueAdminPage() {
                           published
                         </span>
                       ) : (
-                        <span className="inline-flex rounded-full border border-amber-300/30 bg-amber-300/10 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-amber-200">
-                          draft
+                        <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide ${isPublishable ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : "border-amber-300/30 bg-amber-300/10 text-amber-200"}`}>
+                          {isPublishable ? "draft ready" : "draft gated"}
                         </span>
                       )
                     ) : (
@@ -226,7 +227,7 @@ export default function QueueAdminPage() {
         <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-white/60">
           <li>One slug per line. Order is publish order.</li>
           <li>Lines starting with <code className="font-mono text-brand-teal">#</code> are ignored — use to comment out a slug or annotate a Day-N slot.</li>
-          <li>The cron processes the first non-comment slug whose .mdx exists with <code className="font-mono">status: &quot;draft&quot;</code>. Missing .mdx files are skipped (line stays in queue).</li>
+          <li>The cron processes the first non-comment slug whose .mdx exists with <code className="font-mono">status: &quot;draft&quot;</code> and <code className="font-mono">publishable: true</code>. Missing .mdx files and unreviewed drafts are skipped (line stays in queue).</li>
           <li>To force-publish ad-hoc: don&apos;t edit the queue. Use the &quot;Publish now&quot; button in the <a href="/admin/blog" className="text-brand-teal hover:underline">blog admin</a>.</li>
         </ul>
       </div>

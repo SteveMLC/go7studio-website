@@ -2,6 +2,10 @@
 # Lines starting with # are ignored. Blank lines are ignored.
 # The daily publisher (.github/workflows/daily-publish.yml) processes
 # the first eligible line each day and removes it on success.
+# Eligibility now requires the target MDX to contain:
+#   status: "draft"
+#   publishable: true
+# Keep publishable unset until a post has passed brand/content review.
 #
 # Tier 1 posts (Steve's voice-defining pieces) are commented out below
 # until the .mdx files exist. Steve writes them, drops the .mdx in
@@ -44,11 +48,14 @@ hardcoded-taxonomy-hiding-career-pages-from-google
 blog-bundle-premium-flywheel-auto-promotes
 visual-archetype-system-ai-generated-lessons
 career-match-quizzes-onet-implementation
-five-game-portfolio
-pet-paradise-on-hold
+# PARKED pending rewrite: portfolio framing must be product/accomplishment-led.
+# five-game-portfolio
+# PARKED pending rewrite: "on hold" framing is too defensive for the public queue.
+# pet-paradise-on-hold
 # Day 38 (Steve's Tier 1)
 # things-i-shipped-that-made-zero-and-why-i-kept-them
-picking-mobile-game-names
+# PARKED pending rewrite: naming/process story needs stronger shipped-product framing.
+# picking-mobile-game-names
 # Day 40 — PERMANENTLY PARKED, DO NOT PUBLISH
 # Original slot was post #10 "A 12-Institution Endgame for an Idle Game".
 # That endgame design is not implemented in Empire Tycoon yet, so we
@@ -58,11 +65,15 @@ picking-mobile-game-names
 # (No replacement slot — the cron skips past Day 40 to the next post.)
 cost-and-quality-routing-five-model-families
 one-config-line-slowed-the-studio
-daily-memory-file
+# PARKED pending rewrite: internal memory/process framing should not auto-publish.
+# daily-memory-file
 reading-audit-logs-highest-roi-habit
-state-file-architecture-memory
-decide-ship-or-pause-ai-tool
-three-conversations-stopped-having
+# PARKED pending rewrite: internal state/process framing should not auto-publish.
+# state-file-architecture-memory
+# PARKED pending rewrite: tool-decision/process framing needs stronger product proof.
+# decide-ship-or-pause-ai-tool
+# PARKED pending rewrite: old internal-agent story and links must be removed.
+# three-conversations-stopped-having
 # Day 48 (Steve's Tier 1)
 # what-25-linkedin-outreach-messages-got-me-on-day-7
 # Day 49 (Steve's Tier 1)

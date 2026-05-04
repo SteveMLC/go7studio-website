@@ -10,13 +10,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Join Empire Tycoon - Get Free Rewards!',
     description: 'Your friend invited you to Empire Tycoon. Get 50 PP + 1.5x income boost!',
-    images: ['/games/empire-tycoon-og.jpg'],
+    images: ['/images/games/empire-tycoon/og-image.jpg'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Join Empire Tycoon - Get Free Rewards!',
     description: 'Your friend invited you to Empire Tycoon. Get 50 PP + 1.5x income boost!',
-    images: ['/games/empire-tycoon-og.jpg'],
+    images: ['/images/games/empire-tycoon/og-image.jpg'],
   },
 };
 
@@ -28,7 +28,7 @@ export default function ReferralLayout({
   params: { code: string };
 }) {
   const code = (params.code || '').trim().toUpperCase();
-  const canonical = `https://www.go7studio.com/empire/invite/${encodeURIComponent(code)}`;
+  const canonical = `https://go7studio.com/empire/invite/${encodeURIComponent(code)}`;
   const deepLink = `empiretycoon://refer?code=${encodeURIComponent(code)}`;
 
   // Basic structured data so Google can parse a valid item (Rich Results Test was showing "No items detected").
@@ -42,7 +42,7 @@ export default function ReferralLayout({
     isPartOf: {
       '@type': 'WebSite',
       name: 'Go7Studio',
-      url: 'https://www.go7studio.com',
+      url: 'https://go7studio.com',
     },
     potentialAction: {
       '@type': 'ViewAction',

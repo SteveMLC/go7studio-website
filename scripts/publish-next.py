@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-publish-next.py — promote the next blog post on the publish queue.
+publish-next.py — promote the next approved blog post on the publish queue.
 
 The queue is a plain text file at `scripts/publish-queue.txt`, one slug per
 line. Lines starting with `#` are comments. Blank lines are skipped.
 
 Workflow:
-  1. Read the first non-blank, non-comment line as the next slug.
+  1. Read queued slugs in order.
   2. Find the matching .mdx file in src/content/blog/.
-  3. If the file exists AND has status:"draft", flip to "published",
-     bump `modified` to today, remove the line from the queue.
+  3. If the file exists AND has status:"draft" AND publishable:true,
+     flip to "published", bump `modified` to today, remove the line from
+     the queue.
   4. If the file doesn't exist (Tier 1 not yet written by Steve), skip it
      and try the next line. Don't remove skipped lines.
   5. If no eligible line is found, exit 78 (no-op).
@@ -29,6 +30,7 @@ TODAY = date.today().isoformat()
 SLUG_OUTPUT = Path("/tmp/published-slug")
 
 STATUS_RE = re.compile(r'^(status:\s*)"draft"\s*$', re.MULTILINE)
+PUBLISHABLE_RE = re.compile(r'^publishable:\s*(true|"true"|\'true\')\s*$', re.MULTILINE)
 MODIFIED_RE = re.compile(r'^modified:\s*"[^"]*"\s*$', re.MULTILINE)
 
 
@@ -64,6 +66,10 @@ def main() -> int:
             print(f"publish-next: skip — '{slug}' has no status:'draft' (already published or unexpected state), leaving in queue")
             skipped.append(slug)
             continue
+        if not PUBLISHABLE_RE.search(text):
+            print(f"publish-next: skip — '{slug}' is draft but missing publishable:true, leaving in queue")
+            skipped.append(slug)
+            continue
 
         # Flip the status and bump modified
         new_text = STATUS_RE.sub(r'\1"published"', text, count=1)
@@ -86,7 +92,7 @@ def main() -> int:
             print(f"  skipped (left in queue): {', '.join(skipped)}")
         return 0
 
-    print("publish-next: nothing publishable in queue (all entries skipped — likely all Tier 1 posts not yet written)")
+    print("publish-next: nothing publishable in queue (drafts must have publishable:true)")
     return 78
 
 

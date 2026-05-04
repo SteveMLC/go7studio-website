@@ -1,5 +1,16 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Admin Portal
+
+The site includes a private admin portal at `/admin`.
+
+- Auth: Basic Auth username is `admin`; password comes from `ADMIN_PASSWORD`.
+- Blog hide/publish controls: `/admin/blog` flips MDX frontmatter between `status: "draft"` and `status: "published"`.
+- Writes: status flips commit through the GitHub Contents API and require `GITHUB_TOKEN` with repo contents write access.
+- Automatic queue: the daily publisher only promotes queued drafts that are explicitly marked `publishable: true`.
+
+If `ADMIN_PASSWORD` is missing, admin routes fail closed with `503`. If `GITHUB_TOKEN` is missing, the admin portal is viewable after auth but status flip buttons return an error.
+
 ## Getting Started
 
 First, run the development server:

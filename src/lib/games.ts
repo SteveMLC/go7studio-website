@@ -56,7 +56,7 @@ export const GAMES: Game[] = [
   {
     slug: "empire-tycoon",
     title: "Empire Tycoon - Idle Business",
-    thumbnail: "/images/games/empire-tycoon/icon-new.jpg",
+    thumbnail: "/images/games/empire-tycoon/icon-current.png",
     tagline: "Build your business empire! Idle tycoon with real estate & smart investing.",
     description:
       "Build businesses, automate income, and scale from your first shop to a booming empire.",
