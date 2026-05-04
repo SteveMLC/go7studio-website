@@ -8,19 +8,19 @@ import { ArticleSchema } from "@/components/seo/ArticleSchema";
 import { BreadcrumbSchema } from "@/components/seo/BreadcrumbSchema";
 import { FAQSchema } from "@/components/seo/FAQSchema";
 import { HowToSchema } from "@/components/seo/HowToSchema";
-import { getBlogPostBySlug, getPublishedBlogPosts } from "@/lib/content";
+import { getBlogPostBySlug, getPublishedBlogPosts, isAiLabPost } from "@/lib/content";
 
 const SITE = "https://go7studio.com";
 
 export function generateStaticParams() {
   return getPublishedBlogPosts()
-    .filter((post) => post.pillar.toLowerCase() === "ai lab")
+    .filter(isAiLabPost)
     .map((post) => ({ slug: post.slug }));
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
   const post = getBlogPostBySlug(params.slug);
-  if (!post || post.pillar.toLowerCase() !== "ai lab" || post.status !== "published") return {};
+  if (!post || post.status !== "published" || !isAiLabPost(post)) return {};
   return {
     title: post.seoTitle ?? post.title,
     description: post.seoDescription ?? post.excerpt,
@@ -46,7 +46,7 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 
 export default function AiLabPostPage({ params }: { params: { slug: string } }) {
   const post = getBlogPostBySlug(params.slug);
-  if (!post || post.pillar.toLowerCase() !== "ai lab" || post.status !== "published") notFound();
+  if (!post || post.status !== "published" || !isAiLabPost(post)) notFound();
   const url = `${SITE}/ai-lab/${post.slug}`;
 
   return (

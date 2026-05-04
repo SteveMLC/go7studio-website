@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { GAMES, getGameBySlug } from "@/lib/games";
 import { ScreenshotGallery } from "@/components/games/ScreenshotGallery";
@@ -124,59 +125,72 @@ export default function GameDetailPage({ params }: PageProps) {
           <div className="absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-brand-sky/20 blur-3xl" />
         </div>
 
-        <div className="relative max-w-3xl">
-          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            {game.title}
-          </h1>
-          <p className="mt-3 text-base text-white/75 sm:text-lg">
-            {game.tagline}
-          </p>
+        <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-center">
+          <div className="max-w-3xl">
+            <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+              {game.title}
+            </h1>
+            <p className="mt-3 text-base text-white/75 sm:text-lg">
+              {game.tagline}
+            </p>
 
-          <p className="mt-6 whitespace-pre-line text-sm leading-7 text-white/75 sm:text-base">
-            {game.longDescription}
-          </p>
+            <p className="mt-6 whitespace-pre-line text-sm leading-7 text-white/75 sm:text-base">
+              {game.longDescription}
+            </p>
 
-          {showEnhancedEmpireCta ? (
-            <div className="mt-8 max-w-xl">
-              <div className="mb-4 flex items-center gap-2">
-                <span className="chip border-brand-teal/30 bg-brand-teal/15 text-white">Free to Play</span>
-                <span className="text-xs uppercase tracking-wide text-white/60">Android</span>
+            {showEnhancedEmpireCta ? (
+              <div className="mt-8 max-w-xl">
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="chip border-brand-teal/30 bg-brand-teal/15 text-white">Free to Play</span>
+                  <span className="text-xs uppercase tracking-wide text-white/60">Android</span>
+                </div>
+                <div className="flex flex-col items-start gap-4">
+                  <GooglePlayBadge href={game.primaryCtaHref} />
+                  <DownloadButton href={game.primaryCtaHref} label="Download Empire Tycoon" className="w-full sm:w-auto" />
+                </div>
+                {game.secondaryCtaLabel && game.secondaryCtaHref ? (
+                  <Link
+                    href={game.secondaryCtaHref}
+                    className="btn-secondary mt-4 inline-flex items-center justify-center"
+                  >
+                    {game.secondaryCtaLabel}
+                  </Link>
+                ) : null}
               </div>
-              <div className="flex flex-col items-start gap-4">
-                <GooglePlayBadge href={game.primaryCtaHref} />
-                <DownloadButton href={game.primaryCtaHref} label="Download Empire Tycoon" className="w-full sm:w-auto" />
-              </div>
-              {game.secondaryCtaLabel && game.secondaryCtaHref ? (
-                <Link
-                  href={game.secondaryCtaHref}
-                  className="btn-secondary mt-4 inline-flex items-center justify-center"
+            ) : (
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href={game.primaryCtaHref}
+                  className="btn-primary inline-flex items-center justify-center gap-2"
+                  rel="noopener noreferrer"
+                  target={isExternalPrimaryLink ? "_blank" : undefined}
                 >
-                  {game.secondaryCtaLabel}
-                </Link>
-              ) : null}
-            </div>
-          ) : (
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a
-                href={game.primaryCtaHref}
-                className="btn-primary inline-flex items-center justify-center gap-2"
-                rel="noopener noreferrer"
-                target={isExternalPrimaryLink ? "_blank" : undefined}
-              >
-                {game.primaryCtaLabel}
-                <ExternalLink className="h-4 w-4" />
-              </a>
+                  {game.primaryCtaLabel}
+                  <ExternalLink className="h-4 w-4" />
+                </a>
 
-              {game.secondaryCtaLabel && game.secondaryCtaHref ? (
-                <Link
-                  href={game.secondaryCtaHref}
-                  className="btn-secondary inline-flex items-center justify-center"
-                >
-                  {game.secondaryCtaLabel}
-                </Link>
-              ) : null}
-            </div>
-          )}
+                {game.secondaryCtaLabel && game.secondaryCtaHref ? (
+                  <Link
+                    href={game.secondaryCtaHref}
+                    className="btn-secondary inline-flex items-center justify-center"
+                  >
+                    {game.secondaryCtaLabel}
+                  </Link>
+                ) : null}
+              </div>
+            )}
+          </div>
+
+          <div className="mx-auto w-48 sm:w-56 lg:w-full">
+            <Image
+              src={game.thumbnail}
+              alt={`${game.title} logo`}
+              width={512}
+              height={512}
+              priority={game.slug === "empire-tycoon"}
+              className="h-auto w-full rounded-[28px] shadow-2xl shadow-black/40"
+            />
+          </div>
         </div>
       </header>
 

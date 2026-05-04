@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getBlogPostBySlug } from "@/lib/content";
+import { getBlogPostBySlug, isAiLabPost } from "@/lib/content";
 
 export const runtime = "nodejs";
 export const alt = "Go7Studio blog post";
@@ -19,8 +19,12 @@ export default async function OpenGraphImage({
   params: { slug: string };
 }) {
   const post = getBlogPostBySlug(params.slug);
-  const title = post?.title ?? "Go7Studio";
-  const rawPillar = post?.pillar ?? "Studio";
+  if (!post || post.status !== "published" || isAiLabPost(post)) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  const title = post.title;
+  const rawPillar = post.pillar;
   const pillarKey = rawPillar.toLowerCase();
   const accent =
     PILLAR_ACCENT[pillarKey] ?? PILLAR_ACCENT["studio"];

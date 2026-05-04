@@ -21,7 +21,7 @@ export function StatusToggle({ slug, status }: Props) {
   const buttonLabel = pending
     ? "Working…"
     : current === "published"
-      ? "Unpublish"
+      ? "Hide from site"
       : "Publish now";
 
   async function flip() {
@@ -53,6 +53,7 @@ export function StatusToggle({ slug, status }: Props) {
         type="button"
         onClick={flip}
         disabled={pending}
+        title={current === "published" ? "Move this post to draft so it no longer renders publicly." : "Publish this draft immediately."}
         className="inline-flex items-center gap-1.5 rounded-md border border-brand-teal/40 bg-brand-teal/10 px-3 py-1.5 text-xs font-medium text-[#5eead4] transition hover:bg-brand-teal/20 disabled:opacity-60"
       >
         {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}

@@ -1,9 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Github, Twitter, Youtube } from "lucide-react";
 import { NewsletterSignup } from "@/components/common/NewsletterSignup";
 
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/admin")) return null;
+
   return (
     <footer className="border-t border-white/10 bg-[#050510]">
       <div className="container-px grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">

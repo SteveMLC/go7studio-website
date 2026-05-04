@@ -23,6 +23,8 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  const isAdmin = pathname?.startsWith("/admin");
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -38,6 +40,8 @@ export function Header() {
     if (href === "/projects") return pathname === "/projects" || pathname.startsWith("/projects/");
     return pathname === href || pathname.startsWith(href + "/");
   };
+
+  if (isAdmin) return null;
 
   return (
     <>

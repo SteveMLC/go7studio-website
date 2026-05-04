@@ -61,7 +61,7 @@ export default function ReferralPage() {
           <div className="relative w-24 h-24 mx-auto mb-6">
             <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl blur-xl opacity-50" />
             <Image
-              src="/images/games/empire-tycoon/icon.jpg"
+              src="/images/games/empire-tycoon/icon-new.jpg"
               alt="Empire Tycoon"
               width={96}
               height={96}

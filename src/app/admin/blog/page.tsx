@@ -33,7 +33,7 @@ export default function BlogAdminPage() {
         <h1 className="text-3xl font-bold text-white">All posts</h1>
         <p className="text-white/60">
           Click <span className="font-semibold text-white">Edit</span> to open the source MDX in github.dev.
-          Use the status pill to flip a post between draft and published &mdash; it commits through the GitHub API and Vercel auto-deploys.
+          Use <span className="font-semibold text-white">Publish now</span> or <span className="font-semibold text-white">Hide from site</span> to flip a post between draft and published &mdash; it commits through the GitHub API and Vercel auto-deploys.
         </p>
       </div>
 
@@ -109,7 +109,7 @@ export default function BlogAdminPage() {
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-sm text-white/65">
         <p className="font-semibold text-white">How publishing works</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li><span className="font-mono text-brand-teal">draft</span> &mdash; lives in repo, invisible on the site, ignored by the daily cron.</li>
+          <li><span className="font-mono text-brand-teal">draft</span> &mdash; hidden from public routes, omitted from hubs, sitemap, and feed, and ignored by the daily cron.</li>
           <li><span className="font-mono text-brand-teal">published</span> &mdash; live at <code className="font-mono text-brand-teal">/blog/&lt;slug&gt;</code> or <code className="font-mono text-brand-teal">/ai-lab/&lt;slug&gt;</code>, listed on hub pages and homepage.</li>
           <li>
             The daily publisher cron (<code className="font-mono">14:00 UTC</code>) reads <code className="font-mono">scripts/publish-queue.txt</code> and flips the next eligible draft. To force a flip immediately, hit the status pill on this page.

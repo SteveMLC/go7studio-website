@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getBlogPostBySlug } from "@/lib/content";
+import { getBlogPostBySlug, isAiLabPost } from "@/lib/content";
 
 export const runtime = "nodejs";
 export const alt = "Go7Studio AI Lab post";
@@ -12,8 +12,12 @@ export default async function OpenGraphImage({
   params: { slug: string };
 }) {
   const post = getBlogPostBySlug(params.slug);
-  const title = post?.title ?? "Go7Studio AI Lab";
-  const pillar = (post?.pillar ?? "AI Lab").toUpperCase();
+  if (!post || post.status !== "published" || !isAiLabPost(post)) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  const title = post.title;
+  const pillar = post.pillar.toUpperCase();
   const isAiLab = pillar.toLowerCase().includes("ai lab");
 
   return new ImageResponse(

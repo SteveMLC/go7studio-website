@@ -21,7 +21,7 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
   const post = getBlogPostBySlug(params.slug);
-  if (!post) return {};
+  if (!post || post.status !== "published") return {};
   if (isAiLabPost(post)) {
     const canonicalPath = getBlogPostHref(post);
     return {
@@ -69,7 +69,7 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = getBlogPostBySlug(params.slug);
-  if (!post) notFound();
+  if (!post || post.status !== "published") notFound();
   if (isAiLabPost(post)) redirect(getBlogPostHref(post));
 
   const related = getRelatedBlogPosts(post, 3);

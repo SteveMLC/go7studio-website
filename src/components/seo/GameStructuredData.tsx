@@ -91,7 +91,7 @@ export function getGameStructuredData(game: Game) {
         "@type": "VideoObject",
         name: `${canonicalName} Official Trailer`,
         description: `Watch the official trailer for ${canonicalName}.`,
-        thumbnailUrl: game.ogImage ? `${BASE_URL}${game.ogImage}` : `${BASE_URL}/images/games/empire-tycoon/icon.jpg`,
+        thumbnailUrl: game.ogImage ? `${BASE_URL}${game.ogImage}` : `${BASE_URL}/images/games/empire-tycoon/icon-new.jpg`,
         uploadDate: DEFAULT_TRAILER_UPLOAD_DATE,
         contentUrl: game.trailerUrl,
         embedUrl: toYouTubeEmbedUrl(game.trailerUrl),
